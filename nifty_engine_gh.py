@@ -6,7 +6,6 @@ import shutil
 
 # --- CONFIGURATION ---
 OUTPUT_DIR = "public"
-# CRITICAL: GitHub Pages specifically looks for 'index.html'
 FILE_PATH = os.path.join(OUTPUT_DIR, "index.html")
 
 STOCKS = [
@@ -171,16 +170,3 @@ if __name__ == "__main__":
             print(f"Scanned {symbol}")
             
     generate_dashboard(results)
-
-Step 2: Update and Push (Terminal Commands)
-Run these commands in your terminal to update the code on GitHub:
-# Add the updated file
-git add nifty_engine_gh.py
-
-# Commit
-git commit -m "Fix empty page issue: force index.html and handle nulls"
-
-# Push
-git push
-
-
