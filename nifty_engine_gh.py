@@ -2,7 +2,6 @@ import yfinance as yf
 import pandas as pd
 import os
 import time
-import math
 import requests
 import io
 import json
@@ -25,7 +24,7 @@ def get_nifty500_list():
             return [f"{x}.NS" for x in df['Symbol'].dropna().tolist()]
         except: pass
     
-    # Auto-Download if missing
+    # Auto-Download
     print("Downloading Nifty 500 list...")
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
@@ -35,48 +34,55 @@ def get_nifty500_list():
     except:
         return ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS"]
 
-# --- 2. BACKTEST ENGINE ---
+# --- 2. EXTREME RSI BACKTESTER ---
 def run_backtest(df):
     """
-    Simulates trading the strategy over the past 1 year data.
-    Strategy: BUY when Trend is UP and (MACD Buy OR RSI Dip).
-    Exit: Take Profit +5% or Stop Loss -3% or Max Hold 20 Days.
+    Strategy: 
+    1. EXTREME DIP: RSI < 15 (Panic Buy)
+    2. MOMENTUM: MACD Crossover (Standard Buy)
     """
     trades = []
     wins = 0
     losses = 0
     
-    # We need at least 50 days of data
-    if len(df) < 50: return {"win_rate": 0, "total": 0, "log": []}
+    if len(df) < 200: return {"win_rate": 0, "total": 0, "log": []}
 
-    # Pre-calculate Logic columns to speed up loop
-    # Trend (SMA 200)
+    # Indicators
+    # 1. Trend (SMA 200) - Optional for RSI 15 strategy? 
+    # Usually RSI < 15 happens in downtrends, so we might IGNORE trend for this specific signal to catch bounces.
     df['SMA200'] = df['Close'].rolling(200).mean()
-    df['Trend'] = df['Close'] > df['SMA200']
+    df['In_Uptrend'] = df['Close'] > df['SMA200']
     
-    # MACD
-    ema12 = df['Close'].ewm(span=12, adjust=False).mean()
-    ema26 = df['Close'].ewm(span=26, adjust=False).mean()
-    macd = ema12 - ema26
-    signal = macd.ewm(span=9, adjust=False).mean()
-    df['MACD_Buy'] = (macd > signal) & (macd.shift(1) < signal.shift(1)) # Crossover
-    
-    # RSI
+    # 2. RSI (14)
     delta = df['Close'].diff()
     gain = (delta.where(delta > 0, 0)).rolling(14).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
     rs = gain / loss
     rsi = 100 - (100 / (1 + rs))
-    df['RSI_Buy'] = (rsi < 40) & (rsi.shift(1) >= 40) # Dip below 40
     
-    # SIMULATION LOOP
+    # TRIGGER: RSI Drops below 15 (Extreme)
+    # We use .shift(1) >= 15 to ensure we buy exactly when it crosses into the zone
+    df['Signal_RSI_15'] = (rsi < 15) & (rsi.shift(1) >= 15)
+    
+    # 3. MACD (Standard)
+    ema12 = df['Close'].ewm(span=12, adjust=False).mean()
+    ema26 = df['Close'].ewm(span=26, adjust=False).mean()
+    macd = ema12 - ema26
+    signal = macd.ewm(span=9, adjust=False).mean()
+    df['Signal_MACD'] = (macd > signal) & (macd.shift(1) < signal.shift(1))
+
+    # SIMULATION
     in_position = False
     entry_price = 0
+    entry_reason = ""
     entry_date = None
     days_held = 0
     
-    # Iterate through history (skip first 200 days for SMA)
-    for i in range(200, len(df)):
+    # Iterate last 1 year
+    start_idx = len(df) - 250
+    if start_idx < 200: start_idx = 200
+    
+    for i in range(start_idx, len(df)):
         price = df['Close'].iloc[i]
         date = df.index[i].strftime('%Y-%m-%d')
         
@@ -84,18 +90,22 @@ def run_backtest(df):
             days_held += 1
             pct_change = ((price - entry_price) / entry_price) * 100
             
-            # EXIT CONDITIONS
+            # EXIT LOGIC
+            # For RSI 15, we expect a sharp bounce, so we target higher (7-8%)
+            target_pct = 8.0 if "RSI < 15" in entry_reason else 6.0
+            stop_pct = -4.0 # Give it room to breathe
+            
             result = None
-            if pct_change >= 5.0: result = "WIN (Target)"
-            elif pct_change <= -3.0: result = "LOSS (Stop)"
-            elif days_held >= 20: result = "TIMEOUT" # Exit after 20 days regardless
+            if pct_change >= target_pct: result = "WIN (Target)"
+            elif pct_change <= stop_pct: result = "LOSS (Stop)"
+            elif days_held >= 15: result = "WIN (Time)" if pct_change > 0 else "LOSS (Time)"
             
             if result:
                 trades.append({
                     "date": entry_date, 
                     "entry": round(entry_price, 2), 
                     "exit": round(price, 2), 
-                    "days": days_held,
+                    "reason": entry_reason,
                     "result": result,
                     "pnl": round(pct_change, 2)
                 })
@@ -104,13 +114,23 @@ def run_backtest(df):
                 in_position = False
         
         else:
-            # ENTRY CONDITIONS (Trend UP + Signal)
-            if df['Trend'].iloc[i]:
-                if df['MACD_Buy'].iloc[i] or df['RSI_Buy'].iloc[i]:
-                    in_position = True
-                    entry_price = price
-                    entry_date = date
-                    days_held = 0
+            # ENTRY LOGIC
+            trigger = []
+            
+            # STRATEGY 1: EXTREME RSI (Aggressive - Ignores Trend)
+            if df['Signal_RSI_15'].iloc[i]: 
+                trigger.append("RSI < 15")
+            
+            # STRATEGY 2: MACD (Conservative - Needs Uptrend)
+            if df['Signal_MACD'].iloc[i] and df['In_Uptrend'].iloc[i]:
+                trigger.append("MACD")
+                
+            if len(trigger) > 0:
+                in_position = True
+                entry_price = price
+                entry_date = date
+                entry_reason = "+".join(trigger)
+                days_held = 0
 
     total = wins + losses
     win_rate = round((wins / total * 100), 0) if total > 0 else 0
@@ -120,52 +140,60 @@ def run_backtest(df):
         "total": total,
         "wins": wins,
         "losses": losses,
-        "log": trades[-10:] # Keep only last 10 trades to save space
+        "log": trades[-15:]
     }
 
 # --- 3. ANALYZE STOCK ---
 def analyze_stock(ticker):
     try:
         stock = yf.Ticker(ticker)
-        df = stock.history(period="2y", interval="1d") # Need 2y for valid 1y backtest (200d SMA buffer)
+        df = stock.history(period="2y", interval="1d") 
+        if df.empty or len(df) < 300: return None
         
-        if df.empty or len(df) < 250: return None
-        
-        # --- CURRENT STATUS ---
         close = df['Close']
         curr_price = float(close.iloc[-1])
         prev_price = float(close.iloc[-2])
         change = round(((curr_price - prev_price) / prev_price) * 100, 2)
         
-        # Run Backtest
-        backtest_results = run_backtest(df)
+        # Backtest
+        bt = run_backtest(df)
         
         # Trend
         sma200 = close.rolling(200).mean().iloc[-1]
         trend = "UP" if curr_price > sma200 else "DOWN"
         
-        # Recommendations
-        rec = "WAIT"
-        if trend == "UP":
-            if backtest_results['win_rate'] > 60: rec = "HIGH PROB BUY"
-            else: rec = "BUY"
+        # RSI Calculation (Current)
+        delta = close.diff()
+        gain = (delta.where(delta > 0, 0)).rolling(14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+        rs = gain / loss
+        rsi = 100 - (100 / (1 + rs))
+        curr_rsi = float(rsi.iloc[-1])
+
+        # Rating Logic
+        rating = "WAIT"
+        if curr_rsi < 15: 
+            rating = "EXTREME OVERSOLD" # Priority Alert
+        elif trend == "UP":
+            if bt['win_rate'] >= 60: rating = "HIGH PROB BUY"
+            else: rating = "BUY"
         elif trend == "DOWN":
-            rec = "SELL"
+            rating = "SELL"
 
         return {
             "symbol": ticker.replace(".NS", ""),
             "price": round(curr_price, 2),
             "change": change,
+            "rsi": round(curr_rsi, 1),
             "trend": trend,
-            "rec": rec,
-            "backtest": backtest_results
+            "rating": rating,
+            "backtest": bt
         }
     except Exception as e:
         return None
 
-# --- 4. GENERATE HTML (With Clickable Modals) ---
+# --- 4. GENERATE HTML ---
 def generate_html(results):
-    # Convert data to JSON for JavaScript to use
     json_data = json.dumps(results)
     
     html = f"""
@@ -173,157 +201,148 @@ def generate_html(results):
     <html lang="en">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Nifty Backtest Scanner</title>
+        <title>Nifty RSI Scanner</title>
         <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
         <style>
-            body {{ background-color: #0f172a; color: #e2e8f0; }}
-            .modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 50; }}
-            .modal-content {{ background: #1e293b; margin: 10% auto; padding: 20px; width: 90%; max-width: 600px; border-radius: 8px; position: relative; max-height: 80vh; overflow-y: auto; }}
+            body {{ background-color: #0f172a; color: #cbd5e1; font-family: sans-serif; }}
+            .modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 50; backdrop-filter: blur(4px); }}
+            .modal-content {{ background: #1e293b; margin: 5% auto; padding: 0; width: 95%; max-width: 650px; border-radius: 12px; position: relative; max-height: 90vh; overflow-y: auto; border: 1px solid #334155; }}
         </style>
     </head>
     <body>
-        <div class="max-w-4xl mx-auto p-4">
-            <h1 class="text-3xl font-bold text-blue-400 mb-2">Nifty 500 Strategy Backtester</h1>
-            <p class="text-sm text-slate-400 mb-6">Strategy: Trend Following (Buy on Dip/Momentum in Uptrend). Exit: +5% Profit or -3% Stop.</p>
+        <div class="max-w-5xl mx-auto p-4">
+            <header class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-blue-400 flex items-center gap-2">
+                        <i data-lucide="zap" class="text-yellow-400"></i> Nifty Extreme RSI
+                    </h1>
+                    <p class="text-xs text-slate-500 mt-1">Alerts: RSI < 15 (Panic) | Strategy: Buy Dip & Trend</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs text-slate-500">Total Scanned</div>
+                    <div class="text-xl font-bold text-white">{len(results)}</div>
+                </div>
+            </header>
             
-            <div class="overflow-x-auto rounded-lg border border-slate-700">
+            <div class="overflow-x-auto rounded-lg border border-slate-700 bg-slate-800/50">
                 <table class="w-full text-left text-sm text-slate-400">
-                    <thead class="bg-slate-800 text-xs uppercase text-slate-200">
+                    <thead class="bg-slate-900 text-xs uppercase text-slate-200 font-bold tracking-wider">
                         <tr>
-                            <th class="px-4 py-3">Symbol</th>
-                            <th class="px-4 py-3">Price</th>
-                            <th class="px-4 py-3">Trend</th>
-                            <th class="px-4 py-3">Signal</th>
-                            <th class="px-4 py-3">Win Rate (1Y)</th>
-                            <th class="px-4 py-3">Action</th>
+                            <th class="px-4 py-3">Stock</th>
+                            <th class="px-4 py-3 text-right">Price</th>
+                            <th class="px-4 py-3 text-center">RSI (14)</th>
+                            <th class="px-4 py-3 text-center">Signal</th>
+                            <th class="px-4 py-3 text-center">Backtest Win%</th>
+                            <th class="px-4 py-3 text-center">Analyze</th>
                         </tr>
                     </thead>
-                    <tbody id="stock-table">
-                        <!-- JS Will Inject Rows Here -->
-                    </tbody>
+                    <tbody id="stock-table" class="divide-y divide-slate-700"></tbody>
                 </table>
             </div>
         </div>
 
         <!-- MODAL -->
         <div id="modal" class="modal">
-            <div class="modal-content border border-slate-600 shadow-2xl">
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
-                <h2 id="m-symbol" class="text-2xl font-bold text-white mb-1">RELIANCE</h2>
-                <div class="text-xs text-slate-400 mb-4">Historical Performance Report (Last 12 Months)</div>
-                
-                <div class="grid grid-cols-3 gap-4 mb-6">
-                    <div class="bg-slate-800 p-3 rounded border border-slate-700 text-center">
-                        <div class="text-xs text-slate-500">Total Trades</div>
-                        <div id="m-total" class="text-xl font-bold text-white">0</div>
+            <div class="modal-content">
+                <div class="bg-slate-900 p-4 border-b border-slate-700 flex justify-between items-center sticky top-0">
+                    <div>
+                        <h2 id="m-symbol" class="text-2xl font-bold text-white">SYMBOL</h2>
+                        <span class="text-xs text-slate-400">Strategy Performance Report</span>
                     </div>
-                    <div class="bg-slate-800 p-3 rounded border border-slate-700 text-center">
-                        <div class="text-xs text-slate-500">Win Rate</div>
-                        <div id="m-rate" class="text-xl font-bold text-green-400">0%</div>
-                    </div>
-                    <div class="bg-slate-800 p-3 rounded border border-slate-700 text-center">
-                        <div class="text-xs text-slate-500">Net Logic</div>
-                        <div class="text-sm font-bold text-blue-400">Trend + Mom</div>
-                    </div>
+                    <button onclick="closeModal()" class="bg-slate-800 hover:bg-slate-700 p-2 rounded-full"><i data-lucide="x" class="w-5 h-5 text-white"></i></button>
                 </div>
-
-                <h3 class="text-sm font-bold text-white mb-2">Recent Trade Logs</h3>
-                <div class="overflow-hidden rounded border border-slate-700">
-                    <table class="w-full text-xs">
-                        <thead class="bg-slate-900 text-slate-300">
-                            <tr>
-                                <th class="p-2">Date</th>
-                                <th class="p-2">Entry</th>
-                                <th class="p-2">Result</th>
-                                <th class="p-2 text-right">P&L</th>
-                            </tr>
-                        </thead>
-                        <tbody id="m-logs" class="bg-slate-800 text-slate-300 divide-y divide-slate-700">
-                            <!-- Logs go here -->
-                        </tbody>
-                    </table>
+                <div class="p-6">
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
+                            <div class="text-xs text-slate-500 uppercase">Trades</div>
+                            <div id="m-total" class="text-2xl font-bold text-white mt-1">0</div>
+                        </div>
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
+                            <div class="text-xs text-slate-500 uppercase">Win Rate</div>
+                            <div id="m-rate" class="text-2xl font-bold text-white mt-1">0%</div>
+                        </div>
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
+                            <div class="text-xs text-slate-500 uppercase">Wins</div>
+                            <div id="m-wins" class="text-2xl font-bold text-green-400 mt-1">0</div>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden rounded-lg border border-slate-700">
+                        <table class="w-full text-xs">
+                            <thead class="bg-slate-900 text-slate-300 font-bold">
+                                <tr><th class="p-3 text-left">Date</th><th class="p-3 text-left">Reason</th><th class="p-3 text-right">Entry</th><th class="p-3 text-right">Result</th></tr>
+                            </thead>
+                            <tbody id="m-logs" class="bg-slate-800 text-slate-300 divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
         <script>
             const data = {json_data};
+            lucide.createIcons();
 
             function renderTable() {{
                 const tbody = document.getElementById('stock-table');
                 let html = '';
                 
                 data.forEach((stock, index) => {{
-                    const winColor = stock.backtest.win_rate >= 60 ? 'text-green-400' : (stock.backtest.win_rate < 40 ? 'text-red-400' : 'text-slate-300');
-                    const trendColor = stock.trend === 'UP' ? 'text-green-500' : 'text-red-500';
-                    const changeColor = stock.change >= 0 ? 'text-green-400' : 'text-red-400';
+                    // RSI Color Logic
+                    let rsiClass = 'text-slate-300';
+                    let rsiBg = '';
+                    if(stock.rsi < 30) {{ rsiClass = 'text-red-300 font-bold'; }}
+                    if(stock.rsi < 15) {{ rsiClass = 'text-white font-bold'; rsiBg = 'bg-purple-600 px-2 py-1 rounded shadow-lg shadow-purple-500/50'; }}
                     
+                    // Rating Badge
+                    let ratingBadge = `<span class="bg-slate-700 px-2 py-1 rounded text-xs">${{stock.rating}}</span>`;
+                    if(stock.rating.includes('EXTREME')) ratingBadge = '<span class="bg-purple-600 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">EXTREME OVERSOLD</span>';
+                    else if(stock.rating.includes('HIGH')) ratingBadge = '<span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-bold border border-green-500/30">HIGH PROB</span>';
+
                     html += `
-                        <tr class="border-b border-slate-800 hover:bg-slate-800/50 transition">
+                        <tr class="hover:bg-slate-700/50 transition">
                             <td class="px-4 py-3 font-bold text-white">${{stock.symbol}}</td>
-                            <td class="px-4 py-3">
-                                <div>${{stock.price}}</div>
-                                <div class="text-xs ${{changeColor}}">${{stock.change}}%</div>
+                            <td class="px-4 py-3 text-right">
+                                <div class="font-mono text-slate-200">${{stock.price}}</div>
+                                <div class="text-xs ${{stock.change >= 0 ? 'text-green-400' : 'text-red-400'}}">${{stock.change}}%</div>
                             </td>
-                            <td class="px-4 py-3 font-bold text-xs ${{trendColor}}">${{stock.trend}}</td>
-                            <td class="px-4 py-3 text-xs"><span class="bg-slate-700 px-2 py-1 rounded text-white">${{stock.rec}}</span></td>
-                            <td class="px-4 py-3 font-bold ${{winColor}}">${{stock.backtest.win_rate}}%</td>
-                            <td class="px-4 py-3">
-                                <button onclick="openModal(${{index}})" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded font-bold shadow-lg transition">
-                                    Analyze
-                                </button>
+                            <td class="px-4 py-3 text-center">
+                                <span class="${{rsiClass}} ${{rsiBg}}">${{stock.rsi}}</span>
+                            </td>
+                            <td class="px-4 py-3 text-center">${{ratingBadge}}</td>
+                            <td class="px-4 py-3 text-center font-mono ${{stock.backtest.win_rate >= 60 ? 'text-green-400' : 'text-slate-400'}}">${{stock.backtest.win_rate}}%</td>
+                            <td class="px-4 py-3 text-center">
+                                <button onclick="openModal(${{index}})" class="text-blue-400 hover:text-white hover:bg-blue-600 p-2 rounded transition"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></button>
                             </td>
                         </tr>
                     `;
                 }});
                 tbody.innerHTML = html;
+                lucide.createIcons();
             }}
 
             function openModal(index) {{
                 const stock = data[index];
                 const bt = stock.backtest;
-                
                 document.getElementById('m-symbol').innerText = stock.symbol;
                 document.getElementById('m-total').innerText = bt.total;
                 document.getElementById('m-rate').innerText = bt.win_rate + '%';
+                document.getElementById('m-wins').innerText = bt.wins;
                 
-                // Populate Logs
                 const logsBody = document.getElementById('m-logs');
                 let logHtml = '';
-                
-                if (bt.log.length === 0) {{
-                    logHtml = '<tr><td colspan="4" class="p-3 text-center text-slate-500">No signals generated in last 12 months.</td></tr>';
-                }} else {{
-                    // Show reverse (newest first)
+                if (bt.log.length === 0) logHtml = '<tr><td colspan="4" class="p-4 text-center italic text-slate-500">No signals in last 12 months.</td></tr>';
+                else {{
                     [...bt.log].reverse().forEach(log => {{
-                        const resColor = log.result.includes('WIN') ? 'text-green-400' : (log.result.includes('LOSS') ? 'text-red-400' : 'text-yellow-400');
-                        logHtml += `
-                            <tr>
-                                <td class="p-2">${{log.date}}</td>
-                                <td class="p-2">${{log.entry}}</td>
-                                <td class="p-2 font-bold ${{resColor}}">${{log.result}}</td>
-                                <td class="p-2 text-right ${{resColor}}">${{log.pnl}}%</td>
-                            </tr>
-                        `;
+                        let resClass = log.result.includes('WIN') ? 'text-green-400 font-bold' : 'text-red-400';
+                        logHtml += `<tr><td class="p-3">${{log.date}}</td><td class="p-3 font-bold text-xs uppercase text-blue-300">${{log.reason}}</td><td class="p-3 text-right font-mono">${{log.entry}}</td><td class="p-3 text-right font-mono ${{resClass}}">${{log.result}} (${{log.pnl}}%)</td></tr>`;
                     }});
                 }}
-                
                 logsBody.innerHTML = logHtml;
                 document.getElementById('modal').style.display = 'block';
             }}
-
-            function closeModal() {{
-                document.getElementById('modal').style.display = 'none';
-            }}
-
-            // Close on outside click
-            window.onclick = function(event) {{
-                const modal = document.getElementById('modal');
-                if (event.target == modal) {{
-                    modal.style.display = 'none';
-                }}
-            }}
-
+            function closeModal() {{ document.getElementById('modal').style.display = 'none'; }}
+            window.onclick = function(e) {{ if(e.target == document.getElementById('modal')) closeModal(); }}
             renderTable();
         </script>
     </body>
@@ -332,18 +351,15 @@ def generate_html(results):
     
     if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
     with open(FILE_PATH, "w", encoding="utf-8") as f: f.write(html)
-    print(f"Generated Interactive Dashboard with Backtesting.")
+    print("Generated Extreme RSI Dashboard.")
 
 if __name__ == "__main__":
-    print("Starting Backtest Scan...")
+    print("Starting Extreme RSI Scan...")
     tickers = get_nifty500_list()
-    
     results = []
-    # Using enumerate to track progress
     for i, t in enumerate(tickers):
-        print(f"[{i+1}/{len(tickers)}] Backtesting {t}...", end="\r")
-        time.sleep(0.1) # Prevent blocking
+        print(f"[{i+1}/{len(tickers)}] {t}...", end="\r")
+        time.sleep(0.1) 
         res = analyze_stock(t)
         if res: results.append(res)
-        
     generate_html(results)
