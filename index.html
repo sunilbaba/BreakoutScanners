@@ -3,16 +3,20 @@
     <html lang="en">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Nifty Multi-Breakout</title>
+        <title>Nifty Breakout Pro</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
             body { background-color: #0f172a; color: #e2e8f0; font-family: sans-serif; }
-            .badge-gold { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.3); }
-            .badge-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
-            .badge-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-            .badge-green { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
-            .badge-pink { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+            .card { transition: transform 0.2s; cursor: pointer; }
+            .card:hover { transform: translateY(-4px); border-color: #60a5fa; }
+            .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 50; backdrop-filter: blur(5px); }
+            .modal-content { background: #1e293b; margin: 5vh auto; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; border-radius: 12px; border: 1px solid #334155; }
+            /* Badge Colors */
+            .b-gold { background: rgba(250, 204, 21, 0.2); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); }
+            .b-green { background: rgba(74, 222, 128, 0.2); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
+            .b-pink { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.4); }
+            .b-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
         </style>
     </head>
     <body>
@@ -20,79 +24,150 @@
             <header class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
                 <div>
                     <h1 class="text-2xl font-bold text-blue-400 flex items-center gap-2">
-                        <i data-lucide="layers"></i> Nifty Multi-Breakout
+                        <i data-lucide="radar"></i> Nifty Breakout Pro
                     </h1>
-                    <p class="text-xs text-slate-500 mt-1">Scenarios: Golden Cross | 52W High | Vol Shock | Engulfing | RSI 60 | Gap Up</p>
-                </div>
-                <div class="text-right">
-                    <div class="text-xs text-slate-500">Opportunities</div>
-                    <div class="text-xl font-bold text-white">11</div>
+                    <p class="text-xs text-slate-500 mt-1">Found 12 Opportunities Today</p>
                 </div>
             </header>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="stock-grid">
-                <!-- JS Injected -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="grid"></div>
+        </div>
+
+        <!-- MODAL -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <div class="sticky top-0 bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center">
+                    <div>
+                        <h2 id="m-sym" class="text-2xl font-bold text-white">SYMBOL</h2>
+                        <div class="text-xs text-slate-400">Analysis & Targets</div>
+                    </div>
+                    <button onclick="closeModal()" class="p-2 bg-slate-700 rounded-full hover:bg-slate-600"><i data-lucide="x"></i></button>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Targets -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-green-900/20 border border-green-500/30 p-3 rounded-lg text-center">
+                            <div class="text-xs text-green-400 uppercase font-bold">Target (ATR)</div>
+                            <div id="m-target" class="text-2xl font-bold text-white">0</div>
+                        </div>
+                        <div class="bg-red-900/20 border border-red-500/30 p-3 rounded-lg text-center">
+                            <div class="text-xs text-red-400 uppercase font-bold">Stop Loss</div>
+                            <div id="m-stop" class="text-2xl font-bold text-white">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Backtest Stats -->
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-300 mb-2 flex items-center gap-2"><i data-lucide="history" class="w-4"></i> Backtest (1 Year)</h3>
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <div class="bg-slate-800 p-2 rounded text-center border border-slate-700">
+                                <div class="text-[10px] text-slate-500">WIN RATE</div>
+                                <div id="m-rate" class="text-lg font-bold text-white">0%</div>
+                            </div>
+                            <div class="bg-slate-800 p-2 rounded text-center border border-slate-700">
+                                <div class="text-[10px] text-slate-500">TRADES</div>
+                                <div id="m-total" class="text-lg font-bold text-white">0</div>
+                            </div>
+                            <div class="bg-slate-800 p-2 rounded text-center border border-slate-700">
+                                <div class="text-[10px] text-slate-500">WINS</div>
+                                <div id="m-wins" class="text-lg font-bold text-green-400">0</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Logs -->
+                        <div class="overflow-hidden rounded border border-slate-700">
+                            <table class="w-full text-xs">
+                                <thead class="bg-slate-900 text-slate-300">
+                                    <tr><th class="p-2 text-left">Date</th><th class="p-2 text-right">Entry</th><th class="p-2 text-right">Result</th><th class="p-2 text-right">P&L</th></tr>
+                                </thead>
+                                <tbody id="m-logs" class="bg-slate-800 text-slate-300 divide-y divide-slate-700/50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <script>
-            const data = [{"symbol": "360ONE", "price": 1139.7, "change": -0.21, "rsi": 66.8, "vol_mult": 3.9, "signals": ["Vol Shock (3x)", "RSI > 60"], "history": [1078.91259765625, 1089.5584716796875, 1095.8265380859375, 1120.99853515625, 1154.528076171875, 1165.870361328125, 1159.0052490234375, 1177.3121337890625, 1169.4521484375, 1172.9344482421875, 1179.699951171875, 1173.0, 1171.800048828125, 1126.699951171875, 1119.5999755859375, 1080.699951171875, 1093.5999755859375, 1079.0999755859375, 1068.199951171875, 1066.0, 1074.5999755859375, 1070.0, 1089.0, 1085.5999755859375, 1065.4000244140625, 1071.800048828125, 1078.0, 1119.199951171875, 1142.0999755859375, 1139.699951171875]}, {"symbol": "AWL", "price": 274.1, "change": -0.96, "rsi": 48.4, "vol_mult": 11.8, "signals": ["Vol Shock (3x)"], "history": [268.95001220703125, 268.70001220703125, 268.6499938964844, 267.8999938964844, 266.1499938964844, 261.5, 258.54998779296875, 261.3999938964844, 260.1000061035156, 263.25, 265.70001220703125, 268.45001220703125, 275.54998779296875, 275.3999938964844, 274.8500061035156, 275.1000061035156, 277.3500061035156, 277.3500061035156, 271.25, 270.79998779296875, 270.8999938964844, 273.95001220703125, 272.8999938964844, 272.6499938964844, 274.20001220703125, 274.95001220703125, 269.1499938964844, 275.79998779296875, 276.75, 274.1000061035156]}, {"symbol": "APLLTD", "price": 901.0, "change": 0.17, "rsi": 44.5, "vol_mult": 10.9, "signals": ["Vol Shock (3x)"], "history": [948.3499755859375, 943.7000122070312, 915.9000244140625, 917.6500244140625, 933.4000244140625, 938.5999755859375, 932.0, 932.7999877929688, 921.5499877929688, 924.5999755859375, 914.9000244140625, 905.5999755859375, 900.7999877929688, 899.9500122070312, 897.4000244140625, 924.2000122070312, 960.7000122070312, 960.7000122070312, 915.3499755859375, 921.9500122070312, 926.6500244140625, 916.9500122070312, 916.6500244140625, 915.9500122070312, 904.0499877929688, 948.8499755859375, 913.5499877929688, 906.25, 899.4500122070312, 901.0]}, {"symbol": "DCMSHRIRAM", "price": 1268.5, "change": 8.03, "rsi": 48.1, "vol_mult": 8.4, "signals": ["Vol Shock (3x)"], "history": [1187.852783203125, 1194.23486328125, 1163.820556640625, 1163.2222900390625, 1198.423095703125, 1215.076171875, 1230.9315185546875, 1241.900634765625, 1239.1083984375, 1222.5550537109375, 1221.2586669921875, 1274.9075927734375, 1298.6407470703125, 1326.4622802734375, 1322.1744384765625, 1277.5999755859375, 1277.199951171875, 1249.0999755859375, 1230.0, 1243.9000244140625, 1246.300048828125, 1234.699951171875, 1236.199951171875, 1235.199951171875, 1236.4000244140625, 1211.0, 1190.5999755859375, 1177.9000244140625, 1174.199951171875, 1268.5]}, {"symbol": "ESCORTS", "price": 3617.5, "change": 1.68, "rsi": 33.6, "vol_mult": 1.6, "signals": ["Bull Engulfing"], "history": [3638.10009765625, 3577.5, 3613.800048828125, 3682.60009765625, 3782.39990234375, 3697.39990234375, 3694.5, 3703.699951171875, 3676.699951171875, 3665.39990234375, 3659.800048828125, 3724.199951171875, 3721.5, 3713.89990234375, 3786.5, 3846.5, 3822.300048828125, 3822.300048828125, 3689.699951171875, 3629.199951171875, 3548.60009765625, 3614.0, 3570.39990234375, 3608.0, 3551.10009765625, 3623.39990234375, 3618.800048828125, 3584.39990234375, 3557.800048828125, 3617.5]}, {"symbol": "MARUTI", "price": 15977.0, "change": 1.11, "rsi": 62.2, "vol_mult": 1.6, "signals": ["Bull Engulfing", "RSI > 60"], "history": [16265.0, 16323.0, 16261.0, 16212.0, 16298.0, 16401.0, 16424.0, 16396.0, 16393.0, 16274.0, 16388.0, 16311.0, 16138.0, 16206.0, 16186.0, 15651.0, 15374.0, 15374.0, 15452.0, 15479.0, 15583.0, 15645.0, 15696.0, 15749.0, 15684.0, 15878.0, 15930.0, 15768.0, 15801.0, 15977.0]}, {"symbol": "NESTLEIND", "price": 1280.7, "change": 0.12, "rsi": 63.9, "vol_mult": 0.9, "signals": ["RSI > 60"], "history": [1199.5, 1188.0999755859375, 1175.5, 1221.4000244140625, 1276.5999755859375, 1289.5, 1285.4000244140625, 1287.300048828125, 1272.800048828125, 1282.0, 1283.0, 1271.0, 1273.0, 1279.9000244140625, 1271.5999755859375, 1266.699951171875, 1265.0, 1265.0, 1266.0999755859375, 1262.699951171875, 1262.9000244140625, 1268.0999755859375, 1278.199951171875, 1275.199951171875, 1271.5999755859375, 1270.300048828125, 1265.0999755859375, 1279.0, 1279.199951171875, 1280.699951171875]}, {"symbol": "POONAWALLA", "price": 470.2, "change": 0.37, "rsi": 47.1, "vol_mult": 0.6, "signals": ["Bull Engulfing"], "history": [529.1500244140625, 528.3499755859375, 517.2000122070312, 542.5, 539.4000244140625, 526.4000244140625, 511.8999938964844, 514.9000244140625, 489.6499938964844, 484.54998779296875, 490.3999938964844, 493.45001220703125, 487.79998779296875, 483.04998779296875, 481.8500061035156, 474.6000061035156, 472.6499938964844, 472.6499938964844, 462.8999938964844, 463.6000061035156, 458.54998779296875, 468.45001220703125, 489.29998779296875, 478.95001220703125, 469.20001220703125, 469.0, 465.5, 468.6000061035156, 468.45001220703125, 470.20001220703125]}, {"symbol": "RITES", "price": 246.83, "change": -0.32, "rsi": 51.6, "vol_mult": 8.9, "signals": ["Vol Shock (3x)"], "history": [252.4444122314453, 250.0838165283203, 247.5248565673828, 248.21914672851562, 249.59780883789062, 246.35447692871094, 245.9478302001953, 246.2552947998047, 246.36439514160156, 244.61875915527344, 243.68641662597656, 242.15896606445312, 245.51141357421875, 245.83871459960938, 243.47811889648438, 245.8585662841797, 246.04701232910156, 246.04701232910156, 242.853271484375, 240.51251220703125, 241.08778381347656, 245.73953247070312, 247.00909423828125, 243.25, 246.32000732421875, 252.5, 251.38999938964844, 249.69000244140625, 247.61000061035156, 246.8300018310547]}, {"symbol": "TBOTEK", "price": 1710.0, "change": 1.91, "rsi": 77.7, "vol_mult": 4.4, "signals": ["Vol Shock (3x)"], "history": [1533.0, 1561.5999755859375, 1536.5999755859375, 1497.699951171875, 1550.199951171875, 1568.699951171875, 1577.699951171875, 1587.0999755859375, 1574.199951171875, 1594.5999755859375, 1598.0, 1614.300048828125, 1580.800048828125, 1540.9000244140625, 1508.800048828125, 1483.199951171875, 1496.5999755859375, 1589.0, 1578.5999755859375, 1600.0, 1618.699951171875, 1590.5999755859375, 1604.300048828125, 1563.0, 1572.4000244140625, 1617.0, 1621.4000244140625, 1610.199951171875, 1678.0, 1710.0]}, {"symbol": "RAMCOCEM", "price": 1010.5, "change": 1.37, "rsi": 38.4, "vol_mult": 3.9, "signals": ["Vol Shock (3x)"], "history": [1008.2000122070312, 1018.6500244140625, 1010.9000244140625, 1002.3499755859375, 1015.75, 1029.0999755859375, 1023.5999755859375, 1028.6500244140625, 1038.9000244140625, 1046.6500244140625, 1046.800048828125, 1058.4000244140625, 1059.0999755859375, 1057.6500244140625, 1055.3499755859375, 1044.449951171875, 1025.5, 1027.0, 1033.199951171875, 1033.5, 1032.800048828125, 998.7999877929688, 1005.7000122070312, 987.5999755859375, 980.2999877929688, 994.7999877929688, 984.0, 991.4000244140625, 996.7999877929688, 1010.5]}];
+            const data = [{"symbol": "360ONE", "price": 1139.7, "change": -0.21, "signals": ["Vol Shock"], "target": 1197.1, "stop": 1111.0, "backtest": {"win_rate": 25.0, "total": 12, "wins": 3, "log": [{"date": "2025-01-15", "entry": 1180.17, "exit": 1136.16, "result": "LOSS (Stop)", "pnl": -3.73}, {"date": "2025-01-28", "entry": 1001.78, "exit": 943.88, "result": "LOSS (Stop)", "pnl": -5.78}, {"date": "2025-02-25", "entry": 1026.94, "exit": 987.19, "result": "LOSS (Stop)", "pnl": -3.87}, {"date": "2025-04-23", "entry": 1047.96, "exit": 1006.92, "result": "LOSS (Stop)", "pnl": -3.92}, {"date": "2025-06-05", "entry": 1068.57, "exit": 1134.73, "result": "WIN (Target)", "pnl": 6.19}, {"date": "2025-06-16", "entry": 1163.68, "exit": 1112.99, "result": "LOSS (Stop)", "pnl": -4.36}, {"date": "2025-06-27", "entry": 1189.65, "exit": 1138.31, "result": "LOSS (Stop)", "pnl": -4.32}, {"date": "2025-08-19", "entry": 1073.44, "exit": 1038.62, "result": "LOSS (Stop)", "pnl": -3.24}, {"date": "2025-10-06", "entry": 1057.02, "exit": 1121.0, "result": "WIN (Target)", "pnl": 6.05}, {"date": "2025-10-15", "entry": 1154.53, "exit": 1119.6, "result": "LOSS (Stop)", "pnl": -3.03}]}, "history": [1078.91259765625, 1089.5584716796875, 1095.8265380859375, 1120.99853515625, 1154.528076171875, 1165.870361328125, 1159.0052490234375, 1177.3121337890625, 1169.4521484375, 1172.9344482421875, 1179.699951171875, 1173.0, 1171.800048828125, 1126.699951171875, 1119.5999755859375, 1080.699951171875, 1093.5999755859375, 1079.0999755859375, 1068.199951171875, 1066.0, 1074.5999755859375, 1070.0, 1089.0, 1085.5999755859375, 1065.4000244140625, 1071.800048828125, 1078.0, 1119.199951171875, 1142.0999755859375, 1139.699951171875]}, {"symbol": "AWL", "price": 274.1, "change": -0.96, "signals": ["Vol Shock"], "target": 286.8, "stop": 267.7, "backtest": {"win_rate": 0.0, "total": 1, "wins": 0, "log": [{"date": "2025-09-22", "entry": 271.1, "exit": 260.1, "result": "LOSS (Stop)", "pnl": -4.06}]}, "history": [268.95001220703125, 268.70001220703125, 268.6499938964844, 267.8999938964844, 266.1499938964844, 261.5, 258.54998779296875, 261.3999938964844, 260.1000061035156, 263.25, 265.70001220703125, 268.45001220703125, 275.54998779296875, 275.3999938964844, 274.8500061035156, 275.1000061035156, 277.3500061035156, 277.3500061035156, 271.25, 270.79998779296875, 270.8999938964844, 273.95001220703125, 272.8999938964844, 272.6499938964844, 274.20001220703125, 274.95001220703125, 269.1499938964844, 275.79998779296875, 276.75, 274.1000061035156]}, {"symbol": "APLLTD", "price": 901.0, "change": 0.17, "signals": ["Vol Shock"], "target": 964.4, "stop": 869.3, "backtest": {"win_rate": 11.0, "total": 9, "wins": 1, "log": [{"date": "2024-11-25", "entry": 1081.18, "exit": 1034.5, "result": "LOSS (Stop)", "pnl": -4.32}, {"date": "2024-12-20", "entry": 1043.55, "exit": 998.94, "result": "LOSS (Stop)", "pnl": -4.27}, {"date": "2025-01-20", "entry": 1046.86, "exit": 1007.75, "result": "LOSS (Stop)", "pnl": -3.74}, {"date": "2025-05-19", "entry": 1017.34, "exit": 957.36, "result": "LOSS (Stop)", "pnl": -5.9}, {"date": "2025-06-30", "entry": 1027.67, "exit": 977.63, "result": "LOSS (Stop)", "pnl": -4.87}, {"date": "2025-07-14", "entry": 1019.07, "exit": 986.53, "result": "LOSS (Stop)", "pnl": -3.19}, {"date": "2025-08-14", "entry": 956.95, "exit": 970.1, "result": "TIMEOUT", "pnl": 1.37}, {"date": "2025-11-04", "entry": 960.7, "exit": 915.35, "result": "LOSS (Stop)", "pnl": -4.72}, {"date": "2025-11-17", "entry": 948.85, "exit": 913.55, "result": "LOSS (Stop)", "pnl": -3.72}]}, "history": [948.3499755859375, 943.7000122070312, 915.9000244140625, 917.6500244140625, 933.4000244140625, 938.5999755859375, 932.0, 932.7999877929688, 921.5499877929688, 924.5999755859375, 914.9000244140625, 905.5999755859375, 900.7999877929688, 899.9500122070312, 897.4000244140625, 924.2000122070312, 960.7000122070312, 960.7000122070312, 915.3499755859375, 921.9500122070312, 926.6500244140625, 916.9500122070312, 916.6500244140625, 915.9500122070312, 904.0499877929688, 948.8499755859375, 913.5499877929688, 906.25, 899.4500122070312, 901.0]}, {"symbol": "DCMSHRIRAM", "price": 1268.5, "change": 8.03, "signals": ["Vol Shock"], "target": 1345.3, "stop": 1230.1, "backtest": {"win_rate": 50.0, "total": 12, "wins": 6, "log": [{"date": "2025-01-17", "entry": 1090.79, "exit": 1160.9, "result": "WIN (Target)", "pnl": 6.43}, {"date": "2025-01-28", "entry": 1178.8, "exit": 1128.07, "result": "LOSS (Stop)", "pnl": -4.3}, {"date": "2025-03-27", "entry": 1098.03, "exit": 1040.98, "result": "LOSS (Stop)", "pnl": -5.2}, {"date": "2025-06-12", "entry": 1119.17, "exit": 1194.27, "result": "WIN (Target)", "pnl": 6.71}, {"date": "2025-06-27", "entry": 1174.48, "exit": 1417.98, "result": "WIN (Target)", "pnl": 20.73}, {"date": "2025-07-04", "entry": 1348.06, "exit": 1434.5, "result": "WIN (Target)", "pnl": 6.41}, {"date": "2025-09-10", "entry": 1231.63, "exit": 1375.82, "result": "WIN (Target)", "pnl": 11.71}, {"date": "2025-09-18", "entry": 1310.21, "exit": 1251.77, "result": "LOSS (Stop)", "pnl": -4.46}, {"date": "2025-10-09", "entry": 1187.85, "exit": 1274.91, "result": "WIN (Target)", "pnl": 7.33}, {"date": "2025-10-29", "entry": 1326.46, "exit": 1277.6, "result": "LOSS (Stop)", "pnl": -3.68}]}, "history": [1187.852783203125, 1194.23486328125, 1163.820556640625, 1163.2222900390625, 1198.423095703125, 1215.076171875, 1230.9315185546875, 1241.900634765625, 1239.1083984375, 1222.5550537109375, 1221.2586669921875, 1274.9075927734375, 1298.6407470703125, 1326.4622802734375, 1322.1744384765625, 1277.5999755859375, 1277.199951171875, 1249.0999755859375, 1230.0, 1243.9000244140625, 1246.300048828125, 1234.699951171875, 1236.199951171875, 1235.199951171875, 1236.4000244140625, 1211.0, 1190.5999755859375, 1177.9000244140625, 1174.199951171875, 1268.5]}, {"symbol": "EICHERMOT", "price": 7134.5, "change": 0.13, "signals": ["BB Blast"], "target": 7416.7, "stop": 6993.4, "backtest": {"win_rate": 67.0, "total": 9, "wins": 6, "log": [{"date": "2024-12-27", "entry": 4814.47, "exit": 5240.15, "result": "WIN (Target)", "pnl": 8.84}, {"date": "2025-01-27", "entry": 5078.65, "exit": 5415.04, "result": "WIN (Target)", "pnl": 6.62}, {"date": "2025-02-11", "entry": 4908.7, "exit": 4758.7, "result": "LOSS (Stop)", "pnl": -3.06}, {"date": "2025-03-05", "entry": 4924.45, "exit": 5238.03, "result": "WIN (Target)", "pnl": 6.37}, {"date": "2025-04-15", "entry": 5458.23, "exit": 5255.85, "result": "LOSS (Stop)", "pnl": -3.71}, {"date": "2025-05-15", "entry": 5396.03, "exit": 5247.46, "result": "TIMEOUT", "pnl": -2.75}, {"date": "2025-06-18", "entry": 5323.97, "exit": 5649.25, "result": "WIN (Target)", "pnl": 6.11}, {"date": "2025-08-01", "entry": 5528.0, "exit": 5912.0, "result": "WIN (Target)", "pnl": 6.95}, {"date": "2025-08-26", "entry": 6151.0, "exit": 6580.5, "result": "WIN (Target)", "pnl": 6.98}]}, "history": [6965.0, 6912.0, 6887.0, 6895.0, 6988.0, 7042.5, 7013.5, 7018.5, 6884.5, 6840.0, 6906.5, 7002.5, 6952.0, 6889.0, 7007.0, 7023.5, 6930.0, 6930.0, 6806.5, 6886.0, 6866.5, 6873.0, 6879.0, 6855.0, 6695.0, 6799.0, 6814.5, 6896.5, 7125.5, 7134.5]}, {"symbol": "ESCORTS", "price": 3617.5, "change": 1.68, "signals": ["Bull Engulfing"], "target": 3795.7, "stop": 3528.4, "backtest": {"win_rate": 29.0, "total": 7, "wins": 2, "log": [{"date": "2024-11-25", "entry": 3584.27, "exit": 3421.44, "result": "LOSS (Stop)", "pnl": -4.54}, {"date": "2025-05-26", "entry": 3484.57, "exit": 3354.96, "result": "LOSS (Stop)", "pnl": -3.72}, {"date": "2025-07-29", "entry": 3489.8, "exit": 3359.2, "result": "LOSS (Stop)", "pnl": -3.74}, {"date": "2025-08-04", "entry": 3394.1, "exit": 3623.8, "result": "WIN (Target)", "pnl": 6.77}, {"date": "2025-09-04", "entry": 3633.3, "exit": 3464.0, "result": "LOSS (Stop)", "pnl": -4.66}, {"date": "2025-10-08", "entry": 3627.2, "exit": 3846.5, "result": "WIN (Target)", "pnl": 6.05}, {"date": "2025-11-04", "entry": 3822.3, "exit": 3689.7, "result": "LOSS (Stop)", "pnl": -3.47}]}, "history": [3638.10009765625, 3577.5, 3613.800048828125, 3682.60009765625, 3782.39990234375, 3697.39990234375, 3694.5, 3703.699951171875, 3676.699951171875, 3665.39990234375, 3659.800048828125, 3724.199951171875, 3721.5, 3713.89990234375, 3786.5, 3846.5, 3822.300048828125, 3822.300048828125, 3689.699951171875, 3629.199951171875, 3548.60009765625, 3614.0, 3570.39990234375, 3608.0, 3551.10009765625, 3623.39990234375, 3618.800048828125, 3584.39990234375, 3557.800048828125, 3617.5]}, {"symbol": "MARUTI", "price": 15977.0, "change": 1.11, "signals": ["Bull Engulfing"], "target": 16409.4, "stop": 15760.8, "backtest": {"win_rate": 71.0, "total": 7, "wins": 5, "log": [{"date": "2025-01-31", "entry": 12178.83, "exit": 12999.25, "result": "WIN (Target)", "pnl": 6.74}, {"date": "2025-04-30", "entry": 12125.76, "exit": 12855.86, "result": "WIN (Target)", "pnl": 6.02}, {"date": "2025-06-17", "entry": 12460.14, "exit": 12401.77, "result": "TIMEOUT", "pnl": -0.47}, {"date": "2025-07-31", "entry": 12473.0, "exit": 14068.0, "result": "WIN (Target)", "pnl": 12.79}, {"date": "2025-08-19", "entry": 14250.0, "exit": 15258.0, "result": "WIN (Target)", "pnl": 7.07}, {"date": "2025-09-17", "entry": 15801.0, "exit": 16298.0, "result": "TIMEOUT", "pnl": 3.15}, {"date": "2025-10-31", "entry": 16186.0, "exit": 15651.0, "result": "LOSS (Stop)", "pnl": -3.31}]}, "history": [16265.0, 16323.0, 16261.0, 16212.0, 16298.0, 16401.0, 16424.0, 16396.0, 16393.0, 16274.0, 16388.0, 16311.0, 16138.0, 16206.0, 16186.0, 15651.0, 15374.0, 15374.0, 15452.0, 15479.0, 15583.0, 15645.0, 15696.0, 15749.0, 15684.0, 15878.0, 15930.0, 15768.0, 15801.0, 15977.0]}, {"symbol": "NH", "price": 2043.2, "change": 1.3, "signals": ["BB Blast"], "target": 2200.2, "stop": 1964.7, "backtest": {"win_rate": 29.0, "total": 17, "wins": 5, "log": [{"date": "2025-03-28", "entry": 1688.07, "exit": 1850.04, "result": "WIN (Target)", "pnl": 9.59}, {"date": "2025-05-06", "entry": 1791.28, "exit": 1723.44, "result": "LOSS (Stop)", "pnl": -3.79}, {"date": "2025-05-26", "entry": 1772.72, "exit": 1908.51, "result": "WIN (Target)", "pnl": 7.66}, {"date": "2025-06-23", "entry": 1980.64, "exit": 2257.88, "result": "WIN (Target)", "pnl": 14.0}, {"date": "2025-07-03", "entry": 2001.19, "exit": 1911.3, "result": "LOSS (Stop)", "pnl": -4.49}, {"date": "2025-08-04", "entry": 1829.7, "exit": 1768.6, "result": "LOSS (Stop)", "pnl": -3.34}, {"date": "2025-08-20", "entry": 1839.1, "exit": 1777.2, "result": "LOSS (Stop)", "pnl": -3.37}, {"date": "2025-09-03", "entry": 1809.2, "exit": 1745.3, "result": "LOSS (Stop)", "pnl": -3.53}, {"date": "2025-09-19", "entry": 1772.8, "exit": 1761.9, "result": "TIMEOUT", "pnl": -0.61}, {"date": "2025-11-04", "entry": 1830.3, "exit": 1758.8, "result": "LOSS (Stop)", "pnl": -3.91}]}, "history": [1769.9000244140625, 1759.0, 1743.800048828125, 1748.5999755859375, 1764.699951171875, 1755.4000244140625, 1761.9000244140625, 1780.199951171875, 1759.800048828125, 1734.9000244140625, 1749.300048828125, 1776.0, 1799.9000244140625, 1794.9000244140625, 1757.4000244140625, 1785.0, 1830.300048828125, 1830.300048828125, 1819.9000244140625, 1810.4000244140625, 1812.300048828125, 1758.800048828125, 1759.199951171875, 1777.0999755859375, 1753.5, 2008.199951171875, 1951.699951171875, 1991.199951171875, 2017.0, 2043.199951171875]}, {"symbol": "POONAWALLA", "price": 470.2, "change": 0.37, "signals": ["Bull Engulfing"], "target": 494.1, "stop": 458.2, "backtest": {"win_rate": 60.0, "total": 5, "wins": 3, "log": [{"date": "2025-06-06", "entry": 421.1, "exit": 449.65, "result": "WIN (Target)", "pnl": 6.78}, {"date": "2025-07-25", "entry": 413.3, "exit": 438.4, "result": "WIN (Target)", "pnl": 6.07}, {"date": "2025-08-07", "entry": 444.5, "exit": 429.6, "result": "LOSS (Stop)", "pnl": -3.35}, {"date": "2025-09-16", "entry": 441.85, "exit": 502.1, "result": "WIN (Target)", "pnl": 13.64}, {"date": "2025-10-06", "entry": 531.45, "exit": 511.9, "result": "LOSS (Stop)", "pnl": -3.68}]}, "history": [529.1500244140625, 528.3499755859375, 517.2000122070312, 542.5, 539.4000244140625, 526.4000244140625, 511.8999938964844, 514.9000244140625, 489.6499938964844, 484.54998779296875, 490.3999938964844, 493.45001220703125, 487.79998779296875, 483.04998779296875, 481.8500061035156, 474.6000061035156, 472.6499938964844, 472.6499938964844, 462.8999938964844, 463.6000061035156, 458.54998779296875, 468.45001220703125, 489.29998779296875, 478.95001220703125, 469.20001220703125, 469.0, 465.5, 468.6000061035156, 468.45001220703125, 470.20001220703125]}, {"symbol": "RITES", "price": 246.83, "change": -0.32, "signals": ["Vol Shock"], "target": 259.4, "stop": 240.5, "backtest": {"win_rate": 17.0, "total": 6, "wins": 1, "log": [{"date": "2025-05-16", "entry": 280.44, "exit": 269.17, "result": "LOSS (Stop)", "pnl": -4.02}, {"date": "2025-05-28", "entry": 281.13, "exit": 271.11, "result": "LOSS (Stop)", "pnl": -3.56}, {"date": "2025-06-04", "entry": 288.81, "exit": 275.03, "result": "LOSS (Stop)", "pnl": -4.77}, {"date": "2025-07-02", "entry": 288.37, "exit": 279.33, "result": "LOSS (Stop)", "pnl": -3.13}, {"date": "2025-08-19", "entry": 253.63, "exit": 245.82, "result": "LOSS (Stop)", "pnl": -3.08}, {"date": "2025-09-01", "entry": 253.9, "exit": 270.27, "result": "WIN (Target)", "pnl": 6.45}]}, "history": [252.4444122314453, 250.0838165283203, 247.5248565673828, 248.21914672851562, 249.59780883789062, 246.35447692871094, 245.9478302001953, 246.2552947998047, 246.36439514160156, 244.61875915527344, 243.68641662597656, 242.15896606445312, 245.51141357421875, 245.83871459960938, 243.47811889648438, 245.8585662841797, 246.04701232910156, 246.04701232910156, 242.853271484375, 240.51251220703125, 241.08778381347656, 245.73953247070312, 247.00909423828125, 243.25, 246.32000732421875, 252.5, 251.38999938964844, 249.69000244140625, 247.61000061035156, 246.8300018310547]}, {"symbol": "TBOTEK", "price": 1710.0, "change": 1.91, "signals": ["Vol Shock", "BB Blast"], "target": 1844.1, "stop": 1643.0, "backtest": {"win_rate": 20.0, "total": 5, "wins": 1, "log": [{"date": "2025-08-12", "entry": 1445.4, "exit": 1379.6, "result": "LOSS (Stop)", "pnl": -4.55}, {"date": "2025-09-03", "entry": 1591.0, "exit": 1524.6, "result": "LOSS (Stop)", "pnl": -4.17}, {"date": "2025-09-08", "entry": 1578.3, "exit": 1494.7, "result": "LOSS (Stop)", "pnl": -5.3}, {"date": "2025-10-21", "entry": 1574.2, "exit": 1508.8, "result": "LOSS (Stop)", "pnl": -4.15}, {"date": "2025-11-04", "entry": 1589.0, "exit": 1710.0, "result": "WIN (Target)", "pnl": 7.61}]}, "history": [1533.0, 1561.5999755859375, 1536.5999755859375, 1497.699951171875, 1550.199951171875, 1568.699951171875, 1577.699951171875, 1587.0999755859375, 1574.199951171875, 1594.5999755859375, 1598.0, 1614.300048828125, 1580.800048828125, 1540.9000244140625, 1508.800048828125, 1483.199951171875, 1496.5999755859375, 1589.0, 1578.5999755859375, 1600.0, 1618.699951171875, 1590.5999755859375, 1604.300048828125, 1563.0, 1572.4000244140625, 1617.0, 1621.4000244140625, 1610.199951171875, 1678.0, 1710.0]}, {"symbol": "RAMCOCEM", "price": 1010.5, "change": 1.37, "signals": ["Vol Shock"], "target": 1061.1, "stop": 985.2, "backtest": {"win_rate": 60.0, "total": 10, "wins": 6, "log": [{"date": "2024-11-22", "entry": 943.32, "exit": 1013.05, "result": "WIN (Target)", "pnl": 7.39}, {"date": "2025-01-22", "entry": 867.4, "exit": 924.6, "result": "WIN (Target)", "pnl": 6.59}, {"date": "2025-02-07", "entry": 893.26, "exit": 865.71, "result": "LOSS (Stop)", "pnl": -3.08}, {"date": "2025-04-03", "entry": 939.78, "exit": 947.37, "result": "TIMEOUT", "pnl": 0.81}, {"date": "2025-05-12", "entry": 950.66, "exit": 1037.36, "result": "WIN (Target)", "pnl": 9.12}, {"date": "2025-06-25", "entry": 1041.05, "exit": 1138.64, "result": "WIN (Target)", "pnl": 9.37}, {"date": "2025-07-14", "entry": 1131.85, "exit": 1071.8, "result": "LOSS (Stop)", "pnl": -5.31}, {"date": "2025-09-04", "entry": 1090.3, "exit": 1049.8, "result": "LOSS (Stop)", "pnl": -3.71}, {"date": "2025-09-15", "entry": 1046.0, "exit": 1001.6, "result": "LOSS (Stop)", "pnl": -4.24}, {"date": "2025-10-07", "entry": 1005.7, "exit": 1033.2, "result": "TIMEOUT", "pnl": 2.73}]}, "history": [1008.2000122070312, 1018.6500244140625, 1010.9000244140625, 1002.3499755859375, 1015.75, 1029.0999755859375, 1023.5999755859375, 1028.6500244140625, 1038.9000244140625, 1046.6500244140625, 1046.800048828125, 1058.4000244140625, 1059.0999755859375, 1057.6500244140625, 1055.3499755859375, 1044.449951171875, 1025.5, 1027.0, 1033.199951171875, 1033.5, 1032.800048828125, 998.7999877929688, 1005.7000122070312, 987.5999755859375, 980.2999877929688, 994.7999877929688, 984.0, 991.4000244140625, 996.7999877929688, 1010.5]}];
             lucide.createIcons();
-            const grid = document.getElementById('stock-grid');
             
-            if(data.length === 0) {
-                grid.innerHTML = '<div class="col-span-3 text-center text-slate-500 p-10">No fresh breakouts detected today across any scenario.</div>';
-            } else {
-                data.forEach(stock => {
-                    let badges = '';
-                    stock.signals.forEach(s => {
-                        let cls = 'badge-blue';
-                        if(s.includes('Golden')) cls = 'badge-gold';
-                        if(s.includes('52-Wk')) cls = 'badge-green';
-                        if(s.includes('Vol')) cls = 'badge-pink';
-                        if(s.includes('Engulfing')) cls = 'badge-purple';
-                        badges += `<span class="${cls} px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider mr-1 mb-1 inline-block">${s}</span>`;
-                    });
+            const grid = document.getElementById('grid');
+            if(data.length === 0) grid.innerHTML = '<div class="col-span-3 text-center text-slate-500 p-10">No breakouts today.</div>';
+            
+            data.forEach((s, i) => {
+                // Badges
+                let badges = '';
+                s.signals.forEach(sig => {
+                    let c = 'b-blue';
+                    if(sig.includes('Golden')) c = 'b-gold';
+                    if(sig.includes('Vol') || sig.includes('Engulf')) c = 'b-pink';
+                    if(sig.includes('52-Wk')) c = 'b-green';
+                    badges += `<span class="${c} px-2 py-1 rounded text-[10px] font-bold uppercase mr-1 mb-1 inline-block">${sig}</span>`;
+                });
 
-                    // Sparkline
-                    const pts = stock.history.map((d, i) => {
-                        const min = Math.min(...stock.history);
-                        const max = Math.max(...stock.history);
-                        const x = (i / (stock.history.length - 1)) * 100;
-                        const y = 40 - ((d - min) / (max - min || 1)) * 40;
-                        return `${x},${y}`;
-                    }).join(' ');
+                // Win Rate Color
+                let wr = s.backtest.win_rate;
+                let wrColor = wr >= 60 ? 'text-green-400' : (wr < 40 ? 'text-red-400' : 'text-slate-400');
 
-                    const html = `
-                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg hover:bg-slate-750 hover:border-slate-600 transition group">
-                            <div class="flex justify-between items-start mb-3">
-                                <div>
-                                    <div class="font-bold text-lg text-white group-hover:text-blue-400 transition">${stock.symbol}</div>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <span class="text-slate-400 font-mono text-sm">₹${stock.price}</span>
-                                        <span class="text-xs font-bold ${stock.change >= 0 ? 'text-green-400' : 'text-red-400'}">${stock.change}%</span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-[10px] text-slate-500 uppercase font-bold">Vol Mult</div>
-                                    <div class="text-sm font-mono text-pink-400">${stock.vol_mult}x</div>
-                                </div>
+                // Sparkline
+                const pts = s.history.map((d, j) => {
+                    const min = Math.min(...s.history);
+                    const max = Math.max(...s.history);
+                    const x = (j / (s.history.length - 1)) * 100;
+                    const y = 30 - ((d - min) / (max - min || 1)) * 30;
+                    return `${x},${y}`;
+                }).join(' ');
+
+                grid.innerHTML += `
+                    <div class="card bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg relative group" onclick="openModal(${i})">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <div class="font-bold text-lg text-white group-hover:text-blue-400 transition">${s.symbol}</div>
+                                <div class="text-xs text-slate-400 font-mono">₹${s.price} <span class="${s.change>=0?'text-green-400':'text-red-400'} font-bold ml-1">${s.change}%</span></div>
                             </div>
-                            
-                            <div class="flex flex-wrap gap-y-1 mb-4 h-12 content-start">
-                                ${badges}
-                            </div>
-                            
-                            <div class="relative h-10 w-full opacity-70 group-hover:opacity-100 transition">
-                                <svg width="100%" height="100%" preserveAspectRatio="none" class="overflow-visible">
-                                    <polyline points="${pts}" fill="none" stroke="${stock.change >= 0 ? '#4ade80' : '#f87171'}" stroke-width="2" vector-effect="non-scaling-stroke" />
-                                </svg>
+                            <div class="text-right">
+                                <div class="text-[10px] text-slate-500 uppercase">Win Rate</div>
+                                <div class="text-sm font-mono font-bold ${wrColor}">${wr}%</div>
                             </div>
                         </div>
-                    `;
-                    grid.innerHTML += html;
-                });
+                        <div class="flex flex-wrap gap-1 mb-3 h-8 content-start">${badges}</div>
+                        <div class="h-8 w-full opacity-60">
+                            <svg width="100%" height="100%" preserveAspectRatio="none" class="overflow-visible">
+                                <polyline points="${pts}" fill="none" stroke="${s.change >= 0 ? '#4ade80' : '#f87171'}" stroke-width="2" />
+                            </svg>
+                        </div>
+                        <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition text-slate-500"><i data-lucide="maximize-2" class="w-4"></i></div>
+                    </div>
+                `;
+            });
+
+            function openModal(i) {
+                const s = data[i];
+                const bt = s.backtest;
+                document.getElementById('m-sym').innerText = s.symbol;
+                document.getElementById('m-target').innerText = s.target;
+                document.getElementById('m-stop').innerText = s.stop;
+                
+                document.getElementById('m-rate').innerText = bt.win_rate + '%';
+                document.getElementById('m-total').innerText = bt.total;
+                document.getElementById('m-wins').innerText = bt.wins;
+                
+                let rows = '';
+                if(bt.log.length === 0) rows = '<tr><td colspan="4" class="p-4 text-center italic text-slate-500">No signals in last 12 months.</td></tr>';
+                else {
+                    [...bt.log].reverse().forEach(l => {
+                        let c = l.result.includes('WIN') ? 'text-green-400 font-bold' : (l.result.includes('LOSS') ? 'text-red-400' : 'text-yellow-400');
+                        rows += `<tr class="hover:bg-slate-700/50"><td class="p-2">${l.date}</td><td class="p-2 text-right font-mono">${l.entry}</td><td class="p-2 text-right ${c} text-[10px]">${l.result}</td><td class="p-2 text-right font-mono ${c}">${l.pnl}%</td></tr>`;
+                    });
+                }
+                document.getElementById('m-logs').innerHTML = rows;
+                document.getElementById('modal').style.display = 'block';
             }
+            
+            function closeModal() { document.getElementById('modal').style.display = 'none'; }
+            window.onclick = function(e) { if(e.target == document.getElementById('modal')) closeModal(); }
         </script>
     </body>
     </html>
