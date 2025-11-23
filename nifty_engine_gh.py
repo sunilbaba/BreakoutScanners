@@ -5,6 +5,10 @@ import time
 import math
 import requests
 import io
+import warnings
+
+# Suppress warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # --- CONFIGURATION ---
 OUTPUT_DIR = "public"
@@ -28,25 +32,53 @@ def get_nifty500_list():
         df = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
         return [f"{x}.NS" for x in df['Symbol'].dropna().tolist()]
     except:
-        return ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS"]
+        return ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS"]
 
-# --- 2. TECHNICAL ANALYSIS ENGINE ---
+# --- 2. HYBRID ANALYSIS ENGINE ---
 def analyze_stock(ticker):
     try:
-        # 1. Fetch Data (1 Year for 200 EMA)
         stock = yf.Ticker(ticker)
-        df = stock.history(period="1y", interval="1d")
         
+        # A. TECHNICAL DATA (Fast)
+        df = stock.history(period="1y", interval="1d")
         if df.empty or len(df) < 200: return None
 
-        # 2. Prepare Series
+        # Prices
         close = df['Close']
+        high = df['High']
+        low = df['Low']
         curr_price = float(close.iloc[-1])
         prev_price = float(close.iloc[-2])
         
-        # 3. CALCULATE INDICATORS
+        # B. FUNDAMENTAL DATA (Slow - Requires fetching info)
+        # We use a try-except block here so if fundamentals fail, technicals still work
+        fair_value = 0
+        valuation_status = "-"
+        try:
+            info = stock.info
+            eps = info.get('trailingEps', 0)
+            book_value = info.get('bookValue', 0)
+            
+            # GRAHAM NUMBER CALCULATION: Sqrt(22.5 * EPS * BookValue)
+            if eps > 0 and book_value > 0:
+                graham_num = math.sqrt(22.5 * eps * book_value)
+                fair_value = round(graham_num, 1)
+                
+                # Valuation Logic
+                if curr_price < fair_value:
+                    diff = round(((fair_value - curr_price) / curr_price) * 100, 0)
+                    valuation_status = f"Undervalued (+{diff}%)"
+                else:
+                    valuation_status = "Overvalued"
+            else:
+                fair_value = 0 # Cannot calculate for loss-making companies
+                valuation_status = "N/A (Neg Earnings)"
+        except:
+            valuation_status = "Data Error"
+
+        # --- C. INDICATORS ---
         
-        # --- A. RSI (14) ---
+        # RSI
         delta = close.diff()
         gain = (delta.where(delta > 0, 0)).rolling(14).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
@@ -54,92 +86,88 @@ def analyze_stock(ticker):
         rsi = 100 - (100 / (1 + rs))
         curr_rsi = float(rsi.iloc[-1])
 
-        # --- B. MACD (12, 26, 9) ---
-        # Fast EMA (12) and Slow EMA (26)
+        # MACD
         ema12 = close.ewm(span=12, adjust=False).mean()
         ema26 = close.ewm(span=26, adjust=False).mean()
         macd_line = ema12 - ema26
         signal_line = macd_line.ewm(span=9, adjust=False).mean()
+        macd_signal = "BUY" if float(macd_line.iloc[-1]) > float(signal_line.iloc[-1]) else "SELL"
         
-        # MACD Crossover Logic (Bullish if MACD crosses ABOVE Signal)
-        macd_val = float(macd_line.iloc[-1])
-        sig_val = float(signal_line.iloc[-1])
-        prev_macd = float(macd_line.iloc[-2])
-        prev_sig = float(signal_line.iloc[-2])
-        
-        # --- C. BOLLINGER BANDS (20, 2) ---
-        sma20 = close.rolling(20).mean()
-        std20 = close.rolling(20).std()
-        upper_band = sma20 + (2 * std20)
-        lower_band = sma20 - (2 * std20)
-        curr_upper = float(upper_band.iloc[-1])
-        
-        # --- D. EMA 200 (Long Term Trend) ---
+        # Trend
         ema200 = close.ewm(span=200, adjust=False).mean()
-        curr_ema200 = float(ema200.iloc[-1])
-        trend_status = "UP" if curr_price > curr_ema200 else "DOWN"
+        trend = "UP" if curr_price > float(ema200.iloc[-1]) else "DOWN"
 
-        # 4. PATTERN DETECTION LOGIC
-        signals = []
+        # ATR & Target
+        tr = pd.concat([high - low, (high - close.shift(1)).abs(), (low - close.shift(1)).abs()], axis=1).max(axis=1)
+        atr = tr.rolling(14).mean().iloc[-1]
         
-        # RSI Logic
-        if curr_rsi < 30: signals.append("RSI Oversold")
-        elif curr_rsi < 40 and curr_rsi > float(rsi.iloc[-2]): signals.append("RSI Recovery")
+        # Recommendation Logic
+        rec = "WAIT"
+        tech_target = 0
         
-        # MACD Logic
-        if prev_macd < prev_sig and macd_val > sig_val:
-            signals.append("MACD Buy Signal")
-            
-        # Bollinger Logic
-        if curr_price > curr_upper:
-            signals.append("Bollinger Breakout")
-            
-        # EMA Logic
-        if prev_price < curr_ema200 and curr_price > curr_ema200:
-            signals.append("Trend Reversal (Crossed 200 EMA)")
+        if trend == "UP":
+            if macd_signal == "BUY":
+                rec = "STRONG BUY"
+                tech_target = curr_price + (2 * atr)
+            elif curr_rsi < 40:
+                rec = "BUY DIP"
+                tech_target = curr_price + (1.5 * atr)
+            else:
+                rec = "HOLD"
+                tech_target = curr_price + atr
+        elif trend == "DOWN":
+            rec = "SELL" if macd_signal == "SELL" else "AVOID"
+            tech_target = curr_price - atr
 
-        # Only return if we have valid data
         return {
             "symbol": ticker.replace(".NS", ""),
             "price": round(curr_price, 2),
             "change": round(((curr_price - prev_price) / prev_price) * 100, 2),
-            "rsi": round(curr_rsi, 1),
-            "macd_signal": "BUY" if macd_val > sig_val else "SELL",
-            "trend": trend_status,
-            "signals": ", ".join(signals) if signals else "-"
+            "fair_value": fair_value,
+            "val_status": valuation_status,
+            "rec": rec,
+            "target": round(tech_target, 1),
+            "rsi": round(curr_rsi, 1)
         }
 
     except Exception as e:
         return None
 
-# --- 3. GENERATE PRO HTML ---
+# --- 3. GENERATE HTML ---
 def generate_html(results):
     rows = ""
     for r in results:
-        # Color coding
-        change_color = "#4ade80" if r['change'] >= 0 else "#f87171" # Green/Red
-        trend_color = "#4ade80" if r['trend'] == "UP" else "#f87171"
+        # Colors
+        change_col = "#4ade80" if r['change'] >= 0 else "#f87171"
+        rec_bg = "transparent"
+        rec_col = "#94a3b8"
         
-        # RSI Color
-        rsi_bg = "transparent"
-        if r['rsi'] < 30: rsi_bg = "#b91c1c" # Deep Red (Oversold)
-        if r['rsi'] > 70: rsi_bg = "#15803d" # Deep Green (Overbought)
-
-        # Highlight if Buy Signals exist
-        signal_style = "color: #aaa;"
-        if r['signals'] != "-": signal_style = "color: #fbbf24; font-weight: bold;" # Amber color
+        if "BUY" in r['rec']: 
+            rec_bg = "rgba(74, 222, 128, 0.1)"
+            rec_col = "#4ade80"
+        if "SELL" in r['rec']:
+            rec_bg = "rgba(248, 113, 113, 0.1)"
+            rec_col = "#f87171"
+            
+        # Valuation Color
+        val_col = "#94a3b8"
+        if "Undervalued" in r['val_status']: val_col = "#4ade80" # Green
+        if "Overvalued" in r['val_status']: val_col = "#f87171" # Red
 
         rows += f"""
         <tr style="border-bottom: 1px solid #333;">
             <td style="padding: 12px; font-weight: bold;">{r['symbol']}</td>
             <td style="padding: 12px;">{r['price']}</td>
-            <td style="padding: 12px; color: {change_color};">{r['change']}%</td>
-            <td style="padding: 12px;">
-                <span style="background: {rsi_bg}; padding: 2px 6px; rounded: 4px;">{r['rsi']}</span>
+            <td style="padding: 12px; color: {change_col};">{r['change']}%</td>
+            <td style="padding: 12px; color: {val_col}; font-size: 11px;">
+                <div style="font-weight: bold; font-size: 13px;">{r['fair_value']}</div>
+                <div>{r['val_status']}</div>
             </td>
-            <td style="padding: 12px; color: {trend_color}; font-size: 11px;">{r['trend']}</td>
-            <td style="padding: 12px; font-size: 11px;">{r['macd_signal']}</td>
-            <td style="padding: 12px; font-size: 12px; {signal_style}">{r['signals']}</td>
+            <td style="padding: 12px;">
+                <span style="background: {rec_bg}; color: {rec_col}; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;">{r['rec']}</span>
+            </td>
+            <td style="padding: 12px; color: #38bdf8; font-weight: bold;">{r['target']}</td>
+            <td style="padding: 12px; color: #64748b;">{r['rsi']}</td>
         </tr>
         """
 
@@ -147,30 +175,31 @@ def generate_html(results):
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Pro Nifty Scanner</title>
+        <title>Nifty Valuation Scanner</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            body {{ background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }}
-            h1 {{ color: #38bdf8; border-bottom: 2px solid #1e293b; padding-bottom: 10px; }}
-            table {{ width: 100%; border-collapse: collapse; font-size: 14px; background: #1e293b; }}
-            th {{ text-align: left; padding: 12px; background: #0f172a; color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #334155; }}
+            body {{ background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 20px; }}
+            h1 {{ color: #38bdf8; margin-bottom: 5px; }}
+            p {{ color: #64748b; font-size: 12px; margin-bottom: 20px; }}
+            table {{ width: 100%; border-collapse: collapse; font-size: 13px; background: #1e293b; border-radius: 8px; overflow: hidden; }}
+            th {{ text-align: left; padding: 12px; background: #0f172a; color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }}
             tr:hover {{ background: #334155; }}
         </style>
     </head>
     <body>
-        <h1>Nifty 500 Pro Scanner</h1>
-        <p>Total Scanned: {len(results)} | Time: {pd.Timestamp.now()}</p>
+        <h1>Nifty 500 Value & Trend</h1>
+        <p>Fair Value = Graham Number (Sqrt(22.5 * EPS * BV)). Target = Technical Projection (ATR).</p>
         
         <table>
             <thead>
                 <tr>
                     <th>Symbol</th>
                     <th>Price</th>
-                    <th>% Chg</th>
-                    <th>RSI (14)</th>
-                    <th>Trend (200 EMA)</th>
-                    <th>MACD</th>
-                    <th>Technical Signals</th>
+                    <th>Chg%</th>
+                    <th>Fair Value (Graham)</th>
+                    <th>Recommendation</th>
+                    <th>Tech Target</th>
+                    <th>RSI</th>
                 </tr>
             </thead>
             <tbody>
@@ -183,18 +212,18 @@ def generate_html(results):
     
     if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
     with open(FILE_PATH, "w", encoding="utf-8") as f: f.write(html)
-    print(f"Generated Pro Dashboard with {len(results)} stocks.")
+    print(f"Generated Dashboard with {len(results)} stocks.")
 
 if __name__ == "__main__":
-    print("Starting Pro Scan...")
+    print("Starting Hybrid Scan...")
     tickers = get_nifty500_list()
-    print(f"Stocks found: {len(tickers)}")
     
     results = []
+    # SCANNING LOOP
     for i, t in enumerate(tickers):
         print(f"[{i+1}/{len(tickers)}] {t}...", end="\r")
-        # Rate limiting to prevent 0 results
-        time.sleep(0.2) 
+        # Need longer sleep because we are fetching fundamental INFO now
+        time.sleep(0.3) 
         res = analyze_stock(t)
         if res: results.append(res)
         
