@@ -1,0 +1,41 @@
+name: Nifty 500 Daily Scanner
+
+on:
+  schedule:
+    # Run at 14:30 UTC daily (which is 8:00 PM IST)
+    - cron: '30 14 * * *'
+  workflow_dispatch: # Allows you to run it manually from the Actions tab
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Scanner Script
+        run: python nifty_engine_gh.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: false
+
+
