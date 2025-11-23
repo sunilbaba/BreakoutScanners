@@ -5,6 +5,7 @@ import time
 import math
 import requests
 import io
+import json
 import warnings
 
 # Suppress warnings
@@ -25,205 +26,323 @@ def get_nifty500_list():
         except: pass
     
     # Auto-Download if missing
-    print("Downloading Nifty 500 list from Web...")
+    print("Downloading Nifty 500 list...")
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
         r = requests.get(NSE_URL, headers=headers, timeout=10)
         df = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
         return [f"{x}.NS" for x in df['Symbol'].dropna().tolist()]
     except:
-        return ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS"]
+        return ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS"]
 
-# --- 2. HYBRID ANALYSIS ENGINE ---
+# --- 2. BACKTEST ENGINE ---
+def run_backtest(df):
+    """
+    Simulates trading the strategy over the past 1 year data.
+    Strategy: BUY when Trend is UP and (MACD Buy OR RSI Dip).
+    Exit: Take Profit +5% or Stop Loss -3% or Max Hold 20 Days.
+    """
+    trades = []
+    wins = 0
+    losses = 0
+    
+    # We need at least 50 days of data
+    if len(df) < 50: return {"win_rate": 0, "total": 0, "log": []}
+
+    # Pre-calculate Logic columns to speed up loop
+    # Trend (SMA 200)
+    df['SMA200'] = df['Close'].rolling(200).mean()
+    df['Trend'] = df['Close'] > df['SMA200']
+    
+    # MACD
+    ema12 = df['Close'].ewm(span=12, adjust=False).mean()
+    ema26 = df['Close'].ewm(span=26, adjust=False).mean()
+    macd = ema12 - ema26
+    signal = macd.ewm(span=9, adjust=False).mean()
+    df['MACD_Buy'] = (macd > signal) & (macd.shift(1) < signal.shift(1)) # Crossover
+    
+    # RSI
+    delta = df['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+    rs = gain / loss
+    rsi = 100 - (100 / (1 + rs))
+    df['RSI_Buy'] = (rsi < 40) & (rsi.shift(1) >= 40) # Dip below 40
+    
+    # SIMULATION LOOP
+    in_position = False
+    entry_price = 0
+    entry_date = None
+    days_held = 0
+    
+    # Iterate through history (skip first 200 days for SMA)
+    for i in range(200, len(df)):
+        price = df['Close'].iloc[i]
+        date = df.index[i].strftime('%Y-%m-%d')
+        
+        if in_position:
+            days_held += 1
+            pct_change = ((price - entry_price) / entry_price) * 100
+            
+            # EXIT CONDITIONS
+            result = None
+            if pct_change >= 5.0: result = "WIN (Target)"
+            elif pct_change <= -3.0: result = "LOSS (Stop)"
+            elif days_held >= 20: result = "TIMEOUT" # Exit after 20 days regardless
+            
+            if result:
+                trades.append({
+                    "date": entry_date, 
+                    "entry": round(entry_price, 2), 
+                    "exit": round(price, 2), 
+                    "days": days_held,
+                    "result": result,
+                    "pnl": round(pct_change, 2)
+                })
+                if pct_change > 0: wins += 1
+                else: losses += 1
+                in_position = False
+        
+        else:
+            # ENTRY CONDITIONS (Trend UP + Signal)
+            if df['Trend'].iloc[i]:
+                if df['MACD_Buy'].iloc[i] or df['RSI_Buy'].iloc[i]:
+                    in_position = True
+                    entry_price = price
+                    entry_date = date
+                    days_held = 0
+
+    total = wins + losses
+    win_rate = round((wins / total * 100), 0) if total > 0 else 0
+    
+    return {
+        "win_rate": win_rate,
+        "total": total,
+        "wins": wins,
+        "losses": losses,
+        "log": trades[-10:] # Keep only last 10 trades to save space
+    }
+
+# --- 3. ANALYZE STOCK ---
 def analyze_stock(ticker):
     try:
         stock = yf.Ticker(ticker)
+        df = stock.history(period="2y", interval="1d") # Need 2y for valid 1y backtest (200d SMA buffer)
         
-        # A. TECHNICAL DATA (Fast)
-        df = stock.history(period="1y", interval="1d")
-        if df.empty or len(df) < 200: return None
-
-        # Prices
+        if df.empty or len(df) < 250: return None
+        
+        # --- CURRENT STATUS ---
         close = df['Close']
-        high = df['High']
-        low = df['Low']
         curr_price = float(close.iloc[-1])
         prev_price = float(close.iloc[-2])
+        change = round(((curr_price - prev_price) / prev_price) * 100, 2)
         
-        # B. FUNDAMENTAL DATA (Slow - Requires fetching info)
-        # We use a try-except block here so if fundamentals fail, technicals still work
-        fair_value = 0
-        valuation_status = "-"
-        try:
-            info = stock.info
-            eps = info.get('trailingEps', 0)
-            book_value = info.get('bookValue', 0)
-            
-            # GRAHAM NUMBER CALCULATION: Sqrt(22.5 * EPS * BookValue)
-            if eps > 0 and book_value > 0:
-                graham_num = math.sqrt(22.5 * eps * book_value)
-                fair_value = round(graham_num, 1)
-                
-                # Valuation Logic
-                if curr_price < fair_value:
-                    diff = round(((fair_value - curr_price) / curr_price) * 100, 0)
-                    valuation_status = f"Undervalued (+{diff}%)"
-                else:
-                    valuation_status = "Overvalued"
-            else:
-                fair_value = 0 # Cannot calculate for loss-making companies
-                valuation_status = "N/A (Neg Earnings)"
-        except:
-            valuation_status = "Data Error"
-
-        # --- C. INDICATORS ---
-        
-        # RSI
-        delta = close.diff()
-        gain = (delta.where(delta > 0, 0)).rolling(14).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
-        rs = gain / loss
-        rsi = 100 - (100 / (1 + rs))
-        curr_rsi = float(rsi.iloc[-1])
-
-        # MACD
-        ema12 = close.ewm(span=12, adjust=False).mean()
-        ema26 = close.ewm(span=26, adjust=False).mean()
-        macd_line = ema12 - ema26
-        signal_line = macd_line.ewm(span=9, adjust=False).mean()
-        macd_signal = "BUY" if float(macd_line.iloc[-1]) > float(signal_line.iloc[-1]) else "SELL"
+        # Run Backtest
+        backtest_results = run_backtest(df)
         
         # Trend
-        ema200 = close.ewm(span=200, adjust=False).mean()
-        trend = "UP" if curr_price > float(ema200.iloc[-1]) else "DOWN"
-
-        # ATR & Target
-        tr = pd.concat([high - low, (high - close.shift(1)).abs(), (low - close.shift(1)).abs()], axis=1).max(axis=1)
-        atr = tr.rolling(14).mean().iloc[-1]
+        sma200 = close.rolling(200).mean().iloc[-1]
+        trend = "UP" if curr_price > sma200 else "DOWN"
         
-        # Recommendation Logic
+        # Recommendations
         rec = "WAIT"
-        tech_target = 0
-        
         if trend == "UP":
-            if macd_signal == "BUY":
-                rec = "STRONG BUY"
-                tech_target = curr_price + (2 * atr)
-            elif curr_rsi < 40:
-                rec = "BUY DIP"
-                tech_target = curr_price + (1.5 * atr)
-            else:
-                rec = "HOLD"
-                tech_target = curr_price + atr
+            if backtest_results['win_rate'] > 60: rec = "HIGH PROB BUY"
+            else: rec = "BUY"
         elif trend == "DOWN":
-            rec = "SELL" if macd_signal == "SELL" else "AVOID"
-            tech_target = curr_price - atr
+            rec = "SELL"
 
         return {
             "symbol": ticker.replace(".NS", ""),
             "price": round(curr_price, 2),
-            "change": round(((curr_price - prev_price) / prev_price) * 100, 2),
-            "fair_value": fair_value,
-            "val_status": valuation_status,
+            "change": change,
+            "trend": trend,
             "rec": rec,
-            "target": round(tech_target, 1),
-            "rsi": round(curr_rsi, 1)
+            "backtest": backtest_results
         }
-
     except Exception as e:
         return None
 
-# --- 3. GENERATE HTML ---
+# --- 4. GENERATE HTML (With Clickable Modals) ---
 def generate_html(results):
-    rows = ""
-    for r in results:
-        # Colors
-        change_col = "#4ade80" if r['change'] >= 0 else "#f87171"
-        rec_bg = "transparent"
-        rec_col = "#94a3b8"
-        
-        if "BUY" in r['rec']: 
-            rec_bg = "rgba(74, 222, 128, 0.1)"
-            rec_col = "#4ade80"
-        if "SELL" in r['rec']:
-            rec_bg = "rgba(248, 113, 113, 0.1)"
-            rec_col = "#f87171"
-            
-        # Valuation Color
-        val_col = "#94a3b8"
-        if "Undervalued" in r['val_status']: val_col = "#4ade80" # Green
-        if "Overvalued" in r['val_status']: val_col = "#f87171" # Red
-
-        rows += f"""
-        <tr style="border-bottom: 1px solid #333;">
-            <td style="padding: 12px; font-weight: bold;">{r['symbol']}</td>
-            <td style="padding: 12px;">{r['price']}</td>
-            <td style="padding: 12px; color: {change_col};">{r['change']}%</td>
-            <td style="padding: 12px; color: {val_col}; font-size: 11px;">
-                <div style="font-weight: bold; font-size: 13px;">{r['fair_value']}</div>
-                <div>{r['val_status']}</div>
-            </td>
-            <td style="padding: 12px;">
-                <span style="background: {rec_bg}; color: {rec_col}; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;">{r['rec']}</span>
-            </td>
-            <td style="padding: 12px; color: #38bdf8; font-weight: bold;">{r['target']}</td>
-            <td style="padding: 12px; color: #64748b;">{r['rsi']}</td>
-        </tr>
-        """
-
+    # Convert data to JSON for JavaScript to use
+    json_data = json.dumps(results)
+    
     html = f"""
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
-        <title>Nifty Valuation Scanner</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Nifty Backtest Scanner</title>
+        <script src="https://cdn.tailwindcss.com"></script>
         <style>
-            body {{ background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 20px; }}
-            h1 {{ color: #38bdf8; margin-bottom: 5px; }}
-            p {{ color: #64748b; font-size: 12px; margin-bottom: 20px; }}
-            table {{ width: 100%; border-collapse: collapse; font-size: 13px; background: #1e293b; border-radius: 8px; overflow: hidden; }}
-            th {{ text-align: left; padding: 12px; background: #0f172a; color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }}
-            tr:hover {{ background: #334155; }}
+            body {{ background-color: #0f172a; color: #e2e8f0; }}
+            .modal {{ display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 50; }}
+            .modal-content {{ background: #1e293b; margin: 10% auto; padding: 20px; width: 90%; max-width: 600px; border-radius: 8px; position: relative; max-height: 80vh; overflow-y: auto; }}
         </style>
     </head>
     <body>
-        <h1>Nifty 500 Value & Trend</h1>
-        <p>Fair Value = Graham Number (Sqrt(22.5 * EPS * BV)). Target = Technical Projection (ATR).</p>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>Symbol</th>
-                    <th>Price</th>
-                    <th>Chg%</th>
-                    <th>Fair Value (Graham)</th>
-                    <th>Recommendation</th>
-                    <th>Tech Target</th>
-                    <th>RSI</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows}
-            </tbody>
-        </table>
+        <div class="max-w-4xl mx-auto p-4">
+            <h1 class="text-3xl font-bold text-blue-400 mb-2">Nifty 500 Strategy Backtester</h1>
+            <p class="text-sm text-slate-400 mb-6">Strategy: Trend Following (Buy on Dip/Momentum in Uptrend). Exit: +5% Profit or -3% Stop.</p>
+            
+            <div class="overflow-x-auto rounded-lg border border-slate-700">
+                <table class="w-full text-left text-sm text-slate-400">
+                    <thead class="bg-slate-800 text-xs uppercase text-slate-200">
+                        <tr>
+                            <th class="px-4 py-3">Symbol</th>
+                            <th class="px-4 py-3">Price</th>
+                            <th class="px-4 py-3">Trend</th>
+                            <th class="px-4 py-3">Signal</th>
+                            <th class="px-4 py-3">Win Rate (1Y)</th>
+                            <th class="px-4 py-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stock-table">
+                        <!-- JS Will Inject Rows Here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODAL -->
+        <div id="modal" class="modal">
+            <div class="modal-content border border-slate-600 shadow-2xl">
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
+                <h2 id="m-symbol" class="text-2xl font-bold text-white mb-1">RELIANCE</h2>
+                <div class="text-xs text-slate-400 mb-4">Historical Performance Report (Last 12 Months)</div>
+                
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-800 p-3 rounded border border-slate-700 text-center">
+                        <div class="text-xs text-slate-500">Total Trades</div>
+                        <div id="m-total" class="text-xl font-bold text-white">0</div>
+                    </div>
+                    <div class="bg-slate-800 p-3 rounded border border-slate-700 text-center">
+                        <div class="text-xs text-slate-500">Win Rate</div>
+                        <div id="m-rate" class="text-xl font-bold text-green-400">0%</div>
+                    </div>
+                    <div class="bg-slate-800 p-3 rounded border border-slate-700 text-center">
+                        <div class="text-xs text-slate-500">Net Logic</div>
+                        <div class="text-sm font-bold text-blue-400">Trend + Mom</div>
+                    </div>
+                </div>
+
+                <h3 class="text-sm font-bold text-white mb-2">Recent Trade Logs</h3>
+                <div class="overflow-hidden rounded border border-slate-700">
+                    <table class="w-full text-xs">
+                        <thead class="bg-slate-900 text-slate-300">
+                            <tr>
+                                <th class="p-2">Date</th>
+                                <th class="p-2">Entry</th>
+                                <th class="p-2">Result</th>
+                                <th class="p-2 text-right">P&L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="m-logs" class="bg-slate-800 text-slate-300 divide-y divide-slate-700">
+                            <!-- Logs go here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const data = {json_data};
+
+            function renderTable() {{
+                const tbody = document.getElementById('stock-table');
+                let html = '';
+                
+                data.forEach((stock, index) => {{
+                    const winColor = stock.backtest.win_rate >= 60 ? 'text-green-400' : (stock.backtest.win_rate < 40 ? 'text-red-400' : 'text-slate-300');
+                    const trendColor = stock.trend === 'UP' ? 'text-green-500' : 'text-red-500';
+                    const changeColor = stock.change >= 0 ? 'text-green-400' : 'text-red-400';
+                    
+                    html += `
+                        <tr class="border-b border-slate-800 hover:bg-slate-800/50 transition">
+                            <td class="px-4 py-3 font-bold text-white">${{stock.symbol}}</td>
+                            <td class="px-4 py-3">
+                                <div>${{stock.price}}</div>
+                                <div class="text-xs ${{changeColor}}">${{stock.change}}%</div>
+                            </td>
+                            <td class="px-4 py-3 font-bold text-xs ${{trendColor}}">${{stock.trend}}</td>
+                            <td class="px-4 py-3 text-xs"><span class="bg-slate-700 px-2 py-1 rounded text-white">${{stock.rec}}</span></td>
+                            <td class="px-4 py-3 font-bold ${{winColor}}">${{stock.backtest.win_rate}}%</td>
+                            <td class="px-4 py-3">
+                                <button onclick="openModal(${{index}})" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded font-bold shadow-lg transition">
+                                    Analyze
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }});
+                tbody.innerHTML = html;
+            }}
+
+            function openModal(index) {{
+                const stock = data[index];
+                const bt = stock.backtest;
+                
+                document.getElementById('m-symbol').innerText = stock.symbol;
+                document.getElementById('m-total').innerText = bt.total;
+                document.getElementById('m-rate').innerText = bt.win_rate + '%';
+                
+                // Populate Logs
+                const logsBody = document.getElementById('m-logs');
+                let logHtml = '';
+                
+                if (bt.log.length === 0) {{
+                    logHtml = '<tr><td colspan="4" class="p-3 text-center text-slate-500">No signals generated in last 12 months.</td></tr>';
+                }} else {{
+                    // Show reverse (newest first)
+                    [...bt.log].reverse().forEach(log => {{
+                        const resColor = log.result.includes('WIN') ? 'text-green-400' : (log.result.includes('LOSS') ? 'text-red-400' : 'text-yellow-400');
+                        logHtml += `
+                            <tr>
+                                <td class="p-2">${{log.date}}</td>
+                                <td class="p-2">${{log.entry}}</td>
+                                <td class="p-2 font-bold ${{resColor}}">${{log.result}}</td>
+                                <td class="p-2 text-right ${{resColor}}">${{log.pnl}}%</td>
+                            </tr>
+                        `;
+                    }});
+                }}
+                
+                logsBody.innerHTML = logHtml;
+                document.getElementById('modal').style.display = 'block';
+            }}
+
+            function closeModal() {{
+                document.getElementById('modal').style.display = 'none';
+            }}
+
+            // Close on outside click
+            window.onclick = function(event) {{
+                const modal = document.getElementById('modal');
+                if (event.target == modal) {{
+                    modal.style.display = 'none';
+                }}
+            }}
+
+            renderTable();
+        </script>
     </body>
     </html>
     """
     
     if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
     with open(FILE_PATH, "w", encoding="utf-8") as f: f.write(html)
-    print(f"Generated Dashboard with {len(results)} stocks.")
+    print(f"Generated Interactive Dashboard with Backtesting.")
 
 if __name__ == "__main__":
-    print("Starting Hybrid Scan...")
+    print("Starting Backtest Scan...")
     tickers = get_nifty500_list()
     
     results = []
-    # SCANNING LOOP
+    # Using enumerate to track progress
     for i, t in enumerate(tickers):
-        print(f"[{i+1}/{len(tickers)}] {t}...", end="\r")
-        # Need longer sleep because we are fetching fundamental INFO now
-        time.sleep(0.3) 
+        print(f"[{i+1}/{len(tickers)}] Backtesting {t}...", end="\r")
+        time.sleep(0.1) # Prevent blocking
         res = analyze_stock(t)
         if res: results.append(res)
         
