@@ -1,116 +1,25 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nifty 500 Scanner</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body class="bg-slate-900 text-white">
-    <div id="root" class="min-h-screen flex items-center justify-center">
-        <div class="text-center">
-             <div class="text-blue-500 font-bold text-xl animate-pulse">Loading Nifty 500 Data...</div>
-             <div class="text-slate-500 text-sm mt-2">If this takes too long, check console (F12)</div>
-        </div>
-    </div>
-
-    <script type="text/babel">
-        // INJECT DATA
-        const RAW = {"stocks": [{"symbol": "RELIANCE", "status": "success", "price": 1546.5999755859375, "change": -0.16, "rsi": 73.9, "patterns": [], "history": [1381.699951171875, 1375.0, 1375.9000244140625, 1374.300048828125, 1398.300048828125, 1416.800048828125, 1466.800048828125, 1465.199951171875, 1448.4000244140625, 1451.5999755859375, 1484.0999755859375, 1486.9000244140625, 1504.199951171875, 1488.5, 1486.4000244140625, 1484.699951171875, 1473.0999755859375, 1473.0999755859375, 1496.0999755859375, 1478.0, 1489.300048828125, 1493.4000244140625, 1511.5, 1510.9000244140625, 1518.9000244140625, 1518.300048828125, 1519.4000244140625, 1518.9000244140625, 1549.0999755859375, 1546.5999755859375]}, {"symbol": "TCS", "status": "success", "price": 3150.60009765625, "change": 0.18, "rsi": 70.8, "patterns": [], "history": [3017.04736328125, 2996.02587890625, 2949.300048828125, 2969.800048828125, 2970.699951171875, 2962.199951171875, 3015.199951171875, 3006.699951171875, 3073.199951171875, 3063.199951171875, 3084.89990234375, 3057.89990234375, 3057.60009765625, 3035.300048828125, 3058.0, 3016.800048828125, 2990.199951171875, 2990.199951171875, 3010.89990234375, 2991.800048828125, 3025.199951171875, 3047.0, 3131.800048828125, 3105.699951171875, 3106.0, 3102.199951171875, 3087.10009765625, 3147.699951171875, 3144.800048828125, 3150.60009765625]}, {"symbol": "HDFCBANK", "status": "success", "price": 998.0499877929688, "change": -1.07, "rsi": 54.1, "patterns": [], "history": [980.9000244140625, 977.0, 977.1500244140625, 978.25, 994.3499755859375, 1002.5499877929688, 1002.9500122070312, 1007.7000122070312, 1008.7999877929688, 994.75, 1002.9500122070312, 1003.5499877929688, 1007.8499755859375, 998.1500244140625, 987.2999877929688, 992.6500244140625, 985.25, 985.25, 984.6500244140625, 982.2999877929688, 984.5, 991.7000122070312, 989.5, 986.6500244140625, 989.5999755859375, 996.5499877929688, 992.4500122070312, 994.5999755859375, 1008.8499755859375, 998.0499877929688]}, {"symbol": "INFY", "status": "success", "price": 1545.0, "change": 0.55, "rsi": 62.1, "patterns": [], "history": [1492.058349609375, 1470.6854248046875, 1467.435302734375, 1452.1690673828125, 1449.312744140625, 1419.37109375, 1438.87255859375, 1450.19921875, 1505.4532470703125, 1502.4000244140625, 1504.5, 1500.199951171875, 1510.4000244140625, 1493.800048828125, 1482.300048828125, 1485.5, 1467.9000244140625, 1467.9000244140625, 1466.699951171875, 1476.800048828125, 1513.5, 1530.300048828125, 1551.699951171875, 1541.800048828125, 1502.800048828125, 1507.5999755859375, 1486.4000244140625, 1541.0999755859375, 1536.5, 1545.0]}, {"symbol": "SBIN", "status": "success", "price": 972.5999755859375, "change": -0.91, "rsi": 66.2, "patterns": [], "history": [880.6500244140625, 882.9500122070312, 876.9500122070312, 886.0999755859375, 886.9500122070312, 889.1500244140625, 907.5, 907.8499755859375, 911.5499877929688, 904.5, 922.75, 930.25, 939.75, 934.3499755859375, 937.0, 949.7000122070312, 957.5999755859375, 957.5999755859375, 960.75, 955.8499755859375, 951.1500244140625, 953.2999877929688, 957.1500244140625, 954.0, 967.8499755859375, 973.3499755859375, 972.4500122070312, 982.75, 981.5499877929688, 972.5999755859375]}, {"symbol": "ICICIBANK", "status": "success", "price": 1369.5, "change": -0.98, "rsi": 58.3, "patterns": [], "history": [1380.300048828125, 1379.4000244140625, 1384.0999755859375, 1398.4000244140625, 1417.300048828125, 1436.5999755859375, 1390.300048828125, 1382.0, 1363.699951171875, 1377.699951171875, 1377.5999755859375, 1363.0999755859375, 1370.4000244140625, 1362.4000244140625, 1345.300048828125, 1346.4000244140625, 1336.9000244140625, 1336.9000244140625, 1320.4000244140625, 1343.0, 1348.0, 1358.300048828125, 1358.9000244140625, 1385.9000244140625, 1373.0, 1379.0, 1373.4000244140625, 1383.0999755859375, 1383.0, 1369.5]}, {"symbol": "ITC", "status": "success", "price": 407.8500061035156, "change": 0.59, "rsi": 38.0, "patterns": [], "history": [402.79998779296875, 399.25, 396.79998779296875, 399.8999938964844, 405.1499938964844, 412.1499938964844, 413.04998779296875, 412.8500061035156, 415.95001220703125, 416.79998779296875, 420.6499938964844, 417.8999938964844, 421.6000061035156, 418.75, 420.3500061035156, 413.95001220703125, 408.8999938964844, 408.8999938964844, 407.5, 404.04998779296875, 405.54998779296875, 406.8500061035156, 407.0, 405.70001220703125, 408.1499938964844, 407.1000061035156, 405.8500061035156, 403.54998779296875, 405.45001220703125, 407.8500061035156]}], "logs": [], "meta": {"total": 7, "success": 7, "failed": 0, "timestamp": "2025-11-23 06:49"}};
+    <!DOCTYPE html>
+    <html>
+    <body style="background: #111; color: white; font-family: sans-serif; padding: 20px;">
+        <h1>Nifty 500 Scan Results</h1>
+        <p>Last Updated: 2025-11-23 07:04:07.372690</p>
+        <p>Total Stocks Scanned: 0</p>
         
-        const { useState, useEffect } = React;
-        const { Activity, AlertCircle, Search } = lucide;
-
-        const App = () => {
-            const [view, setView] = useState('stocks');
-            const [filter, setFilter] = useState('ALL');
-            const [search, setSearch] = useState('');
-            const [stocks] = useState(RAW.stocks || []);
-            const [logs] = useState(RAW.logs || []);
-            
-            useEffect(() => { if(window.lucide) window.lucide.createIcons(); }, [view, stocks]);
-
-            const displayed = stocks.filter(s => {
-                const matchF = filter === 'ALL' ? true : s.patterns.length > 0;
-                const matchS = s.symbol.toLowerCase().includes(search.toLowerCase());
-                return matchF && matchS;
-            });
-
-            const Sparkline = ({ data, color }) => {
-                if(!data || data.length < 2) return null;
-                const min = Math.min(...data); const max = Math.max(...data);
-                if (min === max) return null;
-                const points = data.map((d, i) => {
-                    const x = (i / (data.length - 1)) * 100;
-                    const y = 30 - ((d - min) / (max - min)) * 30;
-                    return `${x},${y}`;
-                }).join(' ');
-                return <svg width="100%" height="30" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points={points} fill="none" stroke={color} strokeWidth="2" /></svg>;
-            };
-
-            return (
-                <div className="max-w-4xl mx-auto min-h-screen bg-slate-900 flex flex-col">
-                    <div className="p-4 bg-slate-800 border-b border-slate-700 sticky top-0 z-20 shadow-lg">
-                        <div className="flex justify-between items-center mb-3">
-                            <h1 className="font-bold text-xl flex items-center gap-2"><Activity className="text-blue-500" /> NiftyScan</h1>
-                            <div className="flex gap-2 text-xs">
-                                <button onClick={() => setView('stocks')} className={`px-3 py-1 rounded ${view==='stocks' ? 'bg-blue-600' : 'bg-slate-700'}`}>Stocks ({RAW.meta.success})</button>
-                                <button onClick={() => setView('logs')} className={`px-3 py-1 rounded text-red-300 ${view==='logs' ? 'bg-red-900/50' : 'bg-slate-700'}`}>Failed ({RAW.meta.failed})</button>
-                            </div>
-                        </div>
-                        {view === 'stocks' && (
-                            <div className="flex gap-2">
-                                <input type="text" placeholder="Search..." className="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" value={search} onChange={e => setSearch(e.target.value)} />
-                                <button onClick={() => setFilter(filter === 'ALL' ? 'BREAKOUT' : 'ALL')} className={`px-4 rounded text-sm font-bold ${filter==='BREAKOUT' ? 'bg-blue-600' : 'bg-slate-700 text-slate-400'}`}>
-                                    {filter === 'ALL' ? 'Breakouts' : 'All'}
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="flex-1 p-3 space-y-3">
-                        {view === 'stocks' ? displayed.map((stock, i) => (
-                            <div key={i} className="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <div className="font-bold text-lg">{stock.symbol}</div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-slate-400 text-sm">₹{stock.price}</span>
-                                            <span className={`text-xs font-bold px-1 rounded ${stock.change >= 0 ? 'text-green-400 bg-green-900/20' : 'text-red-400 bg-red-900/20'}`}>{stock.change}%</span>
-                                        </div>
-                                    </div>
-                                    <div className={`px-2 py-1 rounded text-xs font-bold ${stock.rsi < 30 ? 'bg-red-500 text-white' : 'bg-slate-700 text-slate-400'}`}>RSI {stock.rsi}</div>
-                                </div>
-                                <div className="mt-3 grid grid-cols-2 gap-4 items-center">
-                                    <div className="flex flex-wrap gap-1">
-                                        {stock.patterns.length > 0 ? stock.patterns.map(p => (<span key={p} className="text-[10px] uppercase font-bold bg-blue-900/40 text-blue-200 border border-blue-500/30 px-1.5 py-0.5 rounded">{p}</span>)) : <span className="text-[10px] text-slate-600 italic">No patterns</span>}
-                                    </div>
-                                    <div className="h-8 w-full opacity-80"><Sparkline data={stock.history} color={stock.change >= 0 ? '#4ade80' : '#f87171'} /></div>
-                                </div>
-                            </div>
-                        )) : (
-                            <div className="space-y-2">
-                                <div className="text-xs text-slate-500 p-2">Showing failed attempts from CSV list:</div>
-                                {logs.map((log, i) => (
-                                    <div key={i} className="bg-slate-800/50 p-3 rounded border border-red-900/30 flex justify-between items-center">
-                                        <span className="font-mono text-sm text-red-200">{log.symbol}</span>
-                                        <span className="text-xs text-red-400">{log.error}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: #222;">
+                <tr>
+                    <th style="padding: 10px;">Symbol</th>
+                    <th style="padding: 10px;">Price</th>
+                    <th style="padding: 10px;">Change</th>
+                    <th style="padding: 10px;">RSI</th>
+                    <th style="padding: 10px;">Patterns</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </body>
+    </html>
     
