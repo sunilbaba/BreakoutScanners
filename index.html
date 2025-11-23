@@ -1,25 +1,47 @@
 
     <!DOCTYPE html>
     <html>
-    <body style="background: #111; color: white; font-family: sans-serif; padding: 20px;">
-        <h1>Nifty 500 Scan Results</h1>
-        <p>Last Updated: 2025-11-23 07:04:07.372690</p>
-        <p>Total Stocks Scanned: 0</p>
+    <head>
+        <title>Scanner Diagnostic</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body { background: #111; color: white; font-family: monospace; padding: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th { text-align: left; background: #333; padding: 10px; }
+            .logs { background: #000; color: #0f0; padding: 15px; border: 1px solid #333; margin-top: 30px; height: 300px; overflow-y: scroll; }
+        </style>
+    </head>
+    <body>
+        <h1>Market Scanner</h1>
+        <p>Total Scanned: 5</p>
         
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead style="background: #222;">
-                <tr>
-                    <th style="padding: 10px;">Symbol</th>
-                    <th style="padding: 10px;">Price</th>
-                    <th style="padding: 10px;">Change</th>
-                    <th style="padding: 10px;">RSI</th>
-                    <th style="padding: 10px;">Patterns</th>
-                </tr>
-            </thead>
+        <table>
+            <thead><tr><th>Symbol</th><th>Price</th><th>Change</th><th>RSI</th><th>Pattern</th></tr></thead>
             <tbody>
-                
-            </tbody>
+            <tr style="border-bottom: 1px solid #333; background: #2a1111;">
+                <td style="padding: 10px; color: #f87171;">RELIANCE.NS</td>
+                <td colspan="4" style="padding: 10px; color: #f87171;">FAILED: Yahoo API requires curl_cffi session not <class 'requests.sessions.Session'>. Solution: stop setting session, let YF handle.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #333; background: #2a1111;">
+                <td style="padding: 10px; color: #f87171;">TCS.NS</td>
+                <td colspan="4" style="padding: 10px; color: #f87171;">FAILED: Yahoo API requires curl_cffi session not <class 'requests.sessions.Session'>. Solution: stop setting session, let YF handle.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #333; background: #2a1111;">
+                <td style="padding: 10px; color: #f87171;">HDFCBANK.NS</td>
+                <td colspan="4" style="padding: 10px; color: #f87171;">FAILED: Yahoo API requires curl_cffi session not <class 'requests.sessions.Session'>. Solution: stop setting session, let YF handle.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #333; background: #2a1111;">
+                <td style="padding: 10px; color: #f87171;">INFY.NS</td>
+                <td colspan="4" style="padding: 10px; color: #f87171;">FAILED: Yahoo API requires curl_cffi session not <class 'requests.sessions.Session'>. Solution: stop setting session, let YF handle.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #333; background: #2a1111;">
+                <td style="padding: 10px; color: #f87171;">ICICIBANK.NS</td>
+                <td colspan="4" style="padding: 10px; color: #f87171;">FAILED: Yahoo API requires curl_cffi session not <class 'requests.sessions.Session'>. Solution: stop setting session, let YF handle.</td>
+            </tr></tbody>
         </table>
+
+        <h3>SYSTEM DEBUG LOGS (Check here for errors)</h3>
+        <div class="logs">[07:12:41] --- STEP 1: LOADING SYMBOL LIST ---<br>[07:12:41] Current Directory: /home/runner/work/BreakoutScanners/BreakoutScanners<br>[07:12:41] Files found in folder: ['requirements.txt', '.git', '.github', 'README.md', 'nifty_engine_gh.py']<br>[07:12:41] FAILURE: ind_nifty500list.csv NOT FOUND in /home/runner/work/BreakoutScanners/BreakoutScanners<br>[07:12:41] WARNING: Using Fallback List (Top 5 Stocks Only)<br>[07:12:41] --- STEP 2: SCANNING 5 STOCKS ---<br>[07:12:41] Scanning 1/5: RELIANCE.NS<br>[07:12:41] Scanning 2/5: TCS.NS<br>[07:12:41] Scanning 3/5: HDFCBANK.NS<br>[07:12:41] Scanning 4/5: INFY.NS<br>[07:12:41] Scanning 5/5: ICICIBANK.NS<br>[07:12:41] --- STEP 3: GENERATING HTML ---</div>
     </body>
     </html>
     
