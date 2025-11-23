@@ -1,6 +1,5 @@
 import yfinance as yf
 import pandas as pd
-import json
 import os
 import time
 import math
@@ -13,143 +12,170 @@ FILE_PATH = os.path.join(OUTPUT_DIR, "index.html")
 CSV_FILENAME = "ind_nifty500list.csv"
 NSE_URL = "https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv"
 
-# --- 1. GET LIST (Auto-Download if missing) ---
+# --- 1. GET LIST ---
 def get_nifty500_list():
-    tickers = []
-    
-    # Try reading local file
     if os.path.exists(CSV_FILENAME):
         try:
             df = pd.read_csv(CSV_FILENAME)
-            tickers = [f"{x}.NS" for x in df['Symbol'].dropna().tolist()]
-            print(f"Loaded {len(tickers)} stocks from local CSV.")
-            return tickers
-        except Exception as e:
-            print(f"Error reading local CSV: {e}")
-
-    # If local failed, download from Web
-    print("Downloading CSV from NSE...")
+            return [f"{x}.NS" for x in df['Symbol'].dropna().tolist()]
+        except: pass
+    
+    # Auto-Download if missing
+    print("Downloading Nifty 500 list from Web...")
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
-        s = requests.Session()
-        r = s.get(NSE_URL, headers=headers, timeout=10)
+        r = requests.get(NSE_URL, headers=headers, timeout=10)
         df = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
-        tickers = [f"{x}.NS" for x in df['Symbol'].dropna().tolist()]
-        print(f"Downloaded {len(tickers)} stocks from Web.")
-        return tickers
-    except Exception as e:
-        print(f"Download failed: {e}")
-        # Fallback list so script doesn't crash
+        return [f"{x}.NS" for x in df['Symbol'].dropna().tolist()]
+    except:
         return ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS"]
 
-# --- 2. ANALYSIS ENGINE (No Custom Session) ---
+# --- 2. TECHNICAL ANALYSIS ENGINE ---
 def analyze_stock(ticker):
     try:
-        # PAUSE to prevent rate limiting (Crucial for 500 stocks)
-        time.sleep(0.25) 
-        
-        # FIX: Do not pass session. Let yfinance handle it.
+        # 1. Fetch Data (1 Year for 200 EMA)
         stock = yf.Ticker(ticker)
+        df = stock.history(period="1y", interval="1d")
         
-        # Fetch Data
-        df = stock.history(period="6mo", interval="1d")
-        
-        if df.empty: 
-            return {"symbol": ticker, "status": "FAIL", "msg": "No Data"}
-        
-        if len(df) < 50:
-            return {"symbol": ticker, "status": "FAIL", "msg": "Insufficient Data"}
+        if df.empty or len(df) < 200: return None
 
-        # Extract Data
+        # 2. Prepare Series
         close = df['Close']
-        volume = df['Volume']
+        curr_price = float(close.iloc[-1])
+        prev_price = float(close.iloc[-2])
         
-        curr = float(close.iloc[-1])
-        prev = float(close.iloc[-2])
+        # 3. CALCULATE INDICATORS
         
-        # Math safety
-        if math.isnan(curr) or math.isnan(prev): return None
-        
-        change = round(((curr - prev) / prev) * 100, 2)
-        
-        # RSI
+        # --- A. RSI (14) ---
         delta = close.diff()
         gain = (delta.where(delta > 0, 0)).rolling(14).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
         rs = gain / loss
         rsi = 100 - (100 / (1 + rs))
-        curr_rsi = float(rsi.iloc[-1]) if not pd.isna(rsi.iloc[-1]) else 50.0
+        curr_rsi = float(rsi.iloc[-1])
 
-        # SMA
-        sma50_series = close.rolling(50).mean()
-        sma50 = float(sma50_series.iloc[-1]) if not pd.isna(sma50_series.iloc[-1]) else 0.0
+        # --- B. MACD (12, 26, 9) ---
+        # Fast EMA (12) and Slow EMA (26)
+        ema12 = close.ewm(span=12, adjust=False).mean()
+        ema26 = close.ewm(span=26, adjust=False).mean()
+        macd_line = ema12 - ema26
+        signal_line = macd_line.ewm(span=9, adjust=False).mean()
         
-        # Volume
-        vol_avg = float(volume.rolling(20).mean().iloc[-1])
-        curr_vol = float(volume.iloc[-1])
+        # MACD Crossover Logic (Bullish if MACD crosses ABOVE Signal)
+        macd_val = float(macd_line.iloc[-1])
+        sig_val = float(signal_line.iloc[-1])
+        prev_macd = float(macd_line.iloc[-2])
+        prev_sig = float(signal_line.iloc[-2])
+        
+        # --- C. BOLLINGER BANDS (20, 2) ---
+        sma20 = close.rolling(20).mean()
+        std20 = close.rolling(20).std()
+        upper_band = sma20 + (2 * std20)
+        lower_band = sma20 - (2 * std20)
+        curr_upper = float(upper_band.iloc[-1])
+        
+        # --- D. EMA 200 (Long Term Trend) ---
+        ema200 = close.ewm(span=200, adjust=False).mean()
+        curr_ema200 = float(ema200.iloc[-1])
+        trend_status = "UP" if curr_price > curr_ema200 else "DOWN"
 
-        patterns = []
-        if curr_rsi < 30: patterns.append("Oversold")
-        if curr_rsi > 70: patterns.append("Overbought")
-        if curr > sma50 and prev < sma50: patterns.append("SMA Breakout")
-        if curr_vol > (vol_avg * 2): patterns.append("Vol Spike")
+        # 4. PATTERN DETECTION LOGIC
+        signals = []
         
+        # RSI Logic
+        if curr_rsi < 30: signals.append("RSI Oversold")
+        elif curr_rsi < 40 and curr_rsi > float(rsi.iloc[-2]): signals.append("RSI Recovery")
+        
+        # MACD Logic
+        if prev_macd < prev_sig and macd_val > sig_val:
+            signals.append("MACD Buy Signal")
+            
+        # Bollinger Logic
+        if curr_price > curr_upper:
+            signals.append("Bollinger Breakout")
+            
+        # EMA Logic
+        if prev_price < curr_ema200 and curr_price > curr_ema200:
+            signals.append("Trend Reversal (Crossed 200 EMA)")
+
+        # Only return if we have valid data
         return {
             "symbol": ticker.replace(".NS", ""),
-            "status": "OK",
-            "price": round(curr, 2),
-            "change": change,
+            "price": round(curr_price, 2),
+            "change": round(((curr_price - prev_price) / prev_price) * 100, 2),
             "rsi": round(curr_rsi, 1),
-            "patterns": ", ".join(patterns) if patterns else "-"
+            "macd_signal": "BUY" if macd_val > sig_val else "SELL",
+            "trend": trend_status,
+            "signals": ", ".join(signals) if signals else "-"
         }
-    except Exception as e:
-        return {"symbol": ticker, "status": "FAIL", "msg": str(e)}
 
-# --- 3. GENERATE HTML ---
+    except Exception as e:
+        return None
+
+# --- 3. GENERATE PRO HTML ---
 def generate_html(results):
     rows = ""
-    success_count = 0
-    
     for r in results:
-        if r['status'] == "OK":
-            success_count += 1
-            color = "#4ade80" if r['change'] >= 0 else "#f87171"
-            rows += f"""
-            <tr style="border-bottom: 1px solid #333;">
-                <td style="padding: 12px; font-weight: bold;">{r['symbol']}</td>
-                <td style="padding: 12px;">{r['price']}</td>
-                <td style="padding: 12px; color: {color};">{r['change']}%</td>
-                <td style="padding: 12px;">{r['rsi']}</td>
-                <td style="padding: 12px; font-size: 12px; color: #aaa;">{r['patterns']}</td>
-            </tr>
-            """
-        else:
-            # Error Row
-            rows += f"""
-            <tr style="border-bottom: 1px solid #333; background: #2a1111;">
-                <td style="padding: 12px; color: #f87171;">{r['symbol']}</td>
-                <td colspan="4" style="padding: 12px; color: #f87171;">FAILED: {r['msg']}</td>
-            </tr>
-            """
+        # Color coding
+        change_color = "#4ade80" if r['change'] >= 0 else "#f87171" # Green/Red
+        trend_color = "#4ade80" if r['trend'] == "UP" else "#f87171"
+        
+        # RSI Color
+        rsi_bg = "transparent"
+        if r['rsi'] < 30: rsi_bg = "#b91c1c" # Deep Red (Oversold)
+        if r['rsi'] > 70: rsi_bg = "#15803d" # Deep Green (Overbought)
+
+        # Highlight if Buy Signals exist
+        signal_style = "color: #aaa;"
+        if r['signals'] != "-": signal_style = "color: #fbbf24; font-weight: bold;" # Amber color
+
+        rows += f"""
+        <tr style="border-bottom: 1px solid #333;">
+            <td style="padding: 12px; font-weight: bold;">{r['symbol']}</td>
+            <td style="padding: 12px;">{r['price']}</td>
+            <td style="padding: 12px; color: {change_color};">{r['change']}%</td>
+            <td style="padding: 12px;">
+                <span style="background: {rsi_bg}; padding: 2px 6px; rounded: 4px;">{r['rsi']}</span>
+            </td>
+            <td style="padding: 12px; color: {trend_color}; font-size: 11px;">{r['trend']}</td>
+            <td style="padding: 12px; font-size: 11px;">{r['macd_signal']}</td>
+            <td style="padding: 12px; font-size: 12px; {signal_style}">{r['signals']}</td>
+        </tr>
+        """
 
     html = f"""
     <!DOCTYPE html>
     <html>
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Nifty 500 Scanner</title>
+        <title>Pro Nifty Scanner</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            body {{ background: #111; color: white; font-family: sans-serif; padding: 20px; }}
-            table {{ width: 100%; border-collapse: collapse; }}
-            th {{ text-align: left; background: #222; padding: 10px; color: #888; }}
+            body {{ background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }}
+            h1 {{ color: #38bdf8; border-bottom: 2px solid #1e293b; padding-bottom: 10px; }}
+            table {{ width: 100%; border-collapse: collapse; font-size: 14px; background: #1e293b; }}
+            th {{ text-align: left; padding: 12px; background: #0f172a; color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #334155; }}
+            tr:hover {{ background: #334155; }}
         </style>
     </head>
     <body>
-        <h1>Scanner Results</h1>
-        <p>Total: {len(results)} | Success: {success_count}</p>
+        <h1>Nifty 500 Pro Scanner</h1>
+        <p>Total Scanned: {len(results)} | Time: {pd.Timestamp.now()}</p>
+        
         <table>
-            <thead><tr><th>SYM</th><th>PRICE</th><th>%</th><th>RSI</th><th>NOTE</th></tr></thead>
-            <tbody>{rows}</tbody>
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Price</th>
+                    <th>% Chg</th>
+                    <th>RSI (14)</th>
+                    <th>Trend (200 EMA)</th>
+                    <th>MACD</th>
+                    <th>Technical Signals</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows}
+            </tbody>
         </table>
     </body>
     </html>
@@ -157,17 +183,18 @@ def generate_html(results):
     
     if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
     with open(FILE_PATH, "w", encoding="utf-8") as f: f.write(html)
-    print(f"Dashboard generated with {len(results)} rows.")
+    print(f"Generated Pro Dashboard with {len(results)} stocks.")
 
 if __name__ == "__main__":
-    print("Starting Scan...")
+    print("Starting Pro Scan...")
     tickers = get_nifty500_list()
     print(f"Stocks found: {len(tickers)}")
     
     results = []
-    # Removed the limit! Will scan all.
     for i, t in enumerate(tickers):
-        print(f"[{i+1}/{len(tickers)}] Scanning {t}...", end="\r")
+        print(f"[{i+1}/{len(tickers)}] {t}...", end="\r")
+        # Rate limiting to prevent 0 results
+        time.sleep(0.2) 
         res = analyze_stock(t)
         if res: results.append(res)
         
