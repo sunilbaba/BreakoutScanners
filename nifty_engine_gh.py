@@ -7,7 +7,7 @@ import io
 import json
 import warnings
 import math
-import numpy as np
+from datetime import datetime
 
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -29,16 +29,29 @@ def get_session():
     return s
 
 # --- 2. DATA FETCHING ---
-def get_nifty500_list(session):
+def get_nifty500_data(session):
+    print("Fetching Nifty 500 List...")
+    sector_map = {}
+    tickers = []
     try:
         if os.path.exists(CSV_FILENAME):
             df = pd.read_csv(CSV_FILENAME)
         else:
             r = session.get(NSE_URL, timeout=10)
             df = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
-        return [f"{x}.NS" for x in df['Symbol'].dropna().tolist()]
+        
+        # Map Industry
+        if 'Industry' in df.columns:
+            for index, row in df.iterrows():
+                sym = f"{row['Symbol']}.NS"
+                sector_map[sym] = row['Industry']
+                tickers.append(sym)
+        else:
+            tickers = [f"{x}.NS" for x in df['Symbol'].dropna().tolist()]
+            
+        return tickers, sector_map
     except:
-        return ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS"]
+        return ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS"], {}
 
 def get_fno_list(session):
     try:
@@ -63,62 +76,29 @@ def is_hammer(open_p, high, low, close):
     upper = high - max(open_p, close)
     return (lower > 2 * body) and (upper < body)
 
-# --- 4. DECISION LOGIC (THE BRAIN) ---
-def calculate_verdict(trend_score, signals, is_fno, win_rate, rs_score):
-    """
-    Synthesizes all technical data into a single human-readable decision.
-    """
+# --- 4. DECISION LOGIC ---
+def calculate_verdict(trend_score, signals, is_fno, win_rate):
     score = 0
     reasons = []
     
-    # 1. Trend Weight (Max 40 pts)
-    if trend_score == 3: 
-        score += 40
-        reasons.append("Market structure is Bullish (M/W/D).")
-    elif trend_score == 2:
-        score += 25
-        reasons.append("Primary trend is Up.")
-    else:
-        score -= 20
-        reasons.append("Trend is weak/down.")
+    if trend_score == 3: score += 40; reasons.append("Full Bull Trend (M/W/D)")
+    elif trend_score == 2: score += 25; reasons.append("Primary Trend Up")
+    else: score -= 20; reasons.append("Weak Trend")
 
-    # 2. Institutional Weight (Max 20 pts)
-    if is_fno:
-        score += 20
-        reasons.append("High Liquidity (F&O Stock).")
+    if is_fno: score += 20; reasons.append("High Liquidity (F&O)")
     
-    # 3. Signal Strength (Max 20 pts)
-    if "Golden Cross" in signals or "Bull Divergence" in signals:
-        score += 20
-        reasons.append("Strong institutional signal detected.")
-    elif len(signals) > 0:
-        score += 10
-        reasons.append("Breakout signal present.")
+    if "Golden Cross" in signals or "Bull Divergence" in signals: score += 20; reasons.append("Strong Signal")
+    elif len(signals) > 0: score += 10; reasons.append("Breakout Detected")
 
-    # 4. Probability Weight (Max 20 pts)
-    if win_rate > 60:
-        score += 20
-        reasons.append(f"High Win Rate ({win_rate}%).")
-    elif win_rate < 40:
-        score -= 10
-        reasons.append("Historical performance is poor.")
+    if win_rate > 60: score += 20; reasons.append("High Win Rate")
+    elif win_rate < 40: score -= 10
 
-    # 5. FINAL DECISION
     verdict = "WATCH"
     color = "gray"
-    
-    if score >= 80:
-        verdict = "PRIME BUY"
-        color = "green"
-    elif score >= 60:
-        verdict = "MOMENTUM BUY" if not is_fno else "SAFE BUY"
-        color = "blue"
-    elif score >= 40:
-        verdict = "RISKY BUY"
-        color = "orange"
-    else:
-        verdict = "AVOID"
-        color = "red"
+    if score >= 80: verdict = "PRIME BUY"; color = "green"
+    elif score >= 60: verdict = "STRONG BUY"; color = "blue"
+    elif score >= 40: verdict = "RISKY"; color = "orange"
+    else: verdict = "AVOID"; color = "red"
 
     return verdict, color, score, reasons
 
@@ -140,15 +120,16 @@ def run_backtest(df):
     in_pos = False
     entry_price = 0
     
-    for i in range(len(df) - 250, len(df)):
+    start = len(df) - 250
+    if start < 200: start = 200
+    
+    for i in range(start, len(df)):
         price = df['Close'].iloc[i]
-        date = df.index[i].strftime('%Y-%m-%d')
-        
         if in_pos:
             pnl = ((price - entry_price) / entry_price) * 100
             if pnl >= 6.0 or pnl <= -3.0:
                 res = "WIN" if pnl > 0 else "LOSS"
-                trades.append({"date": "", "entry": round(entry_price,2), "result": res, "pnl": round(pnl,2)})
+                trades.append({"date": df.index[i].strftime('%Y-%m-%d'), "entry": round(entry_price,2), "result": res, "pnl": round(pnl,2)})
                 if pnl > 0: wins += 1
                 else: losses += 1
                 in_pos = False
@@ -161,13 +142,13 @@ def run_backtest(df):
     return {"win_rate": rate, "total": total, "log": trades[-5:]}
 
 # --- 6. MASTER ANALYSIS ---
-def analyze_stock(ticker, is_fno, nifty_chg):
+def analyze_stock(ticker, is_fno, sector, nifty_chg):
     try:
         stock = yf.Ticker(ticker)
         df = stock.history(period="5y", interval="1d")
         if df.empty or len(df) < 300: return None
 
-        # Trends
+        # A. TRENDS
         agg = {'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}
         df_w = df.resample('W').agg(agg).dropna()
         df_m = df.resample('ME').agg(agg).dropna()
@@ -176,33 +157,60 @@ def analyze_stock(ticker, is_fno, nifty_chg):
         m_trend = get_trend(df_m)
         w_trend = get_trend(df_w)
         
-        # Daily
+        # B. DAILY
         close = df['Close']
+        high = df['High']
+        low = df['Low']
+        vol = df['Volume']
+        opn = df['Open']
         curr = float(close.iloc[-1])
         prev = float(close.iloc[-2])
         change = round(((curr - prev) / prev) * 100, 2)
         rs_score = round(change - nifty_change, 2)
         
-        # Indicators
-        sma200 = close.rolling(200).mean().iloc[-1]
-        d_trend = "UP" if curr > sma200 else "DOWN"
-        
-        # Pivot
-        r1, s1, pivot = get_pivots(float(df['High'].iloc[-2]), float(df['Low'].iloc[-2]), float(close.iloc[-2]))
-        
-        # Signals
-        signals = []
+        # C. INDICATORS
         sma50 = close.rolling(50).mean()
-        if float(sma50.iloc[-2]) < float(sma200) and float(sma50.iloc[-1]) > float(sma200): signals.append("Golden Cross")
+        sma200 = close.rolling(200).mean()
+        curr_sma200 = float(sma200.iloc[-1])
+        d_trend = "UP" if curr > curr_sma200 else "DOWN"
         
-        rsi_series = 100 - (100 / (1 + (close.diff().where(lambda x: x>0, 0).rolling(14).mean() / close.diff().where(lambda x: x<0, 0).abs().rolling(14).mean())))
-        curr_rsi = float(rsi_series.iloc[-1])
-        if curr_rsi < 30: signals.append("Oversold")
+        # RSI
+        delta = close.diff()
+        gain = (delta.where(delta > 0, 0)).rolling(14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+        rsi = 100 - (100 / (1 + (gain / loss)))
+        curr_rsi = float(rsi.iloc[-1])
         
-        vol_mult = round(float(df['Volume'].iloc[-1]) / float(df['Volume'].rolling(20).mean().iloc[-1]), 1)
-        if vol_mult >= 2.0: signals.append(f"Vol {vol_mult}x")
+        # RSI Divergence (20 Days)
+        div_bull = False
+        if len(close) > 20 and curr < close.iloc[-20:].min() and curr_rsi > rsi.iloc[-20:].min(): div_bull = True
 
-        # Confluence Score (0-3)
+        # Volume
+        vol_avg = float(vol.rolling(20).mean().iloc[-1])
+        vol_mult = round(float(vol.iloc[-1]) / vol_avg, 1) if vol_avg > 0 else 0
+        
+        # Buzz
+        buzz = 0
+        try:
+            if stock.news: buzz = len([n for n in stock.news if (time.time() - n['providerPublishTime']) < 86400])
+        except: pass
+
+        # D. SIGNALS
+        signals = []
+        if float(sma50.iloc[-2]) < float(sma200.iloc[-2]) and float(sma50.iloc[-1]) > float(sma200.iloc[-1]): signals.append("Golden Cross")
+        if div_bull: signals.append("Bull Divergence")
+        
+        # NR7
+        if (high.iloc[-1] - low.iloc[-1]) == (high - low).tail(7).min(): signals.append("NR7 Squeeze")
+        
+        # Hammer
+        if is_hammer(float(opn.iloc[-1]), float(high.iloc[-1]), float(low.iloc[-1]), curr): signals.append("Hammer")
+        
+        if curr_rsi < 30: signals.append("Oversold")
+        if vol_mult >= 2.5: signals.append(f"Vol {vol_mult}x")
+        if prev < float(high.iloc[-253:-1].max()) and curr > float(high.iloc[-253:-1].max()): signals.append("52W High")
+
+        # Filter
         trend_score = 0
         if m_trend == "UP": trend_score += 1
         if w_trend == "UP": trend_score += 1
@@ -211,39 +219,55 @@ def analyze_stock(ticker, is_fno, nifty_chg):
         if not signals and trend_score < 3: return None
         
         bt = run_backtest(df)
+        verdict, v_color, score, reasons = calculate_verdict(trend_score, signals, is_fno, bt['win_rate'])
         
-        # *** GET FINAL VERDICT ***
-        verdict, v_color, score, reasons = calculate_verdict(trend_score, signals, is_fno, bt['win_rate'], rs_score)
+        # Targets
+        atr = float((high - low).rolling(14).mean().iloc[-1])
+        r1, s1, pivot = get_pivots(float(high.iloc[-2]), float(low.iloc[-2]), float(close.iloc[-2]))
 
-        # ATR Targets
-        atr = float((df['High'] - df['Low']).rolling(14).mean().iloc[-1])
-        
         return {
             "symbol": ticker.replace(".NS", ""),
             "price": round(curr, 2),
             "change": change,
+            "sector": sector if sector else "Other",
+            "rs": rs_score,
+            "trends": {"M": m_trend, "W": w_trend, "D": d_trend},
+            "signals": signals,
             "verdict": verdict,
             "v_color": v_color,
             "score": score,
             "reasons": reasons,
-            "signals": signals,
-            "target": round(curr + (2*atr), 1),
-            "stop": round(curr - (1*atr), 1),
+            "is_fno": is_fno,
+            "buzz": buzz,
+            "backtest": bt,
+            "levels": {"R1": r1, "S1": s1, "P": pivot, "TGT": round(curr+(2*atr),1), "SL": round(curr-atr,1)},
             "history": [x if not math.isnan(x) else 0 for x in close.tail(30).tolist()]
         }
 
     except: return None
 
 # --- 7. GENERATE HTML ---
-def generate_html(results):
-    json_data = json.dumps(results)
+def generate_html(results, nifty_chg):
+    # Market Stats
+    adv = len([x for x in results if x['change'] > 0])
+    dec = len([x for x in results if x['change'] < 0])
+    
+    # Sector Stats
+    sec_perf = {}
+    for r in results:
+        s = r['sector']
+        if s not in sec_perf: sec_perf[s] = []
+        sec_perf[s].append(r['change'])
+    sectors = sorted([{"name": k, "avg": round(sum(v)/len(v),2)} for k,v in sec_perf.items()], key=lambda x: x['avg'], reverse=True)[:6]
+
+    json_data = json.dumps({"stocks": results, "sectors": sectors, "stats": {"adv": adv, "dec": dec, "nifty": round(nifty_chg, 2)}})
     
     html = f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Decision Engine</title>
+        <title>Ultra Scanner</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
@@ -251,20 +275,49 @@ def generate_html(results):
             .modal {{ display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 50; backdrop-filter: blur(5px); }}
             .modal-content {{ background: #1e293b; margin: 5vh auto; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; border-radius: 12px; border: 1px solid #334155; }}
             
-            /* Verdict Colors */
-            .v-green {{ background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }}
-            .v-blue {{ background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }}
-            .v-orange {{ background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }}
-            .v-red {{ background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }}
+            .dot {{ height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 2px; }}
+            .dot-up {{ background-color: #4ade80; box-shadow: 0 0 5px #4ade80; }}
+            .dot-down {{ background-color: #f87171; opacity: 0.4; }}
+            
+            .b-std {{ background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }}
+            .b-gold {{ background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.3); }}
+            .b-nr7 {{ background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }}
+            .b-div {{ background: #ec4899; color: white; box-shadow: 0 0 8px #ec4899; }}
+            
+            .v-green {{ color: #4ade80; border: 1px solid #4ade80; background: rgba(74, 222, 128, 0.1); }}
+            .v-blue {{ color: #60a5fa; border: 1px solid #60a5fa; background: rgba(96, 165, 250, 0.1); }}
+            .v-orange {{ color: #fb923c; border: 1px solid #fb923c; background: rgba(251, 146, 60, 0.1); }}
         </style>
     </head>
     <body>
-        <div class="max-w-6xl mx-auto p-4">
-            <header class="mb-6 border-b border-slate-700 pb-4">
-                <h1 class="text-2xl font-bold text-blue-400 flex items-center gap-2">
-                    <i data-lucide="brain-circuit"></i> Decision Engine
-                </h1>
-                <p class="text-xs text-slate-500 mt-1">Artificial Intelligence Decision Matrix</p>
+        <div class="max-w-7xl mx-auto p-4">
+            <!-- HEADER -->
+            <header class="mb-4 border-b border-slate-700 pb-4">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-blue-400 flex items-center gap-2"><i data-lucide="zap"></i> Ultra Scanner</h1>
+                        <div class="flex items-center gap-2 text-xs mt-1 text-slate-400">
+                            <span class="text-green-400 font-bold">ADV {{RAW.stats.adv}}</span> / <span class="text-red-400 font-bold">DEC {{RAW.stats.dec}}</span>
+                            <span>• NIFTY {{RAW.stats.nifty}}%</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- SECTORS -->
+                <div class="flex gap-2 overflow-x-auto pb-2">
+                    {{RAW.sectors.map(s => (
+                        <div class="bg-slate-800 px-3 py-1.5 rounded border border-slate-700 whitespace-nowrap">
+                            <span class="text-[10px] text-slate-400 mr-2">{{s.name}}</span>
+                            <span class="font-bold text-xs ${{s.avg >= 0 ? 'text-green-400' : 'text-red-400'}}">{{s.avg}}%</span>
+                        </div>
+                    ))}}
+                </div>
+                <!-- FILTERS -->
+                <div class="flex bg-slate-800 p-1 rounded-lg mt-3 overflow-x-auto gap-1">
+                    <button onclick="setFilter('ALL')" id="btn-all" class="px-4 py-1.5 rounded text-xs font-bold bg-blue-600 text-white">All</button>
+                    <button onclick="setFilter('PRIME')" id="btn-prime" class="px-4 py-1.5 rounded text-xs font-bold text-slate-400">Prime Buy</button>
+                    <button onclick="setFilter('FNO')" id="btn-fno" class="px-4 py-1.5 rounded text-xs font-bold text-slate-400">F&O</button>
+                    <button onclick="setFilter('RS')" id="btn-rs" class="px-4 py-1.5 rounded text-xs font-bold text-slate-400">Strong RS</button>
+                </div>
             </header>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="grid"></div>
@@ -274,98 +327,157 @@ def generate_html(results):
         <div id="modal" class="modal">
             <div class="modal-content">
                 <div class="sticky top-0 bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center">
-                    <div>
-                        <h2 id="m-sym" class="text-2xl font-bold text-white">SYMBOL</h2>
-                        <div class="text-xs text-slate-400">Analysis Report</div>
-                    </div>
-                    <button onclick="closeModal()" class="p-2 bg-slate-700 rounded-full"><i data-lucide="x"></i></button>
+                    <div><h2 id="m-sym" class="text-2xl font-bold text-white">SYMBOL</h2></div>
+                    <button onclick="closeModal()" class="p-2 bg-slate-700 rounded-full hover:bg-slate-600"><i data-lucide="x"></i></button>
                 </div>
                 <div class="p-6 space-y-6">
-                    
-                    <!-- THE VERDICT BOX -->
                     <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                        <h3 class="text-xs text-slate-500 uppercase mb-2">Why this decision?</h3>
+                        <h3 class="text-xs text-slate-500 uppercase mb-2">Analysis Verdict</h3>
                         <ul id="m-reasons" class="list-disc list-inside text-sm text-slate-300 space-y-1"></ul>
-                        <div class="mt-4 pt-4 border-t border-slate-700 flex justify-between items-center">
-                            <span class="text-xs text-slate-500">CONFIDENCE SCORE</span>
-                            <span id="m-score" class="text-xl font-bold text-white">0/100</span>
+                        <div class="mt-3 pt-3 border-t border-slate-700 flex justify-between text-sm">
+                            <span class="text-slate-500">SCORE</span><span id="m-score" class="font-bold text-white">0/100</span>
                         </div>
                     </div>
-
-                    <!-- TARGETS -->
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-green-900/20 border border-green-500/30 p-3 rounded-lg text-center">
-                            <div class="text-xs text-green-400 uppercase font-bold">Target</div>
-                            <div id="m-target" class="text-2xl font-bold text-white">0</div>
+                        <div class="bg-green-900/20 border border-green-500/30 p-3 rounded text-center">
+                            <div class="text-xs text-green-400 font-bold">TARGET</div><div id="m-tgt" class="text-xl font-bold text-white">0</div>
                         </div>
-                        <div class="bg-red-900/20 border border-red-500/30 p-3 rounded-lg text-center">
-                            <div class="text-xs text-red-400 uppercase font-bold">Stop Loss</div>
-                            <div id="m-stop" class="text-2xl font-bold text-white">0</div>
+                        <div class="bg-red-900/20 border border-red-500/30 p-3 rounded text-center">
+                            <div class="text-xs text-red-400 font-bold">STOP</div><div id="m-sl" class="text-xl font-bold text-white">0</div>
                         </div>
+                    </div>
+                    <div class="bg-slate-800 p-3 rounded border border-slate-700 flex justify-between text-sm">
+                        <div class="text-center"><div class="text-red-400">R1</div><div id="m-r1">0</div></div>
+                        <div class="text-center border-x border-slate-600 px-4"><div class="text-blue-400">Pivot</div><div id="m-p">0</div></div>
+                        <div class="text-center"><div class="text-green-400">S1</div><div id="m-s1">0</div></div>
+                    </div>
+                    <!-- Logs -->
+                    <div class="overflow-hidden rounded border border-slate-700">
+                        <table class="w-full text-xs">
+                            <thead class="bg-slate-900 text-slate-300"><tr><th class="p-2 text-left">Date</th><th class="p-2 text-right">Entry</th><th class="p-2 text-right">Result</th><th class="p-2 text-right">P&L</th></tr></thead>
+                            <tbody id="m-logs" class="bg-slate-800 text-slate-300 divide-y divide-slate-700/50"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
 
         <script>
-            const data = {json_data};
+            const RAW = {json_data};
+            const data = RAW.stocks;
+            let currentFilter = 'ALL';
             lucide.createIcons();
             
-            const grid = document.getElementById('grid');
-            if(data.length === 0) grid.innerHTML = '<div class="text-center p-10 text-slate-500">No actionable signals today.</div>';
+            function setFilter(type) {{
+                currentFilter = type;
+                ['btn-all','btn-fno','btn-rs','btn-prime'].forEach(id => document.getElementById(id).className = "px-4 py-1.5 rounded text-xs font-bold text-slate-400 hover:text-white transition");
+                document.getElementById('btn-'+type.toLowerCase()).className = "px-4 py-1.5 rounded text-xs font-bold bg-blue-600 text-white transition";
+                render();
+            }}
 
-            data.forEach((s, i) => {{
-                const pts = s.history.map((d, j) => {{
-                    const min = Math.min(...s.history); const max = Math.max(...s.history);
-                    const x = (j / (s.history.length - 1)) * 100;
-                    const y = 30 - ((d - min) / (max - min || 1)) * 30;
-                    return `${{x}},${{y}}`;
-                }}).join(' ');
+            function render() {{
+                const grid = document.getElementById('grid');
+                grid.innerHTML = '';
+                
+                const filtered = data.filter(s => {{
+                    if(currentFilter === 'FNO') return s.is_fno;
+                    if(currentFilter === 'RS') return s.rs > 1.5;
+                    if(currentFilter === 'PRIME') return s.verdict === 'PRIME BUY';
+                    return true;
+                }});
 
-                let vClass = 'v-red';
-                if(s.v_color === 'green') vClass = 'v-green';
-                if(s.v_color === 'blue') vClass = 'v-blue';
-                if(s.v_color === 'orange') vClass = 'v-orange';
+                if(filtered.length === 0) grid.innerHTML = '<div class="col-span-3 text-center text-slate-500 p-10">No results.</div>';
 
-                grid.innerHTML += `
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg hover:border-blue-500/50 transition cursor-pointer relative" onclick="openModal('${{s.symbol}}')">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <div class="font-bold text-lg text-white">${{s.symbol}}</div>
-                                <div class="text-xs text-slate-400 font-mono mt-1">₹${{s.price}} <span class="${{s.change>=0?'text-green-400':'text-red-400'}} ml-1">${{s.change}}%</span></div>
+                filtered.forEach((s, i) => {{
+                    // Dots
+                    const mDot = s.trends.M === 'UP' ? 'dot-up' : 'dot-down';
+                    const wDot = s.trends.W === 'UP' ? 'dot-up' : 'dot-down';
+                    const dDot = s.trends.D === 'UP' ? 'dot-up' : 'dot-down';
+                    
+                    // Verdict Class
+                    let vClass = 'v-orange';
+                    if(s.v_color === 'green') vClass = 'v-green';
+                    if(s.v_color === 'blue') vClass = 'v-blue';
+                    if(s.v_color === 'red') vClass = 'text-red-500 border border-red-500 bg-red-900/20';
+
+                    // Badges
+                    let badges = '';
+                    if(s.is_fno) badges += `<span class="bg-blue-900/50 text-blue-300 border border-blue-500/30 px-1.5 py-0.5 rounded text-[10px] font-bold mr-1">F&O</span>`;
+                    if(s.buzz > 0) badges += `<span class="bg-orange-900/50 text-orange-300 border border-orange-500/30 px-1.5 py-0.5 rounded text-[10px] font-bold mr-1 flex items-center gap-1 inline-flex"><i data-lucide="flame" class="w-3"></i>${{s.buzz}}</span>`;
+                    
+                    s.signals.forEach(sig => {{
+                        let cls = 'b-std';
+                        if(sig.includes('NR7')) cls = 'b-nr7';
+                        if(sig.includes('Divergence')) cls = 'b-div';
+                        if(sig.includes('Golden')) cls = 'b-gold';
+                        badges += `<span class="${{cls}} px-1.5 py-0.5 rounded text-[10px] font-bold uppercase mr-1 mb-1 inline-block">${{sig}}</span>`;
+                    }});
+
+                    const pts = s.history.map((d, j) => {{
+                        const min = Math.min(...s.history); const max = Math.max(...s.history);
+                        const x = (j / (s.history.length - 1)) * 100;
+                        const y = 30 - ((d - min) / (max - min || 1)) * 30;
+                        return `${{x}},${{y}}`;
+                    }}).join(' ');
+
+                    grid.innerHTML += `
+                        <div class="card bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg relative group" onclick="openModal('${{s.symbol}}')">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="font-bold text-lg text-white group-hover:text-blue-400 transition">${{s.symbol}}</div>
+                                        <span class="text-[10px] text-slate-500 border border-slate-600 px-1 rounded">${{s.sector.substring(0,10)}}</span>
+                                    </div>
+                                    <div class="text-xs text-slate-400 font-mono mt-1">₹${{s.price}} <span class="${{s.change>=0?'text-green-400':'text-red-400'}} ml-1">${{s.change}}%</span></div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${{vClass}}">${{s.verdict}}</div>
+                                    <div class="mt-1"><span class="dot ${{mDot}}"></span><span class="dot ${{wDot}}"></span><span class="dot ${{dDot}}"></span></div>
+                                </div>
                             </div>
-                            <div class="px-3 py-1 rounded text-xs font-bold uppercase tracking-wider ${{vClass}}">${{s.verdict}}</div>
+                            
+                            <div class="flex flex-wrap gap-1 mb-3 min-h-[1.5rem] content-start">${{badges}}</div>
+                            
+                            <div class="h-8 w-full opacity-60">
+                                <svg width="100%" height="100%" preserveAspectRatio="none" class="overflow-visible"><polyline points="${{pts}}" fill="none" stroke="${{s.change >= 0 ? '#4ade80' : '#f87171'}}" stroke-width="2" /></svg>
+                            </div>
                         </div>
-                        <div class="h-8 w-full opacity-60 mb-3">
-                            <svg width="100%" height="100%" preserveAspectRatio="none" class="overflow-visible"><polyline points="${{pts}}" fill="none" stroke="${{s.change >= 0 ? '#4ade80' : '#f87171'}}" stroke-width="2" /></svg>
-                        </div>
-                        <div class="flex gap-2 text-[10px] text-slate-500">
-                            <span>Signals: ${{s.signals.length}}</span>
-                            <span>•</span>
-                            <span>Score: ${{s.score}}</span>
-                        </div>
-                    </div>
-                `;
-            }});
+                    `;
+                }});
+                lucide.createIcons();
+            }}
 
             function openModal(sym) {{
                 const s = data.find(x => x.symbol === sym);
                 document.getElementById('m-sym').innerText = s.symbol;
-                document.getElementById('m-target').innerText = s.target;
-                document.getElementById('m-stop').innerText = s.stop;
+                document.getElementById('m-tgt').innerText = s.levels.TGT;
+                document.getElementById('m-sl').innerText = s.levels.SL;
+                document.getElementById('m-r1').innerText = s.levels.R1;
+                document.getElementById('m-p').innerText = s.levels.P;
+                document.getElementById('m-s1').innerText = s.levels.S1;
                 document.getElementById('m-score').innerText = s.score + '/100';
                 
                 const list = document.getElementById('m-reasons');
                 list.innerHTML = '';
-                s.reasons.forEach(r => {{
-                    list.innerHTML += `<li>${{r}}</li>`;
-                }});
+                s.reasons.forEach(r => list.innerHTML += `<li>${{r}}</li>`);
                 
+                let rows = '';
+                const bt = s.backtest;
+                if(bt.log.length === 0) rows = '<tr><td colspan="4" class="p-4 text-center italic text-slate-500">No recent signals.</td></tr>';
+                else {{
+                    [...bt.log].reverse().forEach(l => {{
+                        let c = l.result.includes('WIN') ? 'text-green-400 font-bold' : (l.result.includes('LOSS') ? 'text-red-400' : 'text-yellow-400');
+                        rows += `<tr class="hover:bg-slate-700/50"><td class="p-2">${{l.date}}</td><td class="p-2 text-right font-mono">${{l.entry}}</td><td class="p-2 text-right ${{c}} text-[10px]">${{l.result}}</td><td class="p-2 text-right font-mono ${{c}}">${{l.pnl}}%</td></tr>`;
+                    }});
+                }}
+                document.getElementById('m-logs').innerHTML = rows;
                 document.getElementById('modal').style.display = 'block';
             }}
             
             function closeModal() {{ document.getElementById('modal').style.display = 'none'; }}
             window.onclick = function(e) {{ if(e.target == document.getElementById('modal')) closeModal(); }}
+            
+            render();
         </script>
     </body>
     </html>
@@ -373,21 +485,27 @@ def generate_html(results):
     
     if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
     with open(FILE_PATH, "w", encoding="utf-8") as f: f.write(html)
-    print("Generated Decision Dashboard.")
+    print("Generated Ultra Dashboard.")
 
 if __name__ == "__main__":
     session = get_session()
-    tickers = get_nifty500_list(session)
+    tickers, sector_map = get_nifty500_data(session)
     fno_list = get_fno_list(session)
-    nifty_change = 0 # Simplify
+    nifty_chg = 0
+    try:
+        nifty = yf.Ticker("^NSEI")
+        h = nifty.history(period="5d")
+        nifty_chg = ((h['Close'].iloc[-1] - h['Close'].iloc[-2])/h['Close'].iloc[-2])*100
+    except: pass
     
     results = []
-    print(f"Scanning {{len(tickers)}} stocks...")
+    print(f"Scanning {len(tickers)} stocks...")
     for i, t in enumerate(tickers):
         print(f"[{i+1}/{len(tickers)}] {t}...", end="\r")
-        time.sleep(0.15)
+        time.sleep(0.1)
         is_fno = t in fno_list
-        res = analyze_stock(t, is_fno, nifty_change)
+        sec = sector_map.get(t, "Unknown")
+        res = analyze_stock(t, is_fno, sec, nifty_chg)
         if res: results.append(res)
     
-    generate_html(results)
+    generate_html(results, nifty_chg)
