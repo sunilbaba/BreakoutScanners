@@ -4,6 +4,7 @@ import numpy as np
 import os
 import json
 import warnings
+import pytz
 from datetime import datetime
 
 # Suppress warnings
@@ -13,32 +14,33 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 OUTPUT_DIR = "public"
 FILE_PATH = os.path.join(OUTPUT_DIR, "index.html")
 
-# 1. Sector Indices
 SECTOR_INDICES = {
-    "BANK": "^NSEBANK",
-    "AUTO": "^CNXAUTO",
-    "IT": "^CNXIT",
-    "METAL": "^CNXMETAL",
-    "PHARMA": "^CNXPHARMA",
-    "FMCG": "^CNXFMCG",
-    "ENERGY": "^CNXENERGY",
-    "REALTY": "^CNXREALTY",
-    "PSU BANK": "^CNXPSUBANK"
+    "BANK": "^NSEBANK", "AUTO": "^CNXAUTO", "IT": "^CNXIT",
+    "METAL": "^CNXMETAL", "PHARMA": "^CNXPHARMA", "FMCG": "^CNXFMCG",
+    "ENERGY": "^CNXENERGY", "REALTY": "^CNXREALTY", "PSU BANK": "^CNXPSUBANK"
 }
 
-# 2. Map Stocks to Sectors (Expanded List)
 def get_stock_sector(symbol):
     s = symbol.replace('.NS', '')
-    if s in ["HDFCBANK", "ICICIBANK", "SBIN", "AXISBANK", "KOTAKBANK", "INDUSINDBK", "BANKBARODA", "PNB"]: return "BANK"
-    if s in ["TCS", "INFY", "HCLTECH", "WIPRO", "LTIM", "TECHM", "PERSISTENT", "COFORGE"]: return "IT"
-    if s in ["MARUTI", "TATAMOTORS", "M&M", "BAJAJ-AUTO", "EICHERMOT", "HEROMOTOCO", "TVSMOTOR"]: return "AUTO"
-    if s in ["TATASTEEL", "HINDALCO", "JSWSTEEL", "JINDALSTEL", "VEDL", "SAIL", "NMDC"]: return "METAL"
-    if s in ["SUNPHARMA", "CIPLA", "DRREDDY", "DIVISLAB", "LUPIN", "APOLLOHOSP", "AUROPHARMA"]: return "PHARMA"
-    if s in ["ITC", "HINDUNILVR", "NESTLEIND", "BRITANNIA", "TATACONSUM", "VBL", "COLPAL", "DABUR"]: return "FMCG"
+    if s in ["HDFCBANK", "ICICIBANK", "SBIN", "AXISBANK", "KOTAKBANK"]: return "BANK"
+    if s in ["TCS", "INFY", "HCLTECH", "WIPRO", "LTIM", "TECHM"]: return "IT"
+    if s in ["MARUTI", "TATAMOTORS", "M&M", "BAJAJ-AUTO", "EICHERMOT"]: return "AUTO"
+    if s in ["TATASTEEL", "HINDALCO", "JSWSTEEL", "JINDALSTEL", "VEDL"]: return "METAL"
+    if s in ["SUNPHARMA", "CIPLA", "DRREDDY", "DIVISLAB", "LUPIN"]: return "PHARMA"
+    if s in ["ITC", "HINDUNILVR", "NESTLEIND", "BRITANNIA"]: return "FMCG"
     return "Other"
 
 # --- 1. DATA ACQUISITION ---
 def get_tickers():
+    # Robust fallback list
+    default_list = [
+        "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS", "HINDUNILVR.NS", 
+        "ITC.NS", "SBIN.NS", "BHARTIARTL.NS", "KOTAKBANK.NS", "LTIM.NS", "LT.NS", 
+        "AXISBANK.NS", "ASIANPAINT.NS", "MARUTI.NS", "TITAN.NS", "ULTRACEMCO.NS", 
+        "SUNPHARMA.NS", "BAJFINANCE.NS", "HCLTECH.NS", "ADANIENT.NS", "TATASTEEL.NS",
+        "JIOFIN.NS", "ZOMATO.NS", "DLF.NS", "HAL.NS", "VBL.NS", "TRENT.NS", "BEL.NS",
+        "POWERGRID.NS", "ONGC.NS", "NTPC.NS", "COALINDIA.NS", "BPCL.NS"
+    ]
     url = "https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv"
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
@@ -46,37 +48,22 @@ def get_tickers():
         tickers = [f"{x}.NS" for x in df['Symbol'].dropna().unique()]
         print(f"Fetched {len(tickers)} tickers from NSE.")
         return tickers
-    except Exception as e:
-        print(f"Using Fallback List due to: {e}")
-        return [
-            "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS", "HINDUNILVR.NS", 
-            "ITC.NS", "SBIN.NS", "BHARTIARTL.NS", "KOTAKBANK.NS", "LTIM.NS", "LT.NS", 
-            "AXISBANK.NS", "ASIANPAINT.NS", "MARUTI.NS", "TITAN.NS", "ULTRACEMCO.NS", 
-            "SUNPHARMA.NS", "BAJFINANCE.NS", "HCLTECH.NS", "ADANIENT.NS", "TATASTEEL.NS",
-            "JIOFIN.NS", "ZOMATO.NS", "DLF.NS", "HAL.NS", "VBL.NS", "TRENT.NS", "BEL.NS",
-            "POWERGRID.NS", "ONGC.NS", "NTPC.NS", "COALINDIA.NS", "BPCL.NS"
-        ]
+    except:
+        return default_list
 
 def fetch_bulk_data(tickers):
-    """
-    Downloads data using group_by='ticker' which is the safest structure.
-    """
     all_tickers = tickers + list(SECTOR_INDICES.values())
-    print(f"Downloading data for {len(all_tickers)} symbols...")
-    
+    print(f"Downloading {len(all_tickers)} symbols...")
     try:
-        # group_by='ticker' ensures we get a DataFrame where top level columns are Tickers
         data = yf.download(all_tickers, period="6mo", group_by='ticker', threads=True, progress=True)
         return data
     except Exception as e:
-        print(f"Bulk download failed: {e}")
+        print(f"Download failed: {e}")
         return pd.DataFrame()
 
 # --- 2. ANALYSIS ENGINE ---
 def calculate_indicators(df):
-    # Ensure sorted by date
-    df = df.sort_index()
-    
+    df = df.copy()
     df['SMA50'] = df['Close'].rolling(window=50).mean()
     df['SMA200'] = df['Close'].rolling(window=200).mean()
     df['EMA20'] = df['Close'].ewm(span=20, adjust=False).mean()
@@ -98,10 +85,7 @@ def calculate_indicators(df):
     return df
 
 def analyze_ticker(ticker, df, sector_changes):
-    # Data Cleaning: Drop rows with NaN in Close
     df = df.dropna(subset=['Close'])
-    
-    # We need enough data for 200 SMA
     if len(df) < 200: return None
     
     df = calculate_indicators(df)
@@ -111,64 +95,49 @@ def analyze_ticker(ticker, df, sector_changes):
     
     close = float(curr['Close'])
     prev_close = float(prev['Close'])
-    
     if prev_close == 0: return None
-    change_pct = round(((close - prev_close) / prev_close) * 100, 2)
     
+    change_pct = round(((close - prev_close) / prev_close) * 100, 2)
     clean_sym = ticker.replace(".NS", "")
     
-    # --- LOGIC ---
+    # Logic
     setups = []
+    trend = "UP" if close > float(curr['SMA200']) else "DOWN"
     
-    # Trend Check
-    sma200 = float(curr['SMA200'])
-    trend = "UP" if close > sma200 else "DOWN"
-    
-    # Setup 1: Momentum Burst
-    ema20 = float(curr['EMA20'])
-    if close > ema20 and curr['RSI'] > 60 and curr['Volume'] > (curr['VolAvg'] * 1.5):
+    # Momentum
+    vol_avg = float(curr['VolAvg']) if not np.isnan(curr['VolAvg']) else 1.0
+    if close > float(curr['EMA20']) and curr['RSI'] > 60 and curr['Volume'] > (vol_avg * 1.5):
         setups.append("Momentum Burst")
 
-    # Setup 2: Pullback
+    # Pullback
     sma50 = float(curr['SMA50'])
-    dist_to_50 = abs(close - sma50) / close
-    if trend == "UP" and close > sma50 and dist_to_50 < 0.02 and curr['RSI'] < 55:
+    if trend == "UP" and close > sma50 and abs(close - sma50)/close < 0.02 and curr['RSI'] < 55:
         setups.append("Pullback Buy")
 
-    # Setup 3: Golden Cross
+    # Golden Cross
     if df['SMA50'].iloc[-1] > df['SMA200'].iloc[-1] and df['SMA50'].iloc[-2] < df['SMA200'].iloc[-2]:
-         setups.append("Golden Cross")
-
-    # Setup 4: NR7 Breakout
-    ranges = df['High'] - df['Low']
-    if ranges.iloc[-2] == ranges.iloc[-8:-1].min() and close > prev['High']:
-        setups.append("NR7 Breakout")
+        setups.append("Golden Cross")
             
-    # Gap Trap Warning
+    # Gap
     if (curr['Open'] - prev_close) / prev_close > 0.02:
         setups.append("⚠️ GAP UP")
 
-    # Sector Match
+    # Sector
     my_sector = get_stock_sector(clean_sym)
     sector_strength = sector_changes.get(my_sector, 0)
     has_sector_support = sector_strength > 0.5
-    if has_sector_support: setups.append(f"Sector Support (+{sector_strength}%)")
+    if has_sector_support: setups.append(f"Sector Support")
 
-    # Risk Reward
+    # R:R
     atr = float(curr['ATR'])
     target = close + (3 * atr)
     stop = close - (0.75 * atr)
-    
-    rr_ratio = 0
-    risk = close - stop
-    if risk > 0:
-        rr_ratio = round((target - close) / risk, 1)
+    rr_ratio = round((target - close) / (close - stop), 1)
 
     # Verdict
     verdict = "WAIT"
     v_color = "gray"
     
-    # Only show Buy if Setup exists
     if trend == "UP" and len(setups) > 0 and "⚠️ GAP UP" not in setups:
         if rr_ratio >= 1.5:
             verdict = "PRIME BUY ⭐" if has_sector_support else "BUY"
@@ -180,14 +149,16 @@ def analyze_ticker(ticker, df, sector_changes):
         verdict = "CTR-TREND"
         v_color = "blue"
 
-    # Minimal filter: Show stock if there is a verdict OR significant movement
-    if verdict == "WAIT" and abs(change_pct) < 1.5: return None
+    # Minimal Filter for Dashboard
+    if verdict == "WAIT" and abs(change_pct) < 1.0: return None
 
     return {
         "symbol": clean_sym,
         "price": round(close, 2),
         "change": change_pct,
         "sector": my_sector,
+        "rsi": round(curr['RSI'], 1),
+        "vol_mult": round(curr['Volume']/vol_avg, 1),
         "setups": setups,
         "verdict": verdict,
         "v_color": v_color,
@@ -197,24 +168,15 @@ def analyze_ticker(ticker, df, sector_changes):
     }
 
 # --- 3. HTML GENERATION ---
-def generate_html(stocks, sector_data, updated):
+def generate_html(stocks, sector_data, updated_time, is_market_open):
     adv = len([x for x in stocks if x['change'] > 0])
     dec = len([x for x in stocks if x['change'] < 0])
-    
-    # Sort: Prime first, then Buy, then by Change%
-    def sort_key(x):
-        v_rank = 0
-        if "PRIME" in x['verdict']: v_rank = 3
-        elif "BUY" in x['verdict'] and "BAD" not in x['verdict']: v_rank = 2
-        elif "CTR" in x['verdict']: v_rank = 1
-        return (v_rank, x['change'])
-        
-    stocks.sort(key=sort_key, reverse=True)
+    stocks.sort(key=lambda x: (x['verdict'] != "PRIME BUY ⭐", "BUY" not in x['verdict'], -x['change']))
 
     json_data = json.dumps({
         "stocks": stocks,
         "sectors": [{"name": k, "avg": v} for k,v in sector_data.items()],
-        "market": {"adv": adv, "dec": dec}
+        "market": {"adv": adv, "dec": dec, "status": "OPEN" if is_market_open else "CLOSED"}
     })
 
     html = f"""
@@ -223,203 +185,196 @@ def generate_html(stocks, sector_data, updated):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="refresh" content="300">
-        <title>PrimeTrade</title>
+        <!-- Only refresh if market is OPEN -->
+        { '<meta http-equiv="refresh" content="300">' if is_market_open else '' }
+        <title>PrimeTrade Analyst</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
-            body {{ background: #0b0e14; color: #e2e8f0; font-family: 'Inter', sans-serif; }}
-            .card {{ background: #151921; border: 1px solid #2d3342; border-radius: 12px; padding: 16px; position: relative; overflow: hidden; }}
-            .card:hover {{ border-color: #4b5563; transform: translateY(-2px); transition: all 0.2s; }}
+            body {{ background: #0f172a; color: #e2e8f0; font-family: sans-serif; }}
+            .card {{ background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 12px; }}
+            .card:hover {{ border-color: #64748b; }}
+            .prime {{ border: 1px solid #a855f7; background: #1e293b; }}
+            .badge {{ font-size: 9px; padding: 2px 4px; border-radius: 3px; font-weight: bold; margin-right: 3px; display: inline-block; }}
+            .badge-mom {{ background: #064e3b; color: #6ee7b7; }}
+            .badge-sec {{ background: #1e3a8a; color: #93c5fd; }}
             
-            .prime {{ border: 1px solid #9333ea; background: linear-gradient(135deg, #151921 60%, #2e1065 100%); }}
-            .prime::before {{ content: ""; position: absolute; left:0; top:0; bottom:0; width: 3px; background: #a855f7; }}
-            
-            .badge {{ font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-right: 4px; display: inline-block; margin-bottom: 4px; }}
-            .badge-sec {{ background: #172554; color: #60a5fa; border: 1px solid #1e40af; }}
-            .badge-mom {{ background: #064e3b; color: #34d399; border: 1px solid #059669; }}
-            .badge-gap {{ background: #450a0a; color: #fca5a5; border: 1px solid #b91c1c; }}
+            /* Table Styles */
+            table {{ width: 100%; border-collapse: collapse; font-size: 12px; }}
+            th {{ text-align: left; padding: 8px; background: #0f172a; color: #94a3b8; border-bottom: 1px solid #334155; }}
+            td {{ padding: 8px; border-bottom: 1px solid #1e293b; }}
+            tr:hover {{ background: #1e293b; }}
         </style>
     </head>
-    <body class="p-4 lg:p-8">
+    <body class="p-4 md:p-8">
         <div class="max-w-7xl mx-auto">
             
             <!-- Header -->
-            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-800 pb-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight flex items-center gap-2">
-                        <i data-lucide="scan-search" class="text-purple-500"></i> PrimeTrade
+                    <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="text-purple-500"></i> PrimeTrade 
+                        <span class="text-xs px-2 py-0.5 rounded { 'bg-green-900 text-green-300' if is_market_open else 'bg-red-900 text-red-300' }">
+                            { '🟢 LIVE' if is_market_open else '🔴 CLOSED (EOD)' }
+                        </span>
                     </h1>
-                    <div class="text-xs text-slate-500 mt-1 font-mono">{updated} • Auto-Refresh 5m</div>
+                    <div class="text-xs text-slate-500 mt-1">{updated_time}</div>
                 </div>
-                <div class="mt-4 md:mt-0 flex gap-4">
-                    <div class="text-center px-4">
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest">Advances</div>
-                        <div class="text-xl font-bold text-green-500">{adv}</div>
-                    </div>
-                    <div class="w-px bg-slate-800"></div>
-                    <div class="text-center px-4">
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest">Declines</div>
-                        <div class="text-xl font-bold text-red-500">{dec}</div>
-                    </div>
+                <div class="flex gap-4 mt-4 md:mt-0">
+                    <div class="text-center"><div class="text-[10px] text-slate-500">ADV</div><div class="font-bold text-green-500">{adv}</div></div>
+                    <div class="text-center"><div class="text-[10px] text-slate-500">DEC</div><div class="font-bold text-red-500">{dec}</div></div>
                 </div>
             </div>
 
             <!-- Sectors -->
-            <div id="sector-row" class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2 mb-8"></div>
+            <div id="sector-row" class="grid grid-cols-5 md:grid-cols-9 gap-2 mb-6 text-center"></div>
 
-            <!-- Filter Tabs -->
-            <div class="flex gap-2 mb-6 p-1 bg-slate-900/50 rounded-lg inline-flex">
-                <button onclick="filter('ALL')" id="btn-ALL" class="px-5 py-2 rounded-md text-xs font-bold transition-all bg-slate-700 text-white">Market</button>
-                <button onclick="filter('PRIME')" id="btn-PRIME" class="px-5 py-2 rounded-md text-xs font-bold transition-all text-slate-400 hover:text-white">Prime ⭐</button>
-                <button onclick="filter('BUY')" id="btn-BUY" class="px-5 py-2 rounded-md text-xs font-bold transition-all text-slate-400 hover:text-white">Buys</button>
+            <!-- Controls -->
+            <div class="flex justify-between items-center mb-4 bg-slate-800 p-2 rounded-lg">
+                <div class="flex gap-2">
+                    <button onclick="setView('card')" id="btn-card" class="px-3 py-1 text-xs font-bold rounded bg-blue-600 text-white"><i data-lucide="grid" class="w-3 h-3 inline mr-1"></i>Cards</button>
+                    <button onclick="setView('table')" id="btn-table" class="px-3 py-1 text-xs font-bold rounded text-slate-400 hover:text-white"><i data-lucide="list" class="w-3 h-3 inline mr-1"></i>Table</button>
+                </div>
+                <button onclick="downloadCSV()" class="px-3 py-1 text-xs font-bold rounded bg-green-700 text-white hover:bg-green-600"><i data-lucide="download" class="w-3 h-3 inline mr-1"></i>Excel</button>
             </div>
 
-            <!-- Grid -->
-            <div id="grid-root" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+            <!-- Content Area -->
+            <div id="content-area"></div>
         </div>
 
         <script>
             const DATA = {json_data};
-            let activeFilter = 'ALL';
+            let currentView = 'card';
 
             function init() {{
                 const sRoot = document.getElementById('sector-row');
                 sRoot.innerHTML = DATA.sectors.map(s => {{
                     const color = s.avg >= 0 ? 'text-green-400' : 'text-red-400';
-                    const bg = s.avg >= 0 ? 'bg-green-500/5 border-green-500/20' : 'bg-red-500/5 border-red-500/20';
-                    return `<div class="p-2 rounded border ${{bg}} text-center transition hover:bg-slate-800">
-                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">${{s.name}}</div>
-                        <div class="text-sm font-bold ${{color}} mt-0.5">${{s.avg}}%</div>
+                    return `<div class="p-1 rounded bg-slate-800/50 border border-slate-700/50">
+                        <div class="text-[8px] text-slate-400">${{s.name}}</div>
+                        <div class="text-xs font-bold ${{color}}">${{s.avg}}%</div>
                     </div>`;
                 }}).join('');
-                renderGrid();
+                render();
                 lucide.createIcons();
             }}
 
-            function filter(type) {{
-                activeFilter = type;
-                ['ALL','PRIME','BUY'].forEach(t => {{
-                    const btn = document.getElementById('btn-'+t);
-                    if(t===type) btn.className = "px-5 py-2 rounded-md text-xs font-bold transition-all bg-purple-600 text-white shadow-lg shadow-purple-900/50";
-                    else btn.className = "px-5 py-2 rounded-md text-xs font-bold transition-all text-slate-400 hover:text-white hover:bg-slate-800";
-                }});
-                renderGrid();
+            function setView(v) {{
+                currentView = v;
+                document.getElementById('btn-card').className = v==='card' ? "px-3 py-1 text-xs font-bold rounded bg-blue-600 text-white" : "px-3 py-1 text-xs font-bold rounded text-slate-400";
+                document.getElementById('btn-table').className = v==='table' ? "px-3 py-1 text-xs font-bold rounded bg-blue-600 text-white" : "px-3 py-1 text-xs font-bold rounded text-slate-400";
+                render();
             }}
 
-            function renderGrid() {{
-                const root = document.getElementById('grid-root');
-                const filtered = DATA.stocks.filter(s => {{
-                    if(activeFilter === 'PRIME') return s.verdict.includes('PRIME');
-                    if(activeFilter === 'BUY') return s.verdict.includes('BUY');
-                    return true;
-                }});
+            function render() {{
+                const root = document.getElementById('content-area');
+                if(currentView === 'card') {{
+                    root.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4";
+                    root.innerHTML = DATA.stocks.map(s => {{
+                        const isPrime = s.verdict.includes('PRIME');
+                        const badges = s.setups.map(b => {{
+                            let cls = 'bg-slate-700 text-slate-300';
+                            if(b.includes('Momentum')) cls = 'badge-mom';
+                            if(b.includes('Sector')) cls = 'badge-sec';
+                            return `<span class="badge ${{cls}}">${{b}}</span>`;
+                        }}).join('');
+                        let vColor = s.v_color === 'purple' ? 'text-purple-400' : (s.v_color === 'green' ? 'text-green-400' : 'text-slate-500');
+                        
+                        // Sparkline
+                        const h = s.history; 
+                        const pts = h.map((p,i) => `${{(i/(h.length-1))*100}},${{30-((p-Math.min(...h))/(Math.max(...h)-Math.min(...h)||1))*30}}`).join(' ');
 
-                if(filtered.length === 0) {{ root.innerHTML = '<div class="col-span-full text-center py-20 text-slate-600">No stocks matching criteria found.</div>'; return; }}
-
-                root.innerHTML = filtered.map(s => {{
-                    const isPrime = s.verdict.includes('PRIME');
-                    const hist = s.history;
-                    const min = Math.min(...hist); const max = Math.max(...hist);
-                    const pts = hist.map((p, i) => `${{(i/(hist.length-1))*100}},${{40-((p-min)/(max-min||1))*40}}`).join(' ');
-                    const stroke = s.change >= 0 ? '#22c55e' : '#ef4444';
-                    
-                    const badges = s.setups.map(b => {{
-                        let cls = 'bg-slate-800 text-slate-400 border border-slate-700';
-                        if(b.includes('Sector')) cls = 'badge-sec';
-                        if(b.includes('Momentum')) cls = 'badge-mom';
-                        if(b.includes('GAP')) cls = 'badge-gap';
-                        return `<span class="badge ${{cls}}">${{b}}</span>`;
+                        return `<div class="card ${{isPrime ? 'prime' : ''}}">
+                            <div class="flex justify-between mb-2">
+                                <div><div class="font-bold text-white">${{s.symbol}}</div><div class="text-[10px] text-slate-400">${{s.sector}}</div></div>
+                                <div class="text-right"><div class="font-mono font-bold ${{s.change>=0?'text-green-400':'text-red-400'}}">${{s.change}}%</div><div class="text-[10px] text-slate-500">₹${{s.price}}</div></div>
+                            </div>
+                            <div class="mb-3 h-5">${{badges}}</div>
+                            <div class="flex justify-between items-end border-t border-slate-700 pt-2">
+                                <div class="font-bold text-xs ${{vColor}}">${{s.verdict.replace('⭐','')}}</div>
+                                <div class="text-[10px] text-slate-400">RR: <span class="text-white">${{s.rr}}</span></div>
+                            </div>
+                            <svg class="mt-2 opacity-30" height="30" width="100%"><polyline points="${{pts}}" fill="none" stroke="${{s.change>=0?'#4ade80':'#f87171'}}" stroke-width="2"/></svg>
+                        </div>`;
                     }}).join('');
-
-                    let vColor = 'text-slate-500';
-                    if(s.v_color === 'green') vColor = 'text-green-400';
-                    if(s.v_color === 'purple') vColor = 'text-purple-400';
-                    if(s.v_color === 'orange') vColor = 'text-orange-400';
-
-                    return `
-                    <div class="card ${{isPrime ? 'prime' : ''}} group cursor-default">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <div class="font-bold text-lg text-white tracking-tight">${{s.symbol}}</div>
-                                <div class="text-[10px] text-slate-400 uppercase font-bold">${{s.sector}}</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xl font-mono font-bold ${{s.change>=0?'text-green-400':'text-red-400'}}">${{s.change}}%</div>
-                                <div class="text-[10px] text-slate-500">₹${{s.price}}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4 min-h-[24px] flex flex-wrap content-start">${{badges}}</div>
-                        
-                        <div class="flex justify-between items-end border-t border-slate-800 pt-3 mt-2">
-                             <div>
-                                <div class="text-[9px] text-slate-500 uppercase font-bold">Verdict</div>
-                                <div class="text-xs font-bold ${{vColor}}">${{s.verdict.replace('⭐','')}}</div>
-                             </div>
-                             <div class="text-right">
-                                <div class="text-[9px] text-slate-500 uppercase font-bold">R:R</div>
-                                <div class="text-xs font-bold text-slate-300">${{s.rr}}</div>
-                             </div>
-                        </div>
-
-                        <div class="absolute bottom-0 left-0 right-0 h-12 opacity-20 group-hover:opacity-40 transition pointer-events-none">
-                            <svg width="100%" height="100%" preserveAspectRatio="none"><polyline points="${{pts}}" fill="none" stroke="${{stroke}}" stroke-width="2" vector-effect="non-scaling-stroke" /></svg>
-                        </div>
-                    </div>`;
-                }}).join('');
+                }} else {{
+                    root.className = "overflow-x-auto";
+                    let rows = DATA.stocks.map(s => `<tr>
+                        <td class="font-bold text-white">${{s.symbol}} <span class="text-[10px] text-slate-500 block">${{s.sector}}</span></td>
+                        <td class="${{s.change>=0?'text-green-400':'text-red-400'}} font-mono">${{s.change}}%</td>
+                        <td>${{s.price}}</td>
+                        <td>${{s.rsi}}</td>
+                        <td>${{s.vol_mult}}x</td>
+                        <td class="text-xs text-slate-300">${{s.setups.join(', ')}}</td>
+                        <td class="font-bold ${{s.v_color==='purple'?'text-purple-400':(s.v_color==='green'?'text-green-400':'text-slate-500')}}">${{s.verdict}}</td>
+                        <td>${{s.rr}}</td>
+                        <td class="font-mono text-green-400">${{s.levels.TGT}}</td>
+                        <td class="font-mono text-red-400">${{s.levels.SL}}</td>
+                    </tr>`).join('');
+                    root.innerHTML = `<table><thead><tr><th>Stock</th><th>%</th><th>Price</th><th>RSI</th><th>Vol</th><th>Setup</th><th>Verdict</th><th>RR</th><th>Target</th><th>Stop</th></tr></thead><tbody>${{rows}}</tbody></table>`;
+                }}
                 lucide.createIcons();
             }}
+
+            function downloadCSV() {{
+                const headers = ["Symbol", "Sector", "Price", "Change%", "RSI", "VolMult", "Verdict", "RR", "Target", "Stop", "Setups"];
+                const rows = DATA.stocks.map(s => [
+                    s.symbol, s.sector, s.price, s.change, s.rsi, s.vol_mult, 
+                    s.verdict.replace('⭐',''), s.rr, s.levels.TGT, s.levels.SL, s.setups.join('|')
+                ]);
+                let csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\\n");
+                const link = document.createElement("a");
+                link.setAttribute("href", encodeURI(csvContent));
+                link.setAttribute("download", "prime_trade_data.csv");
+                document.body.appendChild(link);
+                link.click();
+            }}
+            
             init();
         </script>
     </body>
     </html>
     """
-    
     if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
     with open(FILE_PATH, "w", encoding="utf-8") as f: f.write(html)
 
 if __name__ == "__main__":
-    print("--- SCANNER STARTING ---")
-    tickers = get_tickers()
+    # Time Logic: Check if market is open (09:15 - 15:30 IST)
+    # IST = UTC + 5:30
+    utc_now = datetime.utcnow()
+    ist_hour = (utc_now.hour + 5) + (utc_now.minute + 30) // 60
+    ist_min = (utc_now.minute + 30) % 60
     
-    # Force group_by='ticker' to get specific structure: [Ticker] -> [Open, High...]
+    # Simple market check: Weekday AND (Time > 09:15 AND Time < 15:30)
+    # Note: GitHub Actions runs on UTC, so we rely on the scheduler mostly.
+    # But we calculate status for the badge.
+    # 03:45 UTC = 09:15 IST | 10:00 UTC = 15:30 IST
+    utc_time = utc_now.hour * 60 + utc_now.minute
+    market_open = (utc_now.weekday() < 5) and (225 <= utc_time <= 600) # 03:45 to 10:00 UTC
+
+    tickers = get_tickers()
     bulk_data = fetch_bulk_data(tickers)
     
     sector_changes = {}
     results = []
-
+    
     if not bulk_data.empty:
-        # Extract Sector Changes First
+        # Extract Sector Data
         for name, ticker in SECTOR_INDICES.items():
-            if ticker in bulk_data.columns: # Top level check
+            if ticker in bulk_data.columns:
                 try:
                     s = bulk_data[ticker]['Close'].dropna()
-                    if len(s) > 1:
-                        sector_changes[name] = round(((s.iloc[-1] - s.iloc[-2]) / s.iloc[-2]) * 100, 2)
+                    if len(s)>1: sector_changes[name] = round(((s.iloc[-1]-s.iloc[-2])/s.iloc[-2])*100, 2)
                 except: pass
-
-        # Extract Stocks
-        # With group_by='ticker', the columns top level is the Tickers
-        # We iterate over unique values in level 0
-        stock_list = bulk_data.columns.levels[0] if isinstance(bulk_data.columns, pd.MultiIndex) else bulk_data.columns
-
-        print(f"Processing {len(stock_list)} items...")
-        
-        for t in stock_list:
-            if t.startswith('^'): continue # Skip sector indices in the loop
-            
-            try:
-                # Direct Access via Ticker Key
-                df = bulk_data[t].copy()
                 
-                # Analyze
-                res = analyze_ticker(t, df, sector_changes)
+        # Extract Stocks
+        stock_list = bulk_data.columns.levels[0] if isinstance(bulk_data.columns, pd.MultiIndex) else bulk_data.columns
+        for t in stock_list:
+            if t.startswith('^'): continue
+            try:
+                res = analyze_ticker(t, bulk_data[t].copy(), sector_changes)
                 if res: results.append(res)
-            except Exception as e:
-                continue
+            except: continue
 
-    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
-    print(f"Generating Report for {len(results)} stocks...")
-    generate_html(results, sector_changes, now)
-    print("Done.")
+    timestamp = utc_now.strftime("%Y-%m-%d %H:%M UTC")
+    generate_html(results, sector_changes, timestamp, market_open)
