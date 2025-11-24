@@ -1,10 +1,16 @@
-name: Nifty 500 Daily Scanner
+name: Nifty 500 Intraday Scanner
 
 on:
   schedule:
-    # Run at 14:30 UTC daily (which is 8:00 PM IST)
-    - cron: '30 * 9-14 * * 1-5'
-  workflow_dispatch: # Allows you to run it manually from the Actions tab
+    # Run every 15 minutes from 03:00 UTC to 10:00 UTC (8:30 AM IST to 3:30 PM IST)
+    # Weekdays only (Monday to Friday)
+    - cron: '*/15 3-10 * * 1-5'
+  workflow_dispatch: # Button to run manually
+
+# Prevents multiple runs from overlapping (e.g. if one run hangs)
+concurrency:
+  group: "scanner-production"
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -14,6 +20,7 @@ permissions:
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 10 # Force kill if it gets stuck to save minutes
 
     steps:
       - name: Checkout code
@@ -23,6 +30,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+          cache: 'pip' # Caches dependencies to make runs faster (saves minutes)
 
       - name: Install dependencies
         run: |
@@ -37,5 +45,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
           keep_files: false
-
-
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Auto-update market data'
