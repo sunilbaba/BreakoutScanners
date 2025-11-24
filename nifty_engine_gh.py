@@ -7,7 +7,7 @@ import io
 import json
 import warnings
 import math
-from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
 
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -16,7 +16,8 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 OUTPUT_DIR = "public"
 FILE_PATH = os.path.join(OUTPUT_DIR, "index.html")
 CSV_FILENAME = "ind_nifty500list.csv"
-NSE_URL = "https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv"
+# We use a fallback list if NSE blocks the request
+NSE_URL = "https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv" 
 FNO_URL = "https://nsearchives.nseindia.com/content/fo/fo_mktlots.csv"
 
 # --- 1. SESSION HELPER ---
@@ -34,13 +35,13 @@ def get_nifty500_data(session):
     sector_map = {}
     tickers = []
     try:
-        if os.path.exists(CSV_FILENAME):
-            df = pd.read_csv(CSV_FILENAME)
-        else:
-            r = session.get(NSE_URL, timeout=10)
+        # Try fetching live
+        r = session.get(NSE_URL, timeout=10)
+        if r.status_code == 200:
             df = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
+        else:
+            raise Exception("NSE Download Failed")
         
-        # Map Industry
         if 'Industry' in df.columns:
             for index, row in df.iterrows():
                 sym = f"{row['Symbol']}.NS"
@@ -48,10 +49,15 @@ def get_nifty500_data(session):
                 tickers.append(sym)
         else:
             tickers = [f"{x}.NS" for x in df['Symbol'].dropna().tolist()]
+    except Exception as e:
+        print(f"Warning: Could not fetch Nifty 500 list ({e}). Using fallback top 20.")
+        # Fallback list to ensure script always runs
+        tickers = ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS",
+                   "HINDUNILVR.NS", "ITC.NS", "SBIN.NS", "BHARTIARTL.NS", "KOTAKBANK.NS",
+                   "LTIM.NS", "LT.NS", "AXISBANK.NS", "ASIANPAINT.NS", "MARUTI.NS",
+                   "TITAN.NS", "ULTRACEMCO.NS", "SUNPHARMA.NS", "BAJFINANCE.NS", "HCLTECH.NS"]
             
-        return tickers, sector_map
-    except:
-        return ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS"], {}
+    return tickers, sector_map
 
 def get_fno_list(session):
     try:
@@ -72,6 +78,7 @@ def get_pivots(high, low, close):
 
 def is_hammer(open_p, high, low, close):
     body = abs(close - open_p)
+    if body == 0: return False
     lower = min(open_p, close) - low
     upper = high - max(open_p, close)
     return (lower > 2 * body) and (upper < body)
@@ -108,6 +115,7 @@ def run_backtest(df):
     wins, losses = 0, 0
     if len(df) < 200: return {"win_rate": 0, "total": 0, "log": []}
 
+    df = df.copy()
     df['SMA200'] = df['Close'].rolling(200).mean()
     df['Trend'] = df['Close'] > df['SMA200']
     
@@ -123,17 +131,24 @@ def run_backtest(df):
     start = len(df) - 250
     if start < 200: start = 200
     
+    # Simple simulation loop
+    # Note: iterating rows is slow, but acceptable for backtesting small datasets
+    close_prices = df['Close'].values
+    trend_vals = df['Trend'].values
+    sig_vals = df['Signal'].values
+    dates = df.index
+    
     for i in range(start, len(df)):
-        price = df['Close'].iloc[i]
+        price = close_prices[i]
         if in_pos:
             pnl = ((price - entry_price) / entry_price) * 100
             if pnl >= 6.0 or pnl <= -3.0:
                 res = "WIN" if pnl > 0 else "LOSS"
-                trades.append({"date": df.index[i].strftime('%Y-%m-%d'), "entry": round(entry_price,2), "result": res, "pnl": round(pnl,2)})
+                trades.append({"date": dates[i].strftime('%Y-%m-%d'), "entry": round(entry_price,2), "result": res, "pnl": round(pnl,2)})
                 if pnl > 0: wins += 1
                 else: losses += 1
                 in_pos = False
-        elif df['Trend'].iloc[i] and df['Signal'].iloc[i]:
+        elif trend_vals[i] and sig_vals[i]:
             in_pos = True
             entry_price = price
 
@@ -145,15 +160,18 @@ def run_backtest(df):
 def analyze_stock(ticker, is_fno, sector, nifty_chg):
     try:
         stock = yf.Ticker(ticker)
-        df = stock.history(period="5y", interval="1d")
-        if df.empty or len(df) < 300: return None
+        df = stock.history(period="2y", interval="1d") # 2y is enough for calculation, faster
+        if df.empty or len(df) < 200: return None
 
         # A. TRENDS
         agg = {'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}
         df_w = df.resample('W').agg(agg).dropna()
         df_m = df.resample('ME').agg(agg).dropna()
         
-        def get_trend(d): return "UP" if d['Close'].iloc[-1] > d['Close'].ewm(span=20).mean().iloc[-1] else "DOWN"
+        def get_trend(d): 
+            if len(d) < 20: return "FLAT"
+            return "UP" if d['Close'].iloc[-1] > d['Close'].ewm(span=20).mean().iloc[-1] else "DOWN"
+            
         m_trend = get_trend(df_m)
         w_trend = get_trend(df_w)
         
@@ -166,7 +184,7 @@ def analyze_stock(ticker, is_fno, sector, nifty_chg):
         curr = float(close.iloc[-1])
         prev = float(close.iloc[-2])
         change = round(((curr - prev) / prev) * 100, 2)
-        rs_score = round(change - nifty_change, 2)
+        rs_score = round(change - nifty_chg, 2)
         
         # C. INDICATORS
         sma50 = close.rolling(50).mean()
@@ -191,9 +209,10 @@ def analyze_stock(ticker, is_fno, sector, nifty_chg):
         
         # Buzz
         buzz = 0
-        try:
-            if stock.news: buzz = len([n for n in stock.news if (time.time() - n['providerPublishTime']) < 86400])
-        except: pass
+        # News fetching can be slow, skipping for speed in this version
+        # try:
+        #    if stock.news: buzz = len([n for n in stock.news if (time.time() - n['providerPublishTime']) < 86400])
+        # except: pass
 
         # D. SIGNALS
         signals = []
@@ -208,15 +227,19 @@ def analyze_stock(ticker, is_fno, sector, nifty_chg):
         
         if curr_rsi < 30: signals.append("Oversold")
         if vol_mult >= 2.5: signals.append(f"Vol {vol_mult}x")
-        if prev < float(high.iloc[-253:-1].max()) and curr > float(high.iloc[-253:-1].max()): signals.append("52W High")
+        
+        # 52W High check (last 250 days)
+        if len(high) > 250:
+            if prev < float(high.iloc[-250:-1].max()) and curr > float(high.iloc[-250:-1].max()): signals.append("52W High")
 
-        # Filter
+        # Filter: Only show interesting stocks to keep HTML size down
         trend_score = 0
         if m_trend == "UP": trend_score += 1
         if w_trend == "UP": trend_score += 1
         if d_trend == "UP": trend_score += 1
         
-        if not signals and trend_score < 3: return None
+        # Skip junk stocks
+        if not signals and trend_score < 2: return None
         
         bt = run_backtest(df)
         verdict, v_color, score, reasons = calculate_verdict(trend_score, signals, is_fno, bt['win_rate'])
@@ -244,24 +267,34 @@ def analyze_stock(ticker, is_fno, sector, nifty_chg):
             "history": [x if not math.isnan(x) else 0 for x in close.tail(30).tolist()]
         }
 
-    except: return None
+    except Exception as e:
+        return None
 
 # --- 7. GENERATE HTML ---
 def generate_html(results, nifty_chg):
-    # Market Stats
+    # Market Stats calculation in Python, but passed to JS
     adv = len([x for x in results if x['change'] > 0])
     dec = len([x for x in results if x['change'] < 0])
     
-    # Sector Stats
+    # Sector Stats calculation
     sec_perf = {}
     for r in results:
         s = r['sector']
         if s not in sec_perf: sec_perf[s] = []
         sec_perf[s].append(r['change'])
+    
     sectors = sorted([{"name": k, "avg": round(sum(v)/len(v),2)} for k,v in sec_perf.items()], key=lambda x: x['avg'], reverse=True)[:6]
 
-    json_data = json.dumps({"stocks": results, "sectors": sectors, "stats": {"adv": adv, "dec": dec, "nifty": round(nifty_chg, 2)}})
+    # Prepare data for Injection
+    final_data = {
+        "stocks": results, 
+        "sectors": sectors, 
+        "stats": {"adv": adv, "dec": dec, "nifty": round(nifty_chg, 2)}
+    }
+    json_data = json.dumps(final_data)
     
+    # HTML Template
+    # NOTICE: Double curly braces {{ }} for CSS/JS, Single { } for Python f-string variable injection
     html = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -297,19 +330,15 @@ def generate_html(results, nifty_chg):
                     <div>
                         <h1 class="text-2xl font-bold text-blue-400 flex items-center gap-2"><i data-lucide="zap"></i> Ultra Scanner</h1>
                         <div class="flex items-center gap-2 text-xs mt-1 text-slate-400">
-                            <span class="text-green-400 font-bold">ADV {{RAW.stats.adv}}</span> / <span class="text-red-400 font-bold">DEC {{RAW.stats.dec}}</span>
-                            <span>• NIFTY {{RAW.stats.nifty}}%</span>
+                            <span class="text-green-400 font-bold">ADV <span id="stat-adv">--</span></span> / 
+                            <span class="text-red-400 font-bold">DEC <span id="stat-dec">--</span></span>
+                            <span>• NIFTY <span id="stat-nifty">--</span>%</span>
                         </div>
                     </div>
                 </div>
                 <!-- SECTORS -->
-                <div class="flex gap-2 overflow-x-auto pb-2">
-                    {{RAW.sectors.map(s => (
-                        <div class="bg-slate-800 px-3 py-1.5 rounded border border-slate-700 whitespace-nowrap">
-                            <span class="text-[10px] text-slate-400 mr-2">{{s.name}}</span>
-                            <span class="font-bold text-xs ${{s.avg >= 0 ? 'text-green-400' : 'text-red-400'}}">{{s.avg}}%</span>
-                        </div>
-                    ))}}
+                <div id="sector-container" class="flex gap-2 overflow-x-auto pb-2">
+                    <!-- JS Injected -->
                 </div>
                 <!-- FILTERS -->
                 <div class="flex bg-slate-800 p-1 rounded-lg mt-3 overflow-x-auto gap-1">
@@ -320,7 +349,9 @@ def generate_html(results, nifty_chg):
                 </div>
             </header>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="grid"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="grid">
+                <div class="col-span-3 text-center text-slate-500 mt-10">Loading Data...</div>
+            </div>
         </div>
 
         <!-- MODAL -->
@@ -363,19 +394,46 @@ def generate_html(results, nifty_chg):
         </div>
 
         <script>
+            // INJECT PYTHON DATA HERE
             const RAW = {json_data};
             const data = RAW.stocks;
             let currentFilter = 'ALL';
-            lucide.createIcons();
             
+            // --- MAIN RENDER LOGIC ---
+            function initDashboard() {{
+                // 1. Render Stats
+                document.getElementById('stat-adv').innerText = RAW.stats.adv;
+                document.getElementById('stat-dec').innerText = RAW.stats.dec;
+                document.getElementById('stat-nifty').innerText = RAW.stats.nifty;
+
+                // 2. Render Sectors
+                const sectorContainer = document.getElementById('sector-container');
+                let sectorHTML = '';
+                RAW.sectors.forEach(s => {{
+                   const colorClass = s.avg >= 0 ? 'text-green-400' : 'text-red-400';
+                   sectorHTML += `
+                    <div class="bg-slate-800 px-3 py-1.5 rounded border border-slate-700 whitespace-nowrap">
+                        <span class="text-[10px] text-slate-400 mr-2">${{s.name}}</span>
+                        <span class="font-bold text-xs ${{colorClass}}">${{s.avg}}%</span>
+                    </div>`;
+                }});
+                sectorContainer.innerHTML = sectorHTML;
+
+                // 3. Render Grid
+                renderGrid();
+                
+                // 4. Initialize Icons
+                lucide.createIcons();
+            }}
+
             function setFilter(type) {{
                 currentFilter = type;
                 ['btn-all','btn-fno','btn-rs','btn-prime'].forEach(id => document.getElementById(id).className = "px-4 py-1.5 rounded text-xs font-bold text-slate-400 hover:text-white transition");
                 document.getElementById('btn-'+type.toLowerCase()).className = "px-4 py-1.5 rounded text-xs font-bold bg-blue-600 text-white transition";
-                render();
+                renderGrid();
             }}
 
-            function render() {{
+            function renderGrid() {{
                 const grid = document.getElementById('grid');
                 grid.innerHTML = '';
                 
@@ -386,9 +444,10 @@ def generate_html(results, nifty_chg):
                     return true;
                 }});
 
-                if(filtered.length === 0) grid.innerHTML = '<div class="col-span-3 text-center text-slate-500 p-10">No results.</div>';
+                if(filtered.length === 0) grid.innerHTML = '<div class="col-span-3 text-center text-slate-500 p-10">No results found.</div>';
 
-                filtered.forEach((s, i) => {{
+                let gridHTML = '';
+                filtered.forEach((s) => {{
                     // Dots
                     const mDot = s.trends.M === 'UP' ? 'dot-up' : 'dot-down';
                     const wDot = s.trends.W === 'UP' ? 'dot-up' : 'dot-down';
@@ -403,7 +462,6 @@ def generate_html(results, nifty_chg):
                     // Badges
                     let badges = '';
                     if(s.is_fno) badges += `<span class="bg-blue-900/50 text-blue-300 border border-blue-500/30 px-1.5 py-0.5 rounded text-[10px] font-bold mr-1">F&O</span>`;
-                    if(s.buzz > 0) badges += `<span class="bg-orange-900/50 text-orange-300 border border-orange-500/30 px-1.5 py-0.5 rounded text-[10px] font-bold mr-1 flex items-center gap-1 inline-flex"><i data-lucide="flame" class="w-3"></i>${{s.buzz}}</span>`;
                     
                     s.signals.forEach(sig => {{
                         let cls = 'b-std';
@@ -413,22 +471,28 @@ def generate_html(results, nifty_chg):
                         badges += `<span class="${{cls}} px-1.5 py-0.5 rounded text-[10px] font-bold uppercase mr-1 mb-1 inline-block">${{sig}}</span>`;
                     }});
 
+                    // Mini Chart Points
                     const pts = s.history.map((d, j) => {{
-                        const min = Math.min(...s.history); const max = Math.max(...s.history);
+                        const min = Math.min(...s.history); 
+                        const max = Math.max(...s.history);
+                        const range = max - min || 1;
                         const x = (j / (s.history.length - 1)) * 100;
-                        const y = 30 - ((d - min) / (max - min || 1)) * 30;
+                        const y = 30 - ((d - min) / range) * 30;
                         return `${{x}},${{y}}`;
                     }}).join(' ');
+                    
+                    const strokeColor = s.change >= 0 ? '#4ade80' : '#f87171';
+                    const changeColor = s.change >= 0 ? 'text-green-400' : 'text-red-400';
 
-                    grid.innerHTML += `
-                        <div class="card bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg relative group" onclick="openModal('${{s.symbol}}')">
+                    gridHTML += `
+                        <div class="card bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg relative group cursor-pointer hover:border-slate-500 transition" onclick="openModal('${{s.symbol}}')">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <div class="font-bold text-lg text-white group-hover:text-blue-400 transition">${{s.symbol}}</div>
                                         <span class="text-[10px] text-slate-500 border border-slate-600 px-1 rounded">${{s.sector.substring(0,10)}}</span>
                                     </div>
-                                    <div class="text-xs text-slate-400 font-mono mt-1">₹${{s.price}} <span class="${{s.change>=0?'text-green-400':'text-red-400'}} ml-1">${{s.change}}%</span></div>
+                                    <div class="text-xs text-slate-400 font-mono mt-1">₹${{s.price}} <span class="${{changeColor}} ml-1">${{s.change}}%</span></div>
                                 </div>
                                 <div class="text-right">
                                     <div class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${{vClass}}">${{s.verdict}}</div>
@@ -439,11 +503,13 @@ def generate_html(results, nifty_chg):
                             <div class="flex flex-wrap gap-1 mb-3 min-h-[1.5rem] content-start">${{badges}}</div>
                             
                             <div class="h-8 w-full opacity-60">
-                                <svg width="100%" height="100%" preserveAspectRatio="none" class="overflow-visible"><polyline points="${{pts}}" fill="none" stroke="${{s.change >= 0 ? '#4ade80' : '#f87171'}}" stroke-width="2" /></svg>
+                                <svg width="100%" height="100%" preserveAspectRatio="none" class="overflow-visible"><polyline points="${{pts}}" fill="none" stroke="${{strokeColor}}" stroke-width="2" /></svg>
                             </div>
                         </div>
                     `;
                 }});
+                
+                grid.innerHTML = gridHTML;
                 lucide.createIcons();
             }}
 
@@ -477,7 +543,8 @@ def generate_html(results, nifty_chg):
             function closeModal() {{ document.getElementById('modal').style.display = 'none'; }}
             window.onclick = function(e) {{ if(e.target == document.getElementById('modal')) closeModal(); }}
             
-            render();
+            // Start
+            initDashboard();
         </script>
     </body>
     </html>
@@ -485,27 +552,38 @@ def generate_html(results, nifty_chg):
     
     if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
     with open(FILE_PATH, "w", encoding="utf-8") as f: f.write(html)
-    print("Generated Ultra Dashboard.")
+    print(f"Generated Ultra Dashboard at: {FILE_PATH}")
 
+# --- MAIN EXECUTION ---
 if __name__ == "__main__":
     session = get_session()
+    
+    # 1. Get List
     tickers, sector_map = get_nifty500_data(session)
     fno_list = get_fno_list(session)
+    
+    # 2. Get Market Context
     nifty_chg = 0
     try:
         nifty = yf.Ticker("^NSEI")
-        h = nifty.history(period="5d")
+        h = nifty.history(period="2d")
         nifty_chg = ((h['Close'].iloc[-1] - h['Close'].iloc[-2])/h['Close'].iloc[-2])*100
     except: pass
     
+    print(f"Scanning {len(tickers)} stocks with ThreadPool...")
     results = []
-    print(f"Scanning {len(tickers)} stocks...")
-    for i, t in enumerate(tickers):
-        print(f"[{i+1}/{len(tickers)}] {t}...", end="\r")
-        time.sleep(0.1)
-        is_fno = t in fno_list
-        sec = sector_map.get(t, "Unknown")
-        res = analyze_stock(t, is_fno, sec, nifty_chg)
-        if res: results.append(res)
-    
+
+    # 3. Multi-threaded Scanning
+    # We use ThreadPool to speed up YFinance blocking calls
+    def scan_task(ticker):
+        is_fno = ticker in fno_list
+        sec = sector_map.get(ticker, "Unknown")
+        return analyze_stock(ticker, is_fno, sec, nifty_chg)
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = list(executor.map(scan_task, tickers))
+        
+    results = [r for r in futures if r is not None]
+
+    # 4. Generate
     generate_html(results, nifty_chg)
