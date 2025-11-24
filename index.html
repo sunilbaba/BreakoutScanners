@@ -4,153 +4,151 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="refresh" content="300">
-        <title>PrimeTrade</title>
+        <!-- Only refresh if market is OPEN -->
+        
+        <title>PrimeTrade Analyst</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
-            body { background: #0b0e14; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-            .card { background: #151921; border: 1px solid #2d3342; border-radius: 12px; padding: 16px; position: relative; overflow: hidden; }
-            .card:hover { border-color: #4b5563; transform: translateY(-2px); transition: all 0.2s; }
+            body { background: #0f172a; color: #e2e8f0; font-family: sans-serif; }
+            .card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 12px; }
+            .card:hover { border-color: #64748b; }
+            .prime { border: 1px solid #a855f7; background: #1e293b; }
+            .badge { font-size: 9px; padding: 2px 4px; border-radius: 3px; font-weight: bold; margin-right: 3px; display: inline-block; }
+            .badge-mom { background: #064e3b; color: #6ee7b7; }
+            .badge-sec { background: #1e3a8a; color: #93c5fd; }
             
-            .prime { border: 1px solid #9333ea; background: linear-gradient(135deg, #151921 60%, #2e1065 100%); }
-            .prime::before { content: ""; position: absolute; left:0; top:0; bottom:0; width: 3px; background: #a855f7; }
-            
-            .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-right: 4px; display: inline-block; margin-bottom: 4px; }
-            .badge-sec { background: #172554; color: #60a5fa; border: 1px solid #1e40af; }
-            .badge-mom { background: #064e3b; color: #34d399; border: 1px solid #059669; }
-            .badge-gap { background: #450a0a; color: #fca5a5; border: 1px solid #b91c1c; }
+            /* Table Styles */
+            table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            th { text-align: left; padding: 8px; background: #0f172a; color: #94a3b8; border-bottom: 1px solid #334155; }
+            td { padding: 8px; border-bottom: 1px solid #1e293b; }
+            tr:hover { background: #1e293b; }
         </style>
     </head>
-    <body class="p-4 lg:p-8">
+    <body class="p-4 md:p-8">
         <div class="max-w-7xl mx-auto">
             
             <!-- Header -->
-            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-800 pb-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight flex items-center gap-2">
-                        <i data-lucide="scan-search" class="text-purple-500"></i> PrimeTrade
+                    <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="text-purple-500"></i> PrimeTrade 
+                        <span class="text-xs px-2 py-0.5 rounded bg-red-900 text-red-300">
+                            🔴 CLOSED (EOD)
+                        </span>
                     </h1>
-                    <div class="text-xs text-slate-500 mt-1 font-mono">2025-11-24 19:40:56 UTC • Auto-Refresh 5m</div>
+                    <div class="text-xs text-slate-500 mt-1">2025-11-24 19:54 UTC</div>
                 </div>
-                <div class="mt-4 md:mt-0 flex gap-4">
-                    <div class="text-center px-4">
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest">Advances</div>
-                        <div class="text-xl font-bold text-green-500">0</div>
-                    </div>
-                    <div class="w-px bg-slate-800"></div>
-                    <div class="text-center px-4">
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest">Declines</div>
-                        <div class="text-xl font-bold text-red-500">0</div>
-                    </div>
+                <div class="flex gap-4 mt-4 md:mt-0">
+                    <div class="text-center"><div class="text-[10px] text-slate-500">ADV</div><div class="font-bold text-green-500">0</div></div>
+                    <div class="text-center"><div class="text-[10px] text-slate-500">DEC</div><div class="font-bold text-red-500">0</div></div>
                 </div>
             </div>
 
             <!-- Sectors -->
-            <div id="sector-row" class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2 mb-8"></div>
+            <div id="sector-row" class="grid grid-cols-5 md:grid-cols-9 gap-2 mb-6 text-center"></div>
 
-            <!-- Filter Tabs -->
-            <div class="flex gap-2 mb-6 p-1 bg-slate-900/50 rounded-lg inline-flex">
-                <button onclick="filter('ALL')" id="btn-ALL" class="px-5 py-2 rounded-md text-xs font-bold transition-all bg-slate-700 text-white">Market</button>
-                <button onclick="filter('PRIME')" id="btn-PRIME" class="px-5 py-2 rounded-md text-xs font-bold transition-all text-slate-400 hover:text-white">Prime ⭐</button>
-                <button onclick="filter('BUY')" id="btn-BUY" class="px-5 py-2 rounded-md text-xs font-bold transition-all text-slate-400 hover:text-white">Buys</button>
+            <!-- Controls -->
+            <div class="flex justify-between items-center mb-4 bg-slate-800 p-2 rounded-lg">
+                <div class="flex gap-2">
+                    <button onclick="setView('card')" id="btn-card" class="px-3 py-1 text-xs font-bold rounded bg-blue-600 text-white"><i data-lucide="grid" class="w-3 h-3 inline mr-1"></i>Cards</button>
+                    <button onclick="setView('table')" id="btn-table" class="px-3 py-1 text-xs font-bold rounded text-slate-400 hover:text-white"><i data-lucide="list" class="w-3 h-3 inline mr-1"></i>Table</button>
+                </div>
+                <button onclick="downloadCSV()" class="px-3 py-1 text-xs font-bold rounded bg-green-700 text-white hover:bg-green-600"><i data-lucide="download" class="w-3 h-3 inline mr-1"></i>Excel</button>
             </div>
 
-            <!-- Grid -->
-            <div id="grid-root" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+            <!-- Content Area -->
+            <div id="content-area"></div>
         </div>
 
         <script>
-            const DATA = {"stocks": [], "sectors": [{"name": "BANK", "avg": -0.05}, {"name": "AUTO", "avg": -0.35}, {"name": "IT", "avg": 0.41}, {"name": "METAL", "avg": -1.23}, {"name": "PHARMA", "avg": -0.39}, {"name": "FMCG", "avg": -0.66}, {"name": "ENERGY", "avg": -1.18}, {"name": "REALTY", "avg": -2.05}, {"name": "PSU BANK", "avg": -0.15}], "market": {"adv": 0, "dec": 0}};
-            let activeFilter = 'ALL';
+            const DATA = {"stocks": [], "sectors": [{"name": "BANK", "avg": -0.05}, {"name": "AUTO", "avg": -0.35}, {"name": "IT", "avg": 0.41}, {"name": "METAL", "avg": -1.23}, {"name": "PHARMA", "avg": -0.39}, {"name": "FMCG", "avg": -0.66}, {"name": "ENERGY", "avg": -1.18}, {"name": "REALTY", "avg": -2.05}, {"name": "PSU BANK", "avg": -0.15}], "market": {"adv": 0, "dec": 0, "status": "CLOSED"}};
+            let currentView = 'card';
 
             function init() {
                 const sRoot = document.getElementById('sector-row');
                 sRoot.innerHTML = DATA.sectors.map(s => {
                     const color = s.avg >= 0 ? 'text-green-400' : 'text-red-400';
-                    const bg = s.avg >= 0 ? 'bg-green-500/5 border-green-500/20' : 'bg-red-500/5 border-red-500/20';
-                    return `<div class="p-2 rounded border ${bg} text-center transition hover:bg-slate-800">
-                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">${s.name}</div>
-                        <div class="text-sm font-bold ${color} mt-0.5">${s.avg}%</div>
+                    return `<div class="p-1 rounded bg-slate-800/50 border border-slate-700/50">
+                        <div class="text-[8px] text-slate-400">${s.name}</div>
+                        <div class="text-xs font-bold ${color}">${s.avg}%</div>
                     </div>`;
                 }).join('');
-                renderGrid();
+                render();
                 lucide.createIcons();
             }
 
-            function filter(type) {
-                activeFilter = type;
-                ['ALL','PRIME','BUY'].forEach(t => {
-                    const btn = document.getElementById('btn-'+t);
-                    if(t===type) btn.className = "px-5 py-2 rounded-md text-xs font-bold transition-all bg-purple-600 text-white shadow-lg shadow-purple-900/50";
-                    else btn.className = "px-5 py-2 rounded-md text-xs font-bold transition-all text-slate-400 hover:text-white hover:bg-slate-800";
-                });
-                renderGrid();
+            function setView(v) {
+                currentView = v;
+                document.getElementById('btn-card').className = v==='card' ? "px-3 py-1 text-xs font-bold rounded bg-blue-600 text-white" : "px-3 py-1 text-xs font-bold rounded text-slate-400";
+                document.getElementById('btn-table').className = v==='table' ? "px-3 py-1 text-xs font-bold rounded bg-blue-600 text-white" : "px-3 py-1 text-xs font-bold rounded text-slate-400";
+                render();
             }
 
-            function renderGrid() {
-                const root = document.getElementById('grid-root');
-                const filtered = DATA.stocks.filter(s => {
-                    if(activeFilter === 'PRIME') return s.verdict.includes('PRIME');
-                    if(activeFilter === 'BUY') return s.verdict.includes('BUY');
-                    return true;
-                });
+            function render() {
+                const root = document.getElementById('content-area');
+                if(currentView === 'card') {
+                    root.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4";
+                    root.innerHTML = DATA.stocks.map(s => {
+                        const isPrime = s.verdict.includes('PRIME');
+                        const badges = s.setups.map(b => {
+                            let cls = 'bg-slate-700 text-slate-300';
+                            if(b.includes('Momentum')) cls = 'badge-mom';
+                            if(b.includes('Sector')) cls = 'badge-sec';
+                            return `<span class="badge ${cls}">${b}</span>`;
+                        }).join('');
+                        let vColor = s.v_color === 'purple' ? 'text-purple-400' : (s.v_color === 'green' ? 'text-green-400' : 'text-slate-500');
+                        
+                        // Sparkline
+                        const h = s.history; 
+                        const pts = h.map((p,i) => `${(i/(h.length-1))*100},${30-((p-Math.min(...h))/(Math.max(...h)-Math.min(...h)||1))*30}`).join(' ');
 
-                if(filtered.length === 0) { root.innerHTML = '<div class="col-span-full text-center py-20 text-slate-600">No stocks matching criteria found.</div>'; return; }
-
-                root.innerHTML = filtered.map(s => {
-                    const isPrime = s.verdict.includes('PRIME');
-                    const hist = s.history;
-                    const min = Math.min(...hist); const max = Math.max(...hist);
-                    const pts = hist.map((p, i) => `${(i/(hist.length-1))*100},${40-((p-min)/(max-min||1))*40}`).join(' ');
-                    const stroke = s.change >= 0 ? '#22c55e' : '#ef4444';
-                    
-                    const badges = s.setups.map(b => {
-                        let cls = 'bg-slate-800 text-slate-400 border border-slate-700';
-                        if(b.includes('Sector')) cls = 'badge-sec';
-                        if(b.includes('Momentum')) cls = 'badge-mom';
-                        if(b.includes('GAP')) cls = 'badge-gap';
-                        return `<span class="badge ${cls}">${b}</span>`;
+                        return `<div class="card ${isPrime ? 'prime' : ''}">
+                            <div class="flex justify-between mb-2">
+                                <div><div class="font-bold text-white">${s.symbol}</div><div class="text-[10px] text-slate-400">${s.sector}</div></div>
+                                <div class="text-right"><div class="font-mono font-bold ${s.change>=0?'text-green-400':'text-red-400'}">${s.change}%</div><div class="text-[10px] text-slate-500">₹${s.price}</div></div>
+                            </div>
+                            <div class="mb-3 h-5">${badges}</div>
+                            <div class="flex justify-between items-end border-t border-slate-700 pt-2">
+                                <div class="font-bold text-xs ${vColor}">${s.verdict.replace('⭐','')}</div>
+                                <div class="text-[10px] text-slate-400">RR: <span class="text-white">${s.rr}</span></div>
+                            </div>
+                            <svg class="mt-2 opacity-30" height="30" width="100%"><polyline points="${pts}" fill="none" stroke="${s.change>=0?'#4ade80':'#f87171'}" stroke-width="2"/></svg>
+                        </div>`;
                     }).join('');
-
-                    let vColor = 'text-slate-500';
-                    if(s.v_color === 'green') vColor = 'text-green-400';
-                    if(s.v_color === 'purple') vColor = 'text-purple-400';
-                    if(s.v_color === 'orange') vColor = 'text-orange-400';
-
-                    return `
-                    <div class="card ${isPrime ? 'prime' : ''} group cursor-default">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <div class="font-bold text-lg text-white tracking-tight">${s.symbol}</div>
-                                <div class="text-[10px] text-slate-400 uppercase font-bold">${s.sector}</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xl font-mono font-bold ${s.change>=0?'text-green-400':'text-red-400'}">${s.change}%</div>
-                                <div class="text-[10px] text-slate-500">₹${s.price}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4 min-h-[24px] flex flex-wrap content-start">${badges}</div>
-                        
-                        <div class="flex justify-between items-end border-t border-slate-800 pt-3 mt-2">
-                             <div>
-                                <div class="text-[9px] text-slate-500 uppercase font-bold">Verdict</div>
-                                <div class="text-xs font-bold ${vColor}">${s.verdict.replace('⭐','')}</div>
-                             </div>
-                             <div class="text-right">
-                                <div class="text-[9px] text-slate-500 uppercase font-bold">R:R</div>
-                                <div class="text-xs font-bold text-slate-300">${s.rr}</div>
-                             </div>
-                        </div>
-
-                        <div class="absolute bottom-0 left-0 right-0 h-12 opacity-20 group-hover:opacity-40 transition pointer-events-none">
-                            <svg width="100%" height="100%" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${stroke}" stroke-width="2" vector-effect="non-scaling-stroke" /></svg>
-                        </div>
-                    </div>`;
-                }).join('');
+                } else {
+                    root.className = "overflow-x-auto";
+                    let rows = DATA.stocks.map(s => `<tr>
+                        <td class="font-bold text-white">${s.symbol} <span class="text-[10px] text-slate-500 block">${s.sector}</span></td>
+                        <td class="${s.change>=0?'text-green-400':'text-red-400'} font-mono">${s.change}%</td>
+                        <td>${s.price}</td>
+                        <td>${s.rsi}</td>
+                        <td>${s.vol_mult}x</td>
+                        <td class="text-xs text-slate-300">${s.setups.join(', ')}</td>
+                        <td class="font-bold ${s.v_color==='purple'?'text-purple-400':(s.v_color==='green'?'text-green-400':'text-slate-500')}">${s.verdict}</td>
+                        <td>${s.rr}</td>
+                        <td class="font-mono text-green-400">${s.levels.TGT}</td>
+                        <td class="font-mono text-red-400">${s.levels.SL}</td>
+                    </tr>`).join('');
+                    root.innerHTML = `<table><thead><tr><th>Stock</th><th>%</th><th>Price</th><th>RSI</th><th>Vol</th><th>Setup</th><th>Verdict</th><th>RR</th><th>Target</th><th>Stop</th></tr></thead><tbody>${rows}</tbody></table>`;
+                }
                 lucide.createIcons();
             }
+
+            function downloadCSV() {
+                const headers = ["Symbol", "Sector", "Price", "Change%", "RSI", "VolMult", "Verdict", "RR", "Target", "Stop", "Setups"];
+                const rows = DATA.stocks.map(s => [
+                    s.symbol, s.sector, s.price, s.change, s.rsi, s.vol_mult, 
+                    s.verdict.replace('⭐',''), s.rr, s.levels.TGT, s.levels.SL, s.setups.join('|')
+                ]);
+                let csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+                const link = document.createElement("a");
+                link.setAttribute("href", encodeURI(csvContent));
+                link.setAttribute("download", "prime_trade_data.csv");
+                document.body.appendChild(link);
+                link.click();
+            }
+            
             init();
         </script>
     </body>
