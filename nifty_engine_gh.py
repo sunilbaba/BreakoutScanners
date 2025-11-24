@@ -7,6 +7,7 @@ import io
 import json
 import warnings
 import math
+from datetime import datetime
 
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -34,119 +35,197 @@ def get_nifty500_list():
     except:
         return ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS"]
 
-# --- 2. HELPER: CALCULATE TRENDS ---
-def get_trend_data(df, period_name):
-    """
-    Calculates Trend (EMA20) and Momentum (MACD) for a given timeframe dataframe.
-    """
-    if len(df) < 26: return "NEUTRAL", False # Not enough data
+# --- 2. BACKTESTER ---
+def run_backtest(df):
+    trades = []
+    wins = 0
+    losses = 0
     
-    # EMA 20 (Trend Filter)
-    ema20 = df['Close'].ewm(span=20, adjust=False).mean()
-    curr_price = df['Close'].iloc[-1]
-    curr_ema = ema20.iloc[-1]
-    prev_price = df['Close'].iloc[-2]
-    prev_ema = ema20.iloc[-2]
-    
-    # Trend Status
-    trend = "UP" if curr_price > curr_ema else "DOWN"
-    
-    # Check for Fresh Breakout (Price crossed EMA20 just now)
-    breakout = (prev_price < prev_ema) and (curr_price > curr_ema)
-    
-    return trend, breakout
+    # Need enough data
+    if len(df) < 200: return {"win_rate": 0, "total": 0, "log": []}
 
-# --- 3. MULTI-TIMEFRAME ENGINE ---
+    # Calculate Logic for Backtest (Vectorized for speed)
+    df['SMA200'] = df['Close'].rolling(200).mean()
+    df['Trend'] = df['Close'] > df['SMA200']
+    
+    # Triggers
+    ema12 = df['Close'].ewm(span=12, adjust=False).mean()
+    ema26 = df['Close'].ewm(span=26, adjust=False).mean()
+    macd = ema12 - ema26
+    signal = macd.ewm(span=9, adjust=False).mean()
+    df['Signal_MACD'] = (macd > signal) & (macd.shift(1) < signal.shift(1))
+    
+    delta = df['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+    rs = gain / loss
+    rsi = 100 - (100 / (1 + rs))
+    df['Signal_RSI'] = (rsi < 40) & (rsi.shift(1) > rsi) # Dip
+    
+    # SIMULATION
+    in_pos = False
+    entry_price = 0
+    entry_date = None
+    days = 0
+    
+    start = len(df) - 250
+    if start < 200: start = 200
+    
+    for i in range(start, len(df)):
+        price = df['Close'].iloc[i]
+        date = df.index[i].strftime('%Y-%m-%d')
+        
+        if in_pos:
+            days += 1
+            pnl = ((price - entry_price) / entry_price) * 100
+            
+            res = None
+            if pnl >= 6.0: res = "WIN (Target)"
+            elif pnl <= -3.0: res = "LOSS (Stop)"
+            elif days >= 20: res = "TIMEOUT"
+            
+            if res:
+                trades.append({"date": entry_date, "entry": round(entry_price, 2), "exit": round(price, 2), "result": res, "pnl": round(pnl, 2)})
+                if pnl > 0: wins += 1
+                else: losses += 1
+                in_pos = False
+        else:
+            if df['Trend'].iloc[i] and (df['Signal_MACD'].iloc[i] or df['Signal_RSI'].iloc[i]):
+                in_pos = True
+                entry_price = price
+                entry_date = date
+                days = 0
+
+    total = wins + losses
+    rate = round((wins / total * 100), 0) if total > 0 else 0
+    return {"win_rate": rate, "total": total, "wins": wins, "log": trades[-5:]} # Keep 5 logs
+
+# --- 3. MULTI-TIMEFRAME HELPER ---
+def get_trend_status(df, tf_name):
+    if len(df) < 20: return "NEUTRAL"
+    ema20 = df['Close'].ewm(span=20, adjust=False).mean()
+    return "UP" if df['Close'].iloc[-1] > ema20.iloc[-1] else "DOWN"
+
+# --- 4. MASTER ANALYZER ---
 def analyze_stock(ticker):
     try:
         stock = yf.Ticker(ticker)
-        # Fetch 5 years to build valid Weekly/Monthly charts
+        # Fetch 5 years for Weekly/Monthly charts
         df_d = stock.history(period="5y", interval="1d")
         
-        if df_d.empty or len(df_d) < 200: return None
+        if df_d.empty or len(df_d) < 300: return None
 
-        # --- A. RESAMPLE DATA (Create W and M Charts) ---
-        agg_dict = {'Open': 'first', 'High': 'max', 'Low': 'min', 'Close': 'last', 'Volume': 'sum'}
+        # --- A. MULTI-TIMEFRAME TRENDS ---
+        agg = {'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}
+        df_w = df_d.resample('W').agg(agg).dropna()
+        df_m = df_d.resample('ME').agg(agg).dropna()
         
-        # Weekly Chart
-        df_w = df_d.resample('W').agg(agg_dict).dropna()
-        # Monthly Chart
-        df_m = df_d.resample('ME').agg(agg_dict).dropna() # 'ME' is Month End
-
-        # --- B. ANALYZE TRENDS ---
-        # 1. Monthly (Long Term)
-        m_trend, m_breakout = get_trend_data(df_m, "Monthly")
+        m_trend = get_trend_status(df_m, "Monthly")
+        w_trend = get_trend_status(df_w, "Weekly")
         
-        # 2. Weekly (Intermediate)
-        w_trend, w_breakout = get_trend_data(df_w, "Weekly")
+        # --- B. DAILY ANALYSIS (Fresh Breakouts) ---
+        close = df_d['Close']
+        high = df_d['High']
+        low = df_d['Low']
+        vol = df_d['Volume']
+        opn = df_d['Open']
         
-        # 3. Daily (Short Term Entry)
-        curr_price = df_d['Close'].iloc[-1]
-        prev_price = df_d['Close'].iloc[-2]
-        change = round(((curr_price - prev_price) / prev_price) * 100, 2)
+        curr = float(close.iloc[-1])
+        prev = float(close.iloc[-2])
+        change = round(((curr - prev) / prev) * 100, 2)
         
-        # --- C. DAILY SIGNALS (Existing Mechanism) ---
-        signals = []
+        # Indicators
+        sma50 = close.rolling(50).mean()
+        sma200 = close.rolling(200).mean()
+        curr_sma200 = float(sma200.iloc[-1])
+        prev_sma200 = float(sma200.iloc[-2])
+        curr_sma50 = float(sma50.iloc[-1])
+        prev_sma50 = float(sma50.iloc[-2])
+        
+        # Daily Trend
+        d_trend = "UP" if curr > curr_sma200 else "DOWN"
         
         # RSI
-        delta = df_d['Close'].diff()
+        delta = close.diff()
         gain = (delta.where(delta > 0, 0)).rolling(14).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
         rs = gain / loss
         rsi = 100 - (100 / (1 + rs))
         curr_rsi = float(rsi.iloc[-1])
+        prev_rsi = float(rsi.iloc[-2])
         
-        if curr_rsi < 30: signals.append("RSI Oversold")
-        if curr_rsi > 70: signals.append("Overbought")
+        # MACD
+        ema12 = close.ewm(span=12, adjust=False).mean()
+        ema26 = close.ewm(span=26, adjust=False).mean()
+        macd = ema12 - ema26
+        sig = macd.ewm(span=9, adjust=False).mean()
+        curr_macd = float(macd.iloc[-1])
+        curr_sig = float(sig.iloc[-1])
+        prev_macd = float(macd.iloc[-2])
+        prev_sig = float(sig.iloc[-2])
         
-        # Bollinger Blast (Volatility Breakout)
-        sma20 = df_d['Close'].rolling(20).mean()
-        std20 = df_d['Close'].rolling(20).std()
+        # Bollinger
+        sma20 = close.rolling(20).mean()
+        std20 = close.rolling(20).std()
         upper = sma20 + (2 * std20)
-        if curr_price > upper.iloc[-1] and prev_price < upper.iloc[-2]:
-            signals.append("BB Blast")
-            
-        # Engulfing (Candlestick)
-        open_p = df_d['Open']
-        close_p = df_d['Close']
-        if (close_p.iloc[-2] < open_p.iloc[-2]) and (close_p.iloc[-1] > open_p.iloc[-1]): # Red then Green
-            if (open_p.iloc[-1] < close_p.iloc[-2]) and (close_p.iloc[-1] > open_p.iloc[-2]): # Engulfs
-                signals.append("Bull Engulfing")
-
-        # --- D. ADD TIMEFRAME SIGNALS ---
-        if w_breakout: signals.append("W-Breakout")
-        if m_breakout: signals.append("M-Breakout")
-
-        # --- E. ALIGNMENT SCORE (Confluence) ---
-        # 3/3 = Perfect alignment (All Up)
-        # 0/3 = Avoid (All Down)
-        alignment = 0
-        if m_trend == "UP": alignment += 1
-        if w_trend == "UP": alignment += 1
-        # Daily trend check (Price > SMA50)
-        sma50 = df_d['Close'].rolling(50).mean().iloc[-1]
-        if curr_price > sma50: alignment += 1
+        curr_upper = float(upper.iloc[-1])
+        prev_upper = float(upper.iloc[-2])
         
-        # FILTER: 
-        # Show if there is a Signal OR if it's a Weekly/Monthly Breakout
-        if not signals and not w_breakout and not m_breakout: return None
+        # ATR Target
+        tr = pd.concat([high - low, (high - close.shift(1)).abs(), (low - close.shift(1)).abs()], axis=1).max(axis=1)
+        atr = float(tr.rolling(14).mean().iloc[-1])
+        target = round(curr + (2 * atr), 1)
+        stop = round(curr - (1 * atr), 1)
+
+        # --- C. BUZZ ---
+        buzz = 0
+        try:
+            if stock.news: buzz = len([n for n in stock.news if (time.time() - n['providerPublishTime']) < 86400])
+        except: pass
+
+        # --- D. SIGNALS ---
+        signals = []
+        if prev_sma50 < prev_sma200 and curr_sma50 > curr_sma200: signals.append("Golden Cross")
+        if prev_macd < prev_sig and curr_macd > curr_sig: signals.append("MACD Buy")
+        if prev < curr_upper and curr > curr_upper: signals.append("BB Blast")
+        if curr_rsi < 15: signals.append("RSI < 15")
+        elif curr_rsi < 30: signals.append("Oversold")
+        
+        # Engulfing
+        prev_open = float(opn.iloc[-2])
+        curr_open = float(opn.iloc[-1])
+        if (prev < prev_open) and (curr > curr_open) and (curr_open < prev) and (curr > prev_open):
+            signals.append("Bull Engulfing")
+
+        # Filter: Show if Signal OR Trend is Strong (3/3 UP)
+        confluence = 0
+        if m_trend == "UP": confluence += 1
+        if w_trend == "UP": confluence += 1
+        if d_trend == "UP": confluence += 1
+        
+        if not signals and confluence < 3: return None
+        
+        # --- E. BACKTEST ---
+        bt = run_backtest(df_d)
 
         return {
             "symbol": ticker.replace(".NS", ""),
-            "price": round(curr_price, 2),
+            "price": round(curr, 2),
             "change": change,
-            "m_trend": m_trend,
-            "w_trend": w_trend,
+            "trends": {"M": m_trend, "W": w_trend, "D": d_trend},
             "signals": signals,
-            "score": f"{alignment}/3",
+            "buzz": buzz,
+            "backtest": bt,
+            "target": target,
+            "stop": stop,
             "rsi": round(curr_rsi, 1),
-            "history": [x if not math.isnan(x) else 0 for x in df_d['Close'].tail(30).tolist()]
+            "history": [x if not math.isnan(x) else 0 for x in close.tail(30).tolist()]
         }
 
-    except Exception as e:
+    except Exception:
         return None
 
-# --- 4. GENERATE HTML ---
+# --- 5. GENERATE HTML ---
 def generate_html(results):
     json_data = json.dumps(results)
     
@@ -155,24 +234,25 @@ def generate_html(results):
     <html lang="en">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Nifty Multi-Timeframe</title>
+        <title>Nifty Ultimate Scanner</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
             body {{ background-color: #0f172a; color: #e2e8f0; font-family: sans-serif; }}
-            .card {{ transition: all 0.2s; }}
+            .card {{ transition: all 0.2s; cursor: pointer; }}
             .card:hover {{ transform: translateY(-3px); border-color: #60a5fa; }}
+            .modal {{ display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 50; backdrop-filter: blur(5px); }}
+            .modal-content {{ background: #1e293b; margin: 5vh auto; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; border-radius: 12px; border: 1px solid #334155; }}
             
-            /* Trend Dots */
-            .dot {{ height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }}
+            /* Dot Indicators */
+            .dot {{ height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 2px; }}
             .dot-up {{ background-color: #4ade80; box-shadow: 0 0 5px #4ade80; }}
-            .dot-down {{ background-color: #f87171; opacity: 0.5; }}
+            .dot-down {{ background-color: #f87171; opacity: 0.4; }}
             
             /* Badges */
-            .badge {{ font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; border: 1px solid; display: inline-block; margin-right: 4px; margin-bottom: 4px; }}
-            .b-gold {{ background: rgba(250, 204, 21, 0.1); color: #facc15; border-color: rgba(250, 204, 21, 0.3); }}
-            .b-purple {{ background: rgba(192, 132, 252, 0.1); color: #c084fc; border-color: rgba(192, 132, 252, 0.3); }}
-            .b-blue {{ background: rgba(96, 165, 250, 0.1); color: #60a5fa; border-color: rgba(96, 165, 250, 0.3); }}
+            .b-std {{ background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }}
+            .b-gold {{ background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.3); }}
+            .b-panic {{ background: #9333ea; color: white; border: 1px solid #d8b4fe; box-shadow: 0 0 8px #a855f7; }}
         </style>
     </head>
     <body>
@@ -180,12 +260,12 @@ def generate_html(results):
             <header class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
                 <div>
                     <h1 class="text-2xl font-bold text-blue-400 flex items-center gap-2">
-                        <i data-lucide="bar-chart-2"></i> Nifty Triple-Trend
+                        <i data-lucide="layers"></i> Nifty Ultimate
                     </h1>
-                    <p class="text-xs text-slate-500 mt-1">Monthly + Weekly + Daily Confluence Scanner</p>
+                    <p class="text-xs text-slate-500 mt-1">Multi-Timeframe + Backtest + Targets</p>
                 </div>
                 <div class="text-right">
-                    <div class="text-xs text-slate-500">Stocks</div>
+                    <div class="text-xs text-slate-500">Opportunities</div>
                     <div class="text-xl font-bold text-white">{len(results)}</div>
                 </div>
             </header>
@@ -193,74 +273,128 @@ def generate_html(results):
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="grid"></div>
         </div>
 
+        <!-- MODAL -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <div class="sticky top-0 bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center">
+                    <div>
+                        <h2 id="m-sym" class="text-2xl font-bold text-white">SYMBOL</h2>
+                        <div class="text-xs text-slate-400">Deep Dive Analysis</div>
+                    </div>
+                    <button onclick="closeModal()" class="p-2 bg-slate-700 rounded-full hover:bg-slate-600"><i data-lucide="x"></i></button>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Targets -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-green-900/20 border border-green-500/30 p-3 rounded-lg text-center">
+                            <div class="text-xs text-green-400 uppercase font-bold">Target (ATR)</div>
+                            <div id="m-target" class="text-2xl font-bold text-white">0</div>
+                        </div>
+                        <div class="bg-red-900/20 border border-red-500/30 p-3 rounded-lg text-center">
+                            <div class="text-xs text-red-400 uppercase font-bold">Stop Loss</div>
+                            <div id="m-stop" class="text-2xl font-bold text-white">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Backtest -->
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-300 mb-2 flex items-center gap-2"><i data-lucide="history" class="w-4"></i> Backtest (1 Year)</h3>
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <div class="bg-slate-800 p-2 rounded text-center"><div class="text-[10px] text-slate-500">WIN RATE</div><div id="m-rate" class="text-lg font-bold text-white">0%</div></div>
+                            <div class="bg-slate-800 p-2 rounded text-center"><div class="text-[10px] text-slate-500">TRADES</div><div id="m-total" class="text-lg font-bold text-white">0</div></div>
+                            <div class="bg-slate-800 p-2 rounded text-center"><div class="text-[10px] text-slate-500">WINS</div><div id="m-wins" class="text-lg font-bold text-green-400">0</div></div>
+                        </div>
+                        <div class="overflow-hidden rounded border border-slate-700">
+                            <table class="w-full text-xs">
+                                <thead class="bg-slate-900 text-slate-300"><tr><th class="p-2 text-left">Date</th><th class="p-2 text-right">Entry</th><th class="p-2 text-right">Result</th><th class="p-2 text-right">P&L</th></tr></thead>
+                                <tbody id="m-logs" class="bg-slate-800 text-slate-300 divide-y divide-slate-700/50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script>
             const data = {json_data};
             lucide.createIcons();
             const grid = document.getElementById('grid');
             
-            if(data.length === 0) grid.innerHTML = '<div class="col-span-3 text-center text-slate-500 p-10">No significant setups found today.</div>';
+            if(data.length === 0) grid.innerHTML = '<div class="col-span-3 text-center text-slate-500 p-10">No signals found.</div>';
             
-            data.forEach(s => {{
-                // Trend Visualization (M | W | D)
-                const mClass = s.m_trend === 'UP' ? 'dot-up' : 'dot-down';
-                const wClass = s.w_trend === 'UP' ? 'dot-up' : 'dot-down';
+            data.forEach((s, i) => {{
+                // Trends
+                const mDot = s.trends.M === 'UP' ? 'dot-up' : 'dot-down';
+                const wDot = s.trends.W === 'UP' ? 'dot-up' : 'dot-down';
+                const dDot = s.trends.D === 'UP' ? 'dot-up' : 'dot-down';
                 
                 // Badges
                 let badges = '';
+                if(s.buzz > 0) badges += `<span class="b-std px-2 py-1 rounded text-[10px] font-bold mr-1 mb-1 inline-block flex items-center gap-1"><i data-lucide="flame" class="w-3"></i> ${{s.buzz}} News</span>`;
+                
                 s.signals.forEach(sig => {{
-                    let c = 'b-blue';
-                    if(sig.includes('M-Breakout')) c = 'b-gold'; // Rare
-                    if(sig.includes('W-Breakout')) c = 'b-purple'; // Strong
-                    badges += `<span class="badge ${{c}}">${{sig}}</span>`;
+                    let cls = 'b-std';
+                    if(sig.includes('Golden')) cls = 'b-gold';
+                    if(sig.includes('15')) cls = 'b-panic';
+                    badges += `<span class="${{cls}} px-2 py-1 rounded text-[10px] font-bold uppercase mr-1 mb-1 inline-block">${{sig}}</span>`;
                 }});
 
-                // Alignment Score Color
-                let scoreColor = 'text-slate-500';
-                if(s.score === '3/3') scoreColor = 'text-green-400 font-bold'; // Jackpot
-                if(s.score === '0/3') scoreColor = 'text-red-500';
-
                 // Sparkline
-                const pts = s.history.map((d, i) => {{
+                const pts = s.history.map((d, j) => {{
                     const min = Math.min(...s.history); const max = Math.max(...s.history);
-                    const x = (i / (s.history.length - 1)) * 100;
-                    const y = 35 - ((d - min) / (max - min || 1)) * 35;
+                    const x = (j / (s.history.length - 1)) * 100;
+                    const y = 30 - ((d - min) / (max - min || 1)) * 30;
                     return `${{x}},${{y}}`;
                 }}).join(' ');
 
                 grid.innerHTML += `
-                    <div class="card bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg">
+                    <div class="card bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-lg relative group" onclick="openModal(${{i}})">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <div class="font-bold text-lg text-white">${{s.symbol}}</div>
-                                <div class="flex items-center gap-2 mt-0.5">
+                                <div class="font-bold text-lg text-white group-hover:text-blue-400 transition">${{s.symbol}}</div>
+                                <div class="flex items-center gap-2">
                                     <span class="text-slate-400 font-mono text-sm">₹${{s.price}}</span>
                                     <span class="text-xs font-bold ${{s.change >= 0 ? 'text-green-400' : 'text-red-400'}}">${{s.change}}%</span>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-[10px] text-slate-500 uppercase">M / W Trend</div>
-                                <div class="flex items-center justify-end gap-1 mt-1">
-                                    <span class="text-[10px] text-slate-400">M</span><span class="dot ${{mClass}}"></span>
-                                    <span class="text-[10px] text-slate-400 ml-1">W</span><span class="dot ${{wClass}}"></span>
-                                </div>
+                                <div class="text-[10px] text-slate-500 uppercase mb-1">M / W / D</div>
+                                <div><span class="dot ${{mDot}}"></span><span class="dot ${{wDot}}"></span><span class="dot ${{dDot}}"></span></div>
                             </div>
                         </div>
-                        
-                        <div class="flex flex-wrap gap-1 mb-3 min-h-[24px] content-start">
-                            ${{badges}}
-                        </div>
-                        
-                        <div class="flex justify-between items-end">
-                            <div class="text-xs text-slate-500">Score: <span class="${{scoreColor}}">${{s.score}}</span></div>
-                            <div class="h-9 w-24 opacity-60">
-                                <svg width="100%" height="100%" preserveAspectRatio="none" class="overflow-visible">
-                                    <polyline points="${{pts}}" fill="none" stroke="${{s.change >= 0 ? '#4ade80' : '#f87171'}}" stroke-width="2" />
-                                </svg>
-                            </div>
+                        <div class="flex flex-wrap gap-1 mb-3 min-h-[1.5rem] content-start">${{badges}}</div>
+                        <div class="h-8 w-full opacity-60">
+                            <svg width="100%" height="100%" preserveAspectRatio="none" class="overflow-visible"><polyline points="${{pts}}" fill="none" stroke="${{s.change >= 0 ? '#4ade80' : '#f87171'}}" stroke-width="2" /></svg>
                         </div>
                     </div>
                 `;
             }});
+
+            function openModal(i) {{
+                const s = data[i];
+                const bt = s.backtest;
+                document.getElementById('m-sym').innerText = s.symbol;
+                document.getElementById('m-target').innerText = s.target;
+                document.getElementById('m-stop').innerText = s.stop;
+                document.getElementById('m-rate').innerText = bt.win_rate + '%';
+                document.getElementById('m-total').innerText = bt.total;
+                document.getElementById('m-wins').innerText = bt.wins;
+                
+                let rows = '';
+                if(bt.log.length === 0) rows = '<tr><td colspan="4" class="p-4 text-center italic text-slate-500">No signals in last 12 months.</td></tr>';
+                else {{
+                    [...bt.log].reverse().forEach(l => {{
+                        let c = l.result.includes('WIN') ? 'text-green-400 font-bold' : (l.result.includes('LOSS') ? 'text-red-400' : 'text-yellow-400');
+                        rows += `<tr class="hover:bg-slate-700/50"><td class="p-2">${{l.date}}</td><td class="p-2 text-right font-mono">${{l.entry}}</td><td class="p-2 text-right ${{c}} text-[10px]">${{l.result}}</td><td class="p-2 text-right font-mono ${{c}}">${{l.pnl}}%</td></tr>`;
+                    }});
+                }}
+                document.getElementById('m-logs').innerHTML = rows;
+                document.getElementById('modal').style.display = 'block';
+                lucide.createIcons();
+            }}
+            function closeModal() {{ document.getElementById('modal').style.display = 'none'; }}
+            window.onclick = function(e) {{ if(e.target == document.getElementById('modal')) closeModal(); }}
         </script>
     </body>
     </html>
@@ -268,18 +402,15 @@ def generate_html(results):
     
     if not os.path.exists(OUTPUT_DIR): os.makedirs(OUTPUT_DIR)
     with open(FILE_PATH, "w", encoding="utf-8") as f: f.write(html)
-    print(f"Generated Multi-Timeframe Dashboard with {len(results)} stocks.")
+    print("Generated Ultimate Dashboard.")
 
 if __name__ == "__main__":
-    print("Starting Triple-Trend Scan...")
+    print("Starting Master Scan...")
     tickers = get_nifty500_list()
-    
     results = []
     for i, t in enumerate(tickers):
         print(f"[{i+1}/{len(tickers)}] {t}...", end="\r")
-        # Slightly longer sleep to handle the heavy 5-year data fetch
-        time.sleep(0.25) 
+        time.sleep(0.2)
         res = analyze_stock(t)
         if res: results.append(res)
-        
     generate_html(results)
