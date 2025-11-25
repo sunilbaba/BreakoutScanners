@@ -1,1 +1,54 @@
-[]
+[
+  {
+    "id": "ONGC-2025-11-25",
+    "date": "2025-11-25",
+    "symbol": "ONGC",
+    "entry": 245.85,
+    "qty": 101,
+    "target": 257.84,
+    "stop_loss": 241.85,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
+    "id": "TATASTEEL-2025-11-25",
+    "date": "2025-11-25",
+    "symbol": "TATASTEEL",
+    "entry": 166.71,
+    "qty": 149,
+    "target": 177.3,
+    "stop_loss": 163.18,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
+    "id": "SUNPHARMA-2025-11-25",
+    "date": "2025-11-25",
+    "symbol": "SUNPHARMA",
+    "entry": 1782.6,
+    "qty": 14,
+    "target": 1853.79,
+    "stop_loss": 1758.87,
+    "status": "OPEN",
+    "pnl": -0.0,
+    "pnl_pct": -0.0,
+    "note": ""
+  },
+  {
+    "id": "HDFCBANK-2025-11-25",
+    "date": "2025-11-25",
+    "symbol": "HDFCBANK",
+    "entry": 995.3,
+    "qty": 25,
+    "target": 1035.71,
+    "stop_loss": 981.83,
+    "status": "OPEN",
+    "pnl": -0.0,
+    "pnl_pct": -0.0,
+    "note": ""
+  }
+]
