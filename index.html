@@ -4,100 +4,94 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PrimeTrade Fund</title>
+        <title>Institutional PrimeTrade</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
             body { background: #0f172a; color: #e2e8f0; font-family: sans-serif; }
-            .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; }
+            .card { background: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 12px; }
             .prime { border: 1px solid #a855f7; background: linear-gradient(to bottom right, #1e293b, #2e1065); }
-            .badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+            .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-right: 4px; }
         </style>
     </head>
     <body class="p-4 md:p-8">
         <div class="max-w-7xl mx-auto">
-            <!-- Market Header -->
+            <!-- Header -->
             <div class="flex justify-between items-center mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
                 <div>
                     <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                        <i data-lucide="briefcase" class="text-purple-500"></i> PrimeTrade Fund
+                        <i data-lucide="building-2" class="text-purple-500"></i> PrimeTrade Institutional
                     </h1>
-                    <div class="text-xs text-slate-500 mt-1">2025-11-25 08:51 UTC • BULL MARKET 🟢</div>
+                    <div class="text-xs text-slate-500 mt-1">2025-11-25 09:16 UTC • BULL MARKET 🟢</div>
                 </div>
                 <div class="text-right">
-                    <div class="text-[10px] text-slate-500 uppercase">Strategy Accuracy</div>
-                    <div class="text-2xl font-bold text-green-400">0%</div>
-                    <div class="text-[10px] text-slate-600">0 Closed Trades</div>
+                    <div class="text-[10px] text-slate-500 uppercase">Net PnL</div>
+                    <div class="text-xl font-bold text-green-400">₹0</div>
+                    <div class="text-[10px] text-slate-600">Win Rate: 0% (0 Trades)</div>
                 </div>
             </div>
 
-            <!-- Active Portfolio (From History) -->
-            <h2 class="text-sm font-bold text-slate-400 mb-3 uppercase tracking-wider">Active Portfolio</h2>
-            <div id="portfolio-area" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
+            <!-- Portfolio -->
+            <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase">Active Positions</h2>
+            <div id="portfolio" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
 
-            <!-- New Signals -->
-            <h2 class="text-sm font-bold text-slate-400 mb-3 uppercase tracking-wider">New Signals Scanner</h2>
-            <div id="signal-area" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+            <!-- Scanner -->
+            <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase">New Opportunities</h2>
+            <div id="scanner" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
         </div>
 
         <script>
-            const DATA = {"stocks": [], "pos": []};
+            const DATA = {"stocks": [{"symbol": "BPCL", "price": 354.5, "change": -1.43, "sector": "Other", "setups": [], "verdict": "WAIT", "v_color": "gray", "rr": 3.0, "qty": 70, "adx": 0.0, "investment": 24815.0, "levels": {"TGT": 377.44, "SL": 346.85}, "history": [325.6736145019531, 331.01251220703125, 329.05328369140625, 329.0043029785156, 330.8166198730469, 332.1390686035156, 324.5470275878906, 323.7143859863281, 336.0085754394531, 333.7064514160156, 341.0046081542969, 350.31097412109375, 349.52728271484375, 359.813232421875, 365.3481140136719, 365.3481140136719, 360.45001220703125, 367.1499938964844, 365.1499938964844, 374.1499938964844, 375.45001220703125, 374.95001220703125, 371.1499938964844, 374.25, 371.8500061035156, 365.6499938964844, 365.04998779296875, 364.54998779296875, 359.6499938964844, 354.5]}, {"symbol": "HDFCBANK", "price": 995.3, "change": -0.39, "sector": "BANK", "setups": ["Pullback"], "verdict": "BUY", "v_color": "green", "rr": 3.0, "qty": 25, "adx": 0.0, "investment": 24882.0, "levels": {"TGT": 1035.71, "SL": 981.83}, "history": [977.1500244140625, 978.25, 994.3499755859375, 1002.5499877929688, 1002.9500122070312, 1007.7000122070312, 1008.7999877929688, 994.75, 1002.9500122070312, 1003.5499877929688, 1007.8499755859375, 998.1500244140625, 987.2999877929688, 992.6500244140625, 985.25, 985.25, 984.6500244140625, 982.2999877929688, 984.5, 991.7000122070312, 989.5, 986.6500244140625, 989.5999755859375, 996.5499877929688, 992.4500122070312, 994.5999755859375, 1008.8499755859375, 998.0499877929688, 999.1500244140625, 995.2999877929688]}, {"symbol": "SUNPHARMA", "price": 1782.6, "change": 0.1, "sector": "PHARMA", "setups": ["Sector Support"], "verdict": "PRIME BUY \u2b50", "v_color": "purple", "rr": 3.0, "qty": 14, "adx": 0.0, "investment": 24956.0, "levels": {"TGT": 1853.79, "SL": 1758.87}, "history": [1654.4000244140625, 1655.0999755859375, 1659.0, 1679.0999755859375, 1688.5999755859375, 1690.5, 1689.9000244140625, 1699.0, 1693.5999755859375, 1687.0, 1715.9000244140625, 1703.4000244140625, 1690.699951171875, 1706.4000244140625, 1690.0, 1690.0, 1685.9000244140625, 1691.4000244140625, 1697.800048828125, 1716.0999755859375, 1732.0999755859375, 1737.4000244140625, 1757.0999755859375, 1763.9000244140625, 1758.800048828125, 1784.0999755859375, 1777.4000244140625, 1779.699951171875, 1780.800048828125, 1782.5999755859375]}, {"symbol": "BEL", "price": 410.5, "change": 1.66, "sector": "Other", "setups": [], "verdict": "WAIT", "v_color": "gray", "rr": 3.0, "qty": 60, "adx": 0.0, "investment": 24630.0, "levels": {"TGT": 436.21, "SL": 401.93}, "history": [402.3999938964844, 408.1000061035156, 411.79998779296875, 412.79998779296875, 416.5, 417.70001220703125, 418.6499938964844, 422.04998779296875, 415.1499938964844, 413.54998779296875, 407.20001220703125, 409.8999938964844, 426.1000061035156, 422.29998779296875, 415.1499938964844, 415.1499938964844, 408.79998779296875, 414.25, 416.8500061035156, 427.29998779296875, 424.75, 419.79998779296875, 426.8500061035156, 424.54998779296875, 420.8999938964844, 423.20001220703125, 423.0, 416.3500061035156, 403.79998779296875, 410.5]}, {"symbol": "SBIN", "price": 986.5, "change": 1.64, "sector": "BANK", "setups": [], "verdict": "WAIT", "v_color": "gray", "rr": 3.0, "qty": 25, "adx": 0.0, "investment": 24662.0, "levels": {"TGT": 1024.34, "SL": 973.89}, "history": [876.9500122070312, 886.0999755859375, 886.9500122070312, 889.1500244140625, 907.5, 907.8499755859375, 911.5499877929688, 904.5, 922.75, 930.25, 939.75, 934.3499755859375, 937.0, 949.7000122070312, 957.5999755859375, 957.5999755859375, 960.75, 955.8499755859375, 951.1500244140625, 953.2999877929688, 957.1500244140625, 954.0, 967.8499755859375, 973.3499755859375, 972.4500122070312, 982.75, 981.5499877929688, 972.5999755859375, 970.5999755859375, 986.5]}, {"symbol": "TATASTEEL", "price": 166.71, "change": 0.82, "sector": "METAL", "setups": ["Sector Support"], "verdict": "PRIME BUY \u2b50", "v_color": "purple", "rr": 3.0, "qty": 149, "adx": 0.0, "investment": 24840.0, "levels": {"TGT": 177.3, "SL": 163.18}, "history": [170.50999450683594, 173.24000549316406, 174.0, 172.22000122070312, 171.9499969482422, 172.77999877929688, 174.16000366210938, 174.44000244140625, 176.66000366210938, 181.80999755859375, 185.19000244140625, 184.35000610351562, 182.83999633789062, 182.6699981689453, 179.2899932861328, 179.2899932861328, 177.27000427246094, 181.3699951171875, 181.47999572753906, 181.0399932861328, 178.61000061035156, 176.64999389648438, 174.25999450683594, 173.1699981689453, 172.4499969482422, 173.2100067138672, 172.4600067138672, 168.0, 165.36000061035156, 166.7100067138672]}, {"symbol": "ADANIENT", "price": 2344.3, "change": -2.29, "sector": "Other", "setups": [], "verdict": "WAIT", "v_color": "gray", "rr": 3.0, "qty": 10, "adx": 0.0, "investment": 23443.0, "levels": {"TGT": 2520.6, "SL": 2285.53}, "history": [2517.0, 2532.800048828125, 2557.60009765625, 2549.39990234375, 2548.10009765625, 2549.89990234375, 2545.800048828125, 2504.199951171875, 2492.800048828125, 2494.39990234375, 2537.39990234375, 2526.89990234375, 2481.0, 2467.0, 2419.800048828125, 2419.800048828125, 2314.300048828125, 2369.39990234375, 2298.358154296875, 2294.5771484375, 2408.685546875, 2412.272705078125, 2440.0, 2462.0, 2436.800048828125, 2433.10009765625, 2446.10009765625, 2422.300048828125, 2399.199951171875, 2344.300048828125]}, {"symbol": "LTIM", "price": 5825.0, "change": -1.64, "sector": "IT", "setups": [], "verdict": "WAIT", "v_color": "gray", "rr": 3.0, "qty": 4, "adx": 0.0, "investment": 23300.0, "levels": {"TGT": 6189.85, "SL": 5703.38}, "history": [5447.57958984375, 5587.529296875, 5600.478515625, 5583.046875, 5574.580078125, 5539.21923828125, 5595.0, 5546.0, 5640.0, 5596.0, 5674.0, 5699.0, 5684.5, 5704.5, 5620.0, 5620.0, 5652.0, 5567.5, 5643.0, 5710.5, 5893.5, 5847.0, 5809.0, 5848.5, 5756.0, 5972.0, 6027.0, 5926.0, 5922.0, 5825.0]}, {"symbol": "INFY", "price": 1528.9, "change": -1.23, "sector": "IT", "setups": [], "verdict": "WAIT", "v_color": "gray", "rr": 3.0, "qty": 16, "adx": 0.0, "investment": 24462.0, "levels": {"TGT": 1615.76, "SL": 1499.95}, "history": [1467.435302734375, 1452.1690673828125, 1449.312744140625, 1419.37109375, 1438.87255859375, 1450.19921875, 1505.4532470703125, 1502.4000244140625, 1504.5, 1500.199951171875, 1510.4000244140625, 1493.800048828125, 1482.300048828125, 1485.5, 1467.9000244140625, 1467.9000244140625, 1466.699951171875, 1476.800048828125, 1513.5, 1530.300048828125, 1551.699951171875, 1541.800048828125, 1502.800048828125, 1507.5999755859375, 1486.4000244140625, 1541.0999755859375, 1536.5, 1545.0, 1548.0, 1528.9000244140625]}, {"symbol": "ONGC", "price": 245.85, "change": 0.04, "sector": "Other", "setups": ["Pullback"], "verdict": "BUY", "v_color": "green", "rr": 3.0, "qty": 101, "adx": 0.0, "investment": 24831.0, "levels": {"TGT": 257.84, "SL": 241.85}, "history": [238.83734130859375, 241.79486083984375, 242.40980529785156, 241.7655792236328, 242.79046630859375, 242.18528747558594, 246.2750701904297, 248.8616943359375, 247.2121124267578, 244.5474090576172, 249.52542114257812, 248.4419708251953, 249.2618865966797, 251.3897247314453, 246.31411743164062, 246.31411743164062, 245.4844512939453, 246.16770935058594, 245.3868408203125, 243.4834747314453, 247.7782440185547, 244.85000610351562, 247.60000610351562, 248.0500030517578, 246.9499969482422, 249.0, 248.0500030517578, 246.9499969482422, 245.75, 245.85000610351562]}], "pos": [{"id": "ONGC-2025-11-25", "date": "2025-11-25", "symbol": "ONGC", "entry": 245.85, "qty": 101, "target": 257.84, "stop_loss": 241.85, "status": "OPEN", "pnl": 0.0, "pnl_pct": 0.0, "note": ""}, {"id": "TATASTEEL-2025-11-25", "date": "2025-11-25", "symbol": "TATASTEEL", "entry": 166.71, "qty": 149, "target": 177.3, "stop_loss": 163.18, "status": "OPEN", "pnl": 0.0, "pnl_pct": 0.0, "note": ""}, {"id": "SUNPHARMA-2025-11-25", "date": "2025-11-25", "symbol": "SUNPHARMA", "entry": 1782.6, "qty": 14, "target": 1853.79, "stop_loss": 1758.87, "status": "OPEN", "pnl": -0.0, "pnl_pct": -0.0, "note": ""}, {"id": "HDFCBANK-2025-11-25", "date": "2025-11-25", "symbol": "HDFCBANK", "entry": 995.3, "qty": 25, "target": 1035.71, "stop_loss": 981.83, "status": "OPEN", "pnl": -0.0, "pnl_pct": -0.0, "note": ""}]};
             
             // Render Portfolio
-            const portRoot = document.getElementById('portfolio-area');
-            if(DATA.pos.length === 0) portRoot.innerHTML = '<div class="col-span-full text-center py-4 text-slate-600 italic">No open positions.</div>';
+            const portRoot = document.getElementById('portfolio');
+            const openTrades = DATA.pos.filter(t => t.status === 'OPEN');
+            
+            if(openTrades.length === 0) portRoot.innerHTML = '<div class="col-span-full text-center text-slate-600 py-4">No active trades.</div>';
             else {
-                portRoot.innerHTML = DATA.pos.map(p => {
+                portRoot.innerHTML = openTrades.map(p => {
                     const pnlClass = p.pnl_pct >= 0 ? 'text-green-400' : 'text-red-400';
-                    return `<div class="bg-slate-800 border border-slate-700 rounded-lg p-4 relative overflow-hidden">
+                    return `<div class="bg-slate-800 border border-slate-700 rounded-lg p-4 relative">
                         <div class="flex justify-between mb-2">
                             <div class="font-bold text-white">${p.symbol}</div>
                             <div class="font-mono font-bold ${pnlClass}">${p.pnl_pct}%</div>
                         </div>
-                        <div class="text-xs text-slate-400 flex justify-between mb-2">
+                        <div class="text-xs text-slate-400 flex justify-between">
                             <span>Entry: ${p.entry}</span>
                             <span>Qty: ${p.qty}</span>
                         </div>
-                        <div class="w-full bg-slate-700 h-1.5 rounded-full mt-2">
-                            <div class="bg-blue-500 h-1.5 rounded-full" style="width: 50%"></div> 
+                        <div class="flex justify-between text-[10px] mt-2 font-mono">
+                            <span class="text-red-400">${p.stop_loss} SL</span>
+                            <span class="text-green-400">${p.target} TGT</span>
                         </div>
-                        <div class="flex justify-between text-[10px] mt-1 text-slate-500 font-mono">
-                            <span class="text-red-400">${p.stop_loss} (SL)</span>
-                            <span class="text-green-400">${p.target} (TGT)</span>
-                        </div>
-                        ${p.note ? `<div class="absolute top-0 right-0 bg-blue-600 text-[9px] text-white px-2 py-0.5 rounded-bl">TSL ACTIVE</div>` : ''}
+                        ${p.note ? `<div class="absolute top-0 right-0 bg-blue-600 text-[9px] text-white px-2 py-0.5 rounded-bl">${p.note}</div>` : ''}
                     </div>`;
                 }).join('');
             }
 
-            // Render Signals
-            const sigRoot = document.getElementById('signal-area');
-            if(DATA.stocks.length === 0) sigRoot.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">No new setups found.</div>';
+            // Render Scanner
+            const scanRoot = document.getElementById('scanner');
+            if(DATA.stocks.length === 0) scanRoot.innerHTML = '<div class="col-span-full text-center text-slate-600 py-10">No signals today.</div>';
             else {
-                sigRoot.innerHTML = DATA.stocks.map(s => {
+                scanRoot.innerHTML = DATA.stocks.map(s => {
                     const isPrime = s.verdict.includes('PRIME');
-                    const pts = s.history.map((p,i) => `${(i/29)*100},${30-((p-Math.min(...s.history))/(Math.max(...s.history)-Math.min(...s.history)||1))*30}`).join(' ');
+                    const badges = s.setups.map(b => `<span class="badge bg-slate-700 text-slate-300">${b}</span>`).join('');
                     
                     return `<div class="card ${isPrime ? 'prime' : ''}">
                         <div class="flex justify-between mb-2">
                             <div><div class="font-bold text-white">${s.symbol}</div><div class="text-[10px] text-slate-400">${s.sector}</div></div>
                             <div class="text-right"><div class="font-bold ${s.change>=0?'text-green-400':'text-red-400'}">${s.change}%</div><div class="text-[10px] text-slate-500">₹${s.price}</div></div>
                         </div>
-                        <div class="flex justify-between bg-slate-900/50 p-2 rounded mb-3 text-[10px]">
-                            <div class="text-center">
-                                <div class="text-slate-500">Rec. Qty</div>
-                                <div class="font-bold text-blue-400 text-lg">${s.qty}</div>
-                            </div>
-                            <div class="text-center border-l border-slate-700 pl-2">
-                                <div class="text-slate-500">Inv. Amt</div>
-                                <div class="font-bold text-slate-300">₹${s.investment}</div>
-                            </div>
+                        <div class="mb-3 h-6 flex flex-wrap">${badges}</div>
+                        <div class="flex justify-between text-[10px] bg-slate-900/50 p-2 rounded mb-2">
+                            <div class="text-center"><div>Rec Qty</div><div class="text-blue-400 font-bold text-sm">${s.qty}</div></div>
+                            <div class="text-center"><div>ADX</div><div class="text-white font-bold text-sm">${s.adx}</div></div>
+                            <div class="text-center"><div>RR</div><div class="text-white font-bold text-sm">${s.rr}</div></div>
                         </div>
-                        <div class="flex justify-between items-end border-t border-slate-700 pt-2">
-                            <div class="font-bold text-xs ${s.v_color==='purple'?'text-purple-400':'text-green-400'}">${s.verdict.replace('⭐','')}</div>
-                            <div class="text-[10px] font-mono text-slate-400">SL: <span class="text-red-400">${s.levels.SL}</span></div>
+                        <div class="flex justify-between text-[10px] font-mono mt-1">
+                            <span class="text-red-400">SL: ${s.levels.SL}</span>
+                            <span class="text-green-400">TGT: ${s.levels.TGT}</span>
                         </div>
-                        <svg class="mt-2 opacity-20" height="30" width="100%"><polyline points="${pts}" fill="none" stroke="${s.change>=0?'#4ade80':'#f87171'}" stroke-width="2"/></svg>
                     </div>`;
                 }).join('');
             }
