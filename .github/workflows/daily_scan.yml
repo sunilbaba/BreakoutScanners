@@ -1,27 +1,25 @@
-name: Nifty 500 Intraday Scanner
+name: PrimeTrade Engine
 
 on:
   schedule:
-    # Run every 15 minutes from 03:00 UTC to 10:00 UTC (8:30 AM IST to 3:30 PM IST)
-    # Weekdays only (Monday to Friday)
-    - cron: '*/15 3-10 * * 1-5'
-  workflow_dispatch: # Button to run manually
+    # Run every 15 mins during market hours
+    - cron: '*/15 4-10 * * 1-5'
+  workflow_dispatch:
 
-# Prevents multiple runs from overlapping (e.g. if one run hangs)
-concurrency:
-  group: "scanner-production"
-  cancel-in-progress: true
-
+# Permissions needed to WRITE the history file back to the repo
 permissions:
   contents: write
   pages: write
   id-token: write
 
+concurrency:
+  group: "scanner"
+  cancel-in-progress: true
+
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 10 # Force kill if it gets stuck to save minutes
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -30,14 +28,24 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          cache: 'pip' # Caches dependencies to make runs faster (saves minutes)
+          cache: 'pip'
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install pandas numpy yfinance requests
 
-      - name: Run Scanner Script
+      - name: Run Scanner
         run: python nifty_engine_gh.py
+
+      # --- NEW STEP: SAVE HISTORY FILE ---
+      - name: Commit Trade History
+        run: |
+          git config --global user.name 'PrimeTrade Bot'
+          git config --global user.email 'bot@primetrade.com'
+          # Add the history file if it exists
+          git add trade_history.json || true
+          # Commit if there are changes
+          git commit -m "Update Trade History [skip ci]" || echo "No history changes"
+          git push
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -45,6 +53,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
           keep_files: false
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'Auto-update market data'
