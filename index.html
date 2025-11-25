@@ -5,7 +5,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- Only refresh if market is OPEN -->
-        
+        <meta http-equiv="refresh" content="300">
         <title>PrimeTrade Analyst</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
@@ -33,11 +33,11 @@
                 <div>
                     <h1 class="text-2xl font-bold text-white flex items-center gap-2">
                         <i data-lucide="bar-chart-2" class="text-purple-500"></i> PrimeTrade 
-                        <span class="text-xs px-2 py-0.5 rounded bg-red-900 text-red-300">
-                            🔴 CLOSED (EOD)
+                        <span class="text-xs px-2 py-0.5 rounded bg-green-900 text-green-300">
+                            🟢 LIVE
                         </span>
                     </h1>
-                    <div class="text-xs text-slate-500 mt-1">2025-11-24 19:54 UTC</div>
+                    <div class="text-xs text-slate-500 mt-1">2025-11-25 03:48 UTC</div>
                 </div>
                 <div class="flex gap-4 mt-4 md:mt-0">
                     <div class="text-center"><div class="text-[10px] text-slate-500">ADV</div><div class="font-bold text-green-500">0</div></div>
@@ -62,7 +62,7 @@
         </div>
 
         <script>
-            const DATA = {"stocks": [], "sectors": [{"name": "BANK", "avg": -0.05}, {"name": "AUTO", "avg": -0.35}, {"name": "IT", "avg": 0.41}, {"name": "METAL", "avg": -1.23}, {"name": "PHARMA", "avg": -0.39}, {"name": "FMCG", "avg": -0.66}, {"name": "ENERGY", "avg": -1.18}, {"name": "REALTY", "avg": -2.05}, {"name": "PSU BANK", "avg": -0.15}], "market": {"adv": 0, "dec": 0, "status": "CLOSED"}};
+            const DATA = {"stocks": [], "sectors": [{"name": "BANK", "avg": 0.06}, {"name": "AUTO", "avg": 0.02}, {"name": "IT", "avg": -0.17}, {"name": "METAL", "avg": 0.37}, {"name": "PHARMA", "avg": 0.07}, {"name": "FMCG", "avg": -0.18}, {"name": "ENERGY", "avg": -0.08}, {"name": "REALTY", "avg": 1.02}, {"name": "PSU BANK", "avg": 0.23}], "market": {"adv": 0, "dec": 0, "status": "OPEN"}};
             let currentView = 'card';
 
             function init() {
