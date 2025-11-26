@@ -1,5 +1,38 @@
 [
   {
+    "id": "ASTRAL-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "ASTRAL",
+    "entry": 1466.0,
+    "qty": 17,
+    "target": 1568.55,
+    "stop_loss": 1431.82,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "AKZOINDIA-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "AKZOINDIA",
+    "entry": 3418.8,
+    "qty": 7,
+    "target": 3617.82,
+    "stop_loss": 3352.46,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "ACC-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "ACC",
+    "entry": 1884.5,
+    "qty": 13,
+    "target": 1998.48,
+    "stop_loss": 1846.51,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "HCLTECH-2025-11-26",
     "date": "2025-11-26",
     "symbol": "HCLTECH",
