@@ -8,7 +8,7 @@ Features:
 - Dynamic Risk Scaling based on Market Regime
 - Volatility Parity Position Sizing
 - JSON State Persistence (No Database required)
-- HTML Dashboard Generation
+- HTML Dashboard Generation with Trade Ledger
 
 Requirements:
     pip install yfinance pandas numpy
@@ -337,6 +337,7 @@ def save_json_file(path, data):
 def update_open_trades_json(bulk_data):
     trades = load_json_file(TRADE_HISTORY_FILE, [])
     updated = False
+    today_str = date.today().isoformat()
     
     for trade in trades:
         if trade['status'] != 'OPEN': continue
@@ -361,6 +362,7 @@ def update_open_trades_json(bulk_data):
             # If market gapped down below SL, you exit at Open price
             exit_price = curr_open if curr_open < sl else sl
             trade['exit_price'] = exit_price
+            trade['exit_date'] = today_str
             
             # Calc Realized PnL (including costs)
             pnl = (exit_price - entry) * trade['qty']
@@ -377,6 +379,7 @@ def update_open_trades_json(bulk_data):
             # If market gapped up above Target, you exit at Open price (Bonus!)
             exit_price = curr_open if curr_open > target else target
             trade['exit_price'] = exit_price
+            trade['exit_date'] = today_str
             
             pnl = (exit_price - entry) * trade['qty']
             costs = estimate_transaction_costs(entry, trade['qty']) + estimate_transaction_costs(exit_price, trade['qty'])
@@ -453,6 +456,13 @@ def generate_html(signals, trades, market_regime, timestamp):
             .card {{ background: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 12px; }}
             .prime {{ border: 1px solid #a855f7; background: linear-gradient(to bottom right, #1e293b, #2e1065); }}
             .badge {{ font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-right: 4px; }}
+            
+            /* Table */
+            .ledger-table {{ width: 100%; border-collapse: collapse; font-size: 12px; }}
+            .ledger-table th {{ text-align: left; padding: 8px; color: #64748b; border-bottom: 1px solid #334155; }}
+            .ledger-table td {{ padding: 8px; border-bottom: 1px solid #1e293b; }}
+            .win-row {{ color: #4ade80; }}
+            .loss-row {{ color: #f87171; }}
         </style>
     </head>
     <body class="p-4 md:p-8">
@@ -478,7 +488,18 @@ def generate_html(signals, trades, market_regime, timestamp):
 
             <!-- Scanner -->
             <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase">New Opportunities</h2>
-            <div id="scanner" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+            <div id="scanner" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"></div>
+            
+            <!-- Closed Trades Ledger (New Section) -->
+            <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase">Trade Ledger (Closed Positions)</h2>
+            <div class="bg-slate-900 rounded-lg border border-slate-800 overflow-hidden mb-8">
+                <div class="overflow-x-auto">
+                    <table class="ledger-table">
+                        <thead><tr><th>Date</th><th>Symbol</th><th>Entry</th><th>Exit</th><th>Qty</th><th>PnL</th><th>Status</th></tr></thead>
+                        <tbody id="ledger-body"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <script>
@@ -501,6 +522,7 @@ def generate_html(signals, trades, market_regime, timestamp):
                             <span>Entry: ${{p.entry}}</span>
                             <span>Qty: ${{p.qty}}</span>
                         </div>
+                        <div class="text-[10px] text-slate-500 mt-1">Date: ${{p.date}}</div>
                         <div class="flex justify-between text-[10px] mt-2 font-mono">
                             <span class="text-red-400">${{p.stop_loss}} SL</span>
                             <span class="text-green-400">${{p.target}} TGT</span>
@@ -536,6 +558,26 @@ def generate_html(signals, trades, market_regime, timestamp):
                     </div>`;
                 }}).join('');
             }}
+            
+            // Render Ledger
+            const ledgerRoot = document.getElementById('ledger-body');
+            const closedTrades = DATA.pos.filter(t => t.status !== 'OPEN');
+            if(closedTrades.length === 0) ledgerRoot.innerHTML = '<tr><td colspan="7" class="text-center text-slate-600 py-4">No closed trades yet.</td></tr>';
+            else {{
+                ledgerRoot.innerHTML = closedTrades.map(t => {{
+                    const statusClass = t.status === 'WIN' ? 'text-green-400' : 'text-red-400';
+                    return `<tr>
+                        <td class="text-slate-400">${{t.date}}</td>
+                        <td class="font-bold text-white">${{t.symbol}}</td>
+                        <td>${{t.entry}}</td>
+                        <td>${{t.exit_price}}</td>
+                        <td>${{t.qty}}</td>
+                        <td class="font-mono font-bold ${{statusClass}}">₹${{t.net_pnl}}</td>
+                        <td><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-opacity-20 ${{t.status==='WIN'?'bg-green-500 text-green-400':'bg-red-500 text-red-400'}}">${{t.status}}</span></td>
+                    </tr>`;
+                }}).join('');
+            }}
+            
             lucide.createIcons();
         </script>
     </body>
