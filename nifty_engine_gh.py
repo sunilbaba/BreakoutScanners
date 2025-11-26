@@ -7,8 +7,9 @@ Features:
 - Realistic Gap-Down Execution Logic
 - Dynamic Risk Scaling based on Market Regime
 - Volatility Parity Position Sizing
-- JSON State Persistence (No Database required)
-- HTML Dashboard Generation with Trade Ledger
+- JSON State Persistence
+- "Smart Filtering": Hides stocks you already own from scanner.
+- "Duplicate Guard": Prevents buying the same stock twice.
 
 Requirements:
     pip install yfinance pandas numpy
@@ -35,18 +36,18 @@ MAX_POSITION_PERC = 0.25          # Max 25% capital in one stock
 
 DATA_PERIOD = "1y"
 RETRY_ATTEMPTS = 3
-RETRY_BACKOFF = 2.0               # Base seconds for exponential backoff
+RETRY_BACKOFF = 2.0
 
 MIN_ADV_VALUE_RS = 2_000_000      # Min Avg Daily Value (Liquidity Filter)
 
-# Transaction Costs (Zerodha/Upstox approx)
+# Transaction Costs
 BROKERAGE_PER_ORDER = 20.0
 BROKERAGE_PCT = 0.0005
 STT_PCT = 0.001
 EXCHANGE_FEES_PCT = 0.0000345
 STAMP_DUTY_PCT = 0.00015
 GST_PCT = 0.18
-SLIPPAGE_PCT = 0.001              # 0.1% Slippage estimate
+SLIPPAGE_PCT = 0.001
 
 # Strategy Parameters
 ATR_MULTIPLIER_TARGET = 3.0
@@ -58,7 +59,6 @@ ADX_THRESHOLD = 25.0              # Min ADX for Momentum setups
 OUTPUT_DIR = "public"
 HTML_FILE = os.path.join(OUTPUT_DIR, "index.html")
 TRADE_HISTORY_FILE = "trade_history.json"
-SIGNALS_FILE = "signals.json"
 
 SECTOR_INDICES = {
     "NIFTY 50": "^NSEI",
@@ -127,22 +127,16 @@ def wilder_rsi(series: pd.Series, period: int = 14) -> pd.Series:
     return rsi.fillna(50)
 
 def adx(df: pd.DataFrame, period: int = 14) -> pd.Series:
-    """Computes Average Directional Index (ADX) for trend strength."""
     plus_dm = df['High'].diff()
     minus_dm = df['Low'].diff()
-    
     plus_dm = np.where((plus_dm > minus_dm) & (plus_dm > 0), plus_dm, 0.0)
     minus_dm = np.where((minus_dm > plus_dm) & (minus_dm > 0), -minus_dm, 0.0)
-    
     tr = true_range(df)
     atr_series = tr.ewm(alpha=1/period, adjust=False).mean()
-    
     plus_di = 100 * (pd.Series(plus_dm).ewm(alpha=1/period, adjust=False).mean() / atr_series)
     minus_di = 100 * (pd.Series(minus_dm).ewm(alpha=1/period, adjust=False).mean() / atr_series)
-    
     dx = (abs(plus_di - minus_di) / (plus_di + minus_di)) * 100
-    adx_series = dx.ewm(alpha=1/period, adjust=False).mean()
-    return adx_series.fillna(0)
+    return dx.ewm(alpha=1/period, adjust=False).mean().fillna(0)
 
 # -------------------------
 # 4. DATA MANAGEMENT
@@ -150,7 +144,6 @@ def adx(df: pd.DataFrame, period: int = 14) -> pd.Series:
 @retry_on_exception(max_tries=RETRY_ATTEMPTS, backoff=RETRY_BACKOFF)
 def robust_download(tickers, period=DATA_PERIOD):
     logger.info(f"Downloading {len(tickers)} symbols...")
-    # group_by='ticker' is safest for multi-stock download
     df = yf.download(tickers, period=period, group_by='ticker', threads=True, progress=False)
     if df is None or df.empty:
         raise RuntimeError("yfinance returned empty data")
@@ -169,11 +162,9 @@ def get_tickers():
 
 def extract_stock_df(bulk_data, ticker):
     try:
-        # Handle MultiIndex (Ticker, Price) structure from group_by='ticker'
         if isinstance(bulk_data.columns, pd.MultiIndex):
             if ticker in bulk_data.columns.get_level_values(0):
-                df = bulk_data[ticker].copy().dropna()
-                return df
+                return bulk_data[ticker].copy().dropna()
     except Exception: pass
     return None
 
@@ -188,36 +179,27 @@ def estimate_transaction_costs(price: float, qty: int):
     stamp = STAMP_DUTY_PCT * val
     gst = GST_PCT * (brokerage + exchange)
     slippage = SLIPPAGE_PCT * val
-    total = brokerage + stt + exchange + stamp + gst + slippage
-    return round(total, 2)
+    return round(brokerage + stt + exchange + stamp + gst + slippage, 2)
 
 def calculate_qty(entry, stop_loss, risk_per_trade=RISK_PER_TRADE):
     risk_amount = CAPITAL * risk_per_trade
     risk_per_share = abs(entry - stop_loss)
     if risk_per_share <= 0: return 0
-    
     qty = int(risk_amount / risk_per_share)
-    
-    # Capital Allocation Limit
     max_alloc = CAPITAL * MAX_POSITION_PERC
-    if (qty * entry) > max_alloc:
-        qty = int(max_alloc / entry)
-        
+    if (qty * entry) > max_alloc: qty = int(max_alloc / entry)
     return max(qty, 0)
 
 # -------------------------
 # 6. STRATEGY ENGINE
 # -------------------------
 def analyze_market_trend(bulk_data):
-    """Determine if Nifty 50 is Bullish or Bearish for risk scaling."""
     try:
         nifty = extract_stock_df(bulk_data, "^NSEI")
         if nifty is None or len(nifty) < 200: return "UNKNOWN"
-        
         curr = nifty['Close'].iloc[-1]
         sma200 = nifty['Close'].rolling(200).mean().iloc[-1]
         sma50 = nifty['Close'].rolling(50).mean().iloc[-1]
-        
         if curr > sma50 and sma50 > sma200: return "BULL MARKET 🟢"
         if curr > sma200: return "UPTREND 🟡"
         return "BEAR MARKET 🔴"
@@ -243,35 +225,31 @@ def generate_signal(ticker, df, sector_changes, market_regime):
     df['EMA20'] = df['Close'].ewm(span=20).mean()
     df['ATR'] = atr(df, 14)
     df['RSI'] = wilder_rsi(df['Close'], 14)
-    df['ADX'] = adx(df, 14) # New ADX
+    df['ADX'] = adx(df, 14)
 
     curr = df.iloc[-1]
     prev = df.iloc[-2]
     close = float(curr['Close'])
-    
     if math.isnan(close): return None
 
-    # 1. Trend Strength Logic
     sma200 = float(curr['SMA200'])
     trend = "UP" if close > sma200 else "DOWN"
     trend_strength = float(curr['ADX'])
     
     setups = []
-    
-    # Setup A: Momentum (Requires Strong Trend ADX > 25)
+    # Momentum
     if close > float(curr['EMA20']) and curr['RSI'] > 60 and trend_strength > ADX_THRESHOLD:
         setups.append("Momentum Burst")
-        
-    # Setup B: Pullback (Buy the dip in uptrend)
+    # Pullback
     sma50 = float(curr['SMA50'])
     if trend == "UP" and close > sma50 and abs(close - sma50)/close < 0.03 and curr['RSI'] < 60:
         setups.append("Pullback")
 
-    # Liquidity Check
+    # Liquidity Filter
     avg_vol = df['Volume'].rolling(30).mean().iloc[-1]
     if (avg_vol * close) < MIN_ADV_VALUE_RS: return None
 
-    # Sector Support
+    # Sector
     clean_sym = ticker.replace(".NS", "")
     my_sector = get_stock_sector(clean_sym)
     has_sector = sector_changes.get(my_sector, 0) > 0.5
@@ -283,26 +261,23 @@ def generate_signal(ticker, df, sector_changes, market_regime):
     target = round(close + ATR_MULTIPLIER_TARGET * atr_val, 2)
     rr = round((target - close) / (close - stop), 2)
 
-    # Dynamic Risk Scaling
+    # Risk Scale
     adjusted_risk = RISK_PER_TRADE
     if "BEAR" in market_regime:
-        adjusted_risk = RISK_PER_TRADE / 2 # Cut risk in half in bear market
-        setups.append("⚠️ Half Size (Bear Mkt)")
+        adjusted_risk = RISK_PER_TRADE / 2
+        setups.append("⚠️ Half Size")
 
     qty = calculate_qty(close, stop, adjusted_risk)
 
-    # Verdict
     verdict = "WAIT"
     v_color = "gray"
-    
     if trend == "UP" and len(setups) > 0:
         if rr >= 2.0:
             verdict = "PRIME BUY ⭐" if has_sector else "BUY"
             v_color = "purple" if has_sector else "green"
         else:
-            verdict = "WATCH" # Good setup but bad RR
+            verdict = "WATCH"
 
-    # Minimal change filter
     if verdict == "WAIT" and abs((close - float(prev['Close']))/float(prev['Close'])) < 0.01:
         return None
 
@@ -347,7 +322,7 @@ def update_open_trades_json(bulk_data):
         if df is None: continue
         
         curr = df.iloc[-1]
-        curr_open = float(curr['Open']) # Needed for Gap Logic
+        curr_open = float(curr['Open'])
         high = float(curr['High'])
         low = float(curr['Low'])
         close = float(curr['Close'])
@@ -356,49 +331,41 @@ def update_open_trades_json(bulk_data):
         target = float(trade['target'])
         sl = float(trade['stop_loss'])
         
-        # 1. Check Stop Loss (Gap Aware)
+        # Stop Loss
         if low <= sl:
             trade['status'] = 'LOSS'
-            # If market gapped down below SL, you exit at Open price
             exit_price = curr_open if curr_open < sl else sl
             trade['exit_price'] = exit_price
             trade['exit_date'] = today_str
-            
-            # Calc Realized PnL (including costs)
             pnl = (exit_price - entry) * trade['qty']
             costs = estimate_transaction_costs(entry, trade['qty']) + estimate_transaction_costs(exit_price, trade['qty'])
             trade['net_pnl'] = round(pnl - costs, 2)
-            
-            trade['note'] = "SL Hit" if curr_open >= sl else "SL Gap Down ⚠️"
+            trade['note'] = "SL Hit" if curr_open >= sl else "SL Gap Down"
             updated = True
-            logger.info(f"Trade {trade['symbol']} stopped out at {exit_price}")
+            logger.info(f"Trade {trade['symbol']} stopped out.")
 
-        # 2. Check Target
+        # Target
         elif high >= target:
             trade['status'] = 'WIN'
-            # If market gapped up above Target, you exit at Open price (Bonus!)
             exit_price = curr_open if curr_open > target else target
             trade['exit_price'] = exit_price
             trade['exit_date'] = today_str
-            
             pnl = (exit_price - entry) * trade['qty']
             costs = estimate_transaction_costs(entry, trade['qty']) + estimate_transaction_costs(exit_price, trade['qty'])
             trade['net_pnl'] = round(pnl - costs, 2)
-            
             trade['note'] = "Target Hit"
             updated = True
-            logger.info(f"Trade {trade['symbol']} won at {exit_price}")
+            logger.info(f"Trade {trade['symbol']} won.")
 
-        # 3. Update Active Trade
+        # Active Update
         else:
-            # Trailing Stop Logic
+            # TSL Logic
             move_needed = (target - entry) * TSL_MOVE_TO_BE_AT
             if close > (entry + move_needed) and sl < entry:
                 trade['stop_loss'] = entry
                 trade['note'] = "TSL @ BE"
                 updated = True
             
-            # Mark-to-Market
             m2m = (close - entry) * trade['qty']
             trade['pnl'] = round(m2m, 2)
             trade['pnl_pct'] = round(((close - entry)/entry)*100, 2)
@@ -409,16 +376,23 @@ def update_open_trades_json(bulk_data):
 def place_orders(signals):
     trades = load_json_file(TRADE_HISTORY_FILE, [])
     today_str = date.today().isoformat()
-    existing_ids = {t['id'] for t in trades}
     
-    # Only take Top 5 Prime Buys to manage capital
+    # 1. IDENTIFY EXISTING OPEN SYMBOLS
+    # This prevents buying TATASTEEL if we already own TATASTEEL
+    open_symbols = {t['symbol'] for t in trades if t['status'] == 'OPEN'}
+    
     prime_signals = [s for s in signals if "BUY" in s['verdict']]
-    # Sort by RR
     prime_signals.sort(key=lambda x: x['rr'], reverse=True)
     
     for s in prime_signals[:5]:
+        # 2. CHECK IF ALREADY OWNED
+        if s['symbol'] in open_symbols:
+            logger.info(f"Skipping {s['symbol']} - Already in portfolio.")
+            continue
+            
         tid = f"{s['symbol']}-{today_str}"
-        if tid not in existing_ids:
+        # Check if trade ID exists (prevent dupes same day)
+        if not any(t['id'] == tid for t in trades):
             new_trade = {
                 "id": tid, "date": today_str, "symbol": s['symbol'],
                 "entry": s['price'], "qty": s['qty'],
@@ -426,6 +400,7 @@ def place_orders(signals):
                 "status": "OPEN", "pnl": 0.0, "pnl_pct": 0.0, "note": ""
             }
             trades.insert(0, new_trade)
+            open_symbols.add(s['symbol']) # Update local set
             save_json_file(TRADE_HISTORY_FILE, trades)
             logger.info(f"Placed Order: {s['symbol']}")
 
@@ -433,14 +408,17 @@ def place_orders(signals):
 # 8. HTML REPORT
 # -------------------------
 def generate_html(signals, trades, market_regime, timestamp):
-    # Stats
     closed_trades = [t for t in trades if t['status'] in ['WIN', 'LOSS']]
     wins = len([t for t in closed_trades if t['status'] == 'WIN'])
     total = len(closed_trades)
     acc = round((wins/total*100), 1) if total > 0 else 0
     total_pnl = sum([t.get('net_pnl', 0) for t in closed_trades])
     
-    json_data = json.dumps({"stocks": signals, "pos": trades})
+    # FILTER: Don't show stocks in "Scanner" if they are already in "Portfolio"
+    open_symbols = {t['symbol'] for t in trades if t['status'] == 'OPEN'}
+    filtered_signals = [s for s in signals if s['symbol'] not in open_symbols]
+    
+    json_data = json.dumps({"stocks": filtered_signals, "pos": trades})
     
     html = f"""
     <!DOCTYPE html>
@@ -456,18 +434,13 @@ def generate_html(signals, trades, market_regime, timestamp):
             .card {{ background: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 12px; }}
             .prime {{ border: 1px solid #a855f7; background: linear-gradient(to bottom right, #1e293b, #2e1065); }}
             .badge {{ font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-right: 4px; }}
-            
-            /* Table */
             .ledger-table {{ width: 100%; border-collapse: collapse; font-size: 12px; }}
             .ledger-table th {{ text-align: left; padding: 8px; color: #64748b; border-bottom: 1px solid #334155; }}
             .ledger-table td {{ padding: 8px; border-bottom: 1px solid #1e293b; }}
-            .win-row {{ color: #4ade80; }}
-            .loss-row {{ color: #f87171; }}
         </style>
     </head>
     <body class="p-4 md:p-8">
         <div class="max-w-7xl mx-auto">
-            <!-- Header -->
             <div class="flex justify-between items-center mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
                 <div>
                     <h1 class="text-2xl font-bold text-white flex items-center gap-2">
@@ -482,16 +455,13 @@ def generate_html(signals, trades, market_regime, timestamp):
                 </div>
             </div>
 
-            <!-- Portfolio -->
             <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase">Active Positions</h2>
             <div id="portfolio" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
 
-            <!-- Scanner -->
             <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase">New Opportunities</h2>
             <div id="scanner" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"></div>
             
-            <!-- Closed Trades Ledger (New Section) -->
-            <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase">Trade Ledger (Closed Positions)</h2>
+            <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase">Trade Ledger (History)</h2>
             <div class="bg-slate-900 rounded-lg border border-slate-800 overflow-hidden mb-8">
                 <div class="overflow-x-auto">
                     <table class="ledger-table">
@@ -505,79 +475,49 @@ def generate_html(signals, trades, market_regime, timestamp):
         <script>
             const DATA = {json_data};
             
-            // Render Portfolio
+            // Portfolio
             const portRoot = document.getElementById('portfolio');
             const openTrades = DATA.pos.filter(t => t.status === 'OPEN');
-            
             if(openTrades.length === 0) portRoot.innerHTML = '<div class="col-span-full text-center text-slate-600 py-4">No active trades.</div>';
             else {{
                 portRoot.innerHTML = openTrades.map(p => {{
                     const pnlClass = p.pnl_pct >= 0 ? 'text-green-400' : 'text-red-400';
                     return `<div class="bg-slate-800 border border-slate-700 rounded-lg p-4 relative">
-                        <div class="flex justify-between mb-2">
-                            <div class="font-bold text-white">${{p.symbol}}</div>
-                            <div class="font-mono font-bold ${{pnlClass}}">${{p.pnl_pct}}%</div>
-                        </div>
-                        <div class="text-xs text-slate-400 flex justify-between">
-                            <span>Entry: ${{p.entry}}</span>
-                            <span>Qty: ${{p.qty}}</span>
-                        </div>
+                        <div class="flex justify-between mb-2"><div class="font-bold text-white">${{p.symbol}}</div><div class="font-mono font-bold ${{pnlClass}}">${{p.pnl_pct}}%</div></div>
+                        <div class="text-xs text-slate-400 flex justify-between"><span>Entry: ${{p.entry}}</span><span>Qty: ${{p.qty}}</span></div>
                         <div class="text-[10px] text-slate-500 mt-1">Date: ${{p.date}}</div>
-                        <div class="flex justify-between text-[10px] mt-2 font-mono">
-                            <span class="text-red-400">${{p.stop_loss}} SL</span>
-                            <span class="text-green-400">${{p.target}} TGT</span>
-                        </div>
+                        <div class="flex justify-between text-[10px] mt-2 font-mono"><span class="text-red-400">${{p.stop_loss}} SL</span><span class="text-green-400">${{p.target}} TGT</span></div>
                         ${{p.note ? `<div class="absolute top-0 right-0 bg-blue-600 text-[9px] text-white px-2 py-0.5 rounded-bl">${{p.note}}</div>` : ''}}
                     </div>`;
                 }}).join('');
             }}
 
-            // Render Scanner
+            // Scanner
             const scanRoot = document.getElementById('scanner');
-            if(DATA.stocks.length === 0) scanRoot.innerHTML = '<div class="col-span-full text-center text-slate-600 py-10">No signals today.</div>';
+            if(DATA.stocks.length === 0) scanRoot.innerHTML = '<div class="col-span-full text-center text-slate-600 py-10">No new signals.</div>';
             else {{
                 scanRoot.innerHTML = DATA.stocks.map(s => {{
                     const isPrime = s.verdict.includes('PRIME');
                     const badges = s.setups.map(b => `<span class="badge bg-slate-700 text-slate-300">${{b}}</span>`).join('');
-                    
                     return `<div class="card ${{isPrime ? 'prime' : ''}}">
-                        <div class="flex justify-between mb-2">
-                            <div><div class="font-bold text-white">${{s.symbol}}</div><div class="text-[10px] text-slate-400">${{s.sector}}</div></div>
-                            <div class="text-right"><div class="font-bold ${{s.change>=0?'text-green-400':'text-red-400'}}">${{s.change}}%</div><div class="text-[10px] text-slate-500">₹${{s.price}}</div></div>
-                        </div>
+                        <div class="flex justify-between mb-2"><div><div class="font-bold text-white">${{s.symbol}}</div><div class="text-[10px] text-slate-400">${{s.sector}}</div></div><div class="text-right"><div class="font-bold ${{s.change>=0?'text-green-400':'text-red-400'}}">${{s.change}}%</div><div class="text-[10px] text-slate-500">₹${{s.price}}</div></div></div>
                         <div class="mb-3 h-6 flex flex-wrap">${{badges}}</div>
-                        <div class="flex justify-between text-[10px] bg-slate-900/50 p-2 rounded mb-2">
-                            <div class="text-center"><div>Rec Qty</div><div class="text-blue-400 font-bold text-sm">${{s.qty}}</div></div>
-                            <div class="text-center"><div>ADX</div><div class="text-white font-bold text-sm">${{s.adx}}</div></div>
-                            <div class="text-center"><div>RR</div><div class="text-white font-bold text-sm">${{s.rr}}</div></div>
-                        </div>
-                        <div class="flex justify-between text-[10px] font-mono mt-1">
-                            <span class="text-red-400">SL: ${{s.levels.SL}}</span>
-                            <span class="text-green-400">TGT: ${{s.levels.TGT}}</span>
-                        </div>
+                        <div class="flex justify-between text-[10px] bg-slate-900/50 p-2 rounded mb-2"><div class="text-center"><div>Qty</div><div class="text-blue-400 font-bold">${{s.qty}}</div></div><div class="text-center"><div>ADX</div><div class="text-white font-bold">${{s.adx}}</div></div><div class="text-center"><div>RR</div><div class="text-white font-bold">${{s.rr}}</div></div></div>
+                        <div class="flex justify-between text-[10px] font-mono mt-1"><span class="text-red-400">SL: ${{s.levels.SL}}</span><span class="text-green-400">TGT: ${{s.levels.TGT}}</span></div>
                     </div>`;
                 }}).join('');
             }}
             
-            // Render Ledger
+            // Ledger
             const ledgerRoot = document.getElementById('ledger-body');
             const closedTrades = DATA.pos.filter(t => t.status !== 'OPEN');
             if(closedTrades.length === 0) ledgerRoot.innerHTML = '<tr><td colspan="7" class="text-center text-slate-600 py-4">No closed trades yet.</td></tr>';
             else {{
                 ledgerRoot.innerHTML = closedTrades.map(t => {{
                     const statusClass = t.status === 'WIN' ? 'text-green-400' : 'text-red-400';
-                    return `<tr>
-                        <td class="text-slate-400">${{t.date}}</td>
-                        <td class="font-bold text-white">${{t.symbol}}</td>
-                        <td>${{t.entry}}</td>
-                        <td>${{t.exit_price}}</td>
-                        <td>${{t.qty}}</td>
-                        <td class="font-mono font-bold ${{statusClass}}">₹${{t.net_pnl}}</td>
-                        <td><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-opacity-20 ${{t.status==='WIN'?'bg-green-500 text-green-400':'bg-red-500 text-red-400'}}">${{t.status}}</span></td>
-                    </tr>`;
+                    return `<tr><td class="text-slate-400">${{t.date}}</td><td class="font-bold text-white">${{t.symbol}}</td><td>${{t.entry}}</td><td>${{t.exit_price}}</td><td>${{t.qty}}</td><td class="font-mono font-bold ${{statusClass}}">₹${{t.net_pnl}}</td><td><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-opacity-20 ${{t.status==='WIN'?'bg-green-500 text-green-400':'bg-red-500 text-red-400'}}">${{t.status}}</span></td></tr>`;
                 }}).join('');
             }}
-            
             lucide.createIcons();
         </script>
     </body>
@@ -600,7 +540,6 @@ def run_once():
         logger.error(f"Critical Data Failure: {e}")
         return
 
-    # Sector Analysis
     sector_changes = {}
     for name, t in SECTOR_INDICES.items():
         df = extract_stock_df(bulk, t)
@@ -611,7 +550,6 @@ def run_once():
     market_regime = analyze_market_trend(bulk)
     logger.info(f"Market Regime: {market_regime}")
 
-    # Stock Analysis
     results = []
     if isinstance(bulk.columns, pd.MultiIndex):
         cols = bulk.columns.get_level_values(0).unique()
@@ -626,11 +564,9 @@ def run_once():
             if res: results.append(res)
         except: continue
 
-    # Execution & Reporting
-    place_orders(results) # Simulate entry for top signals
-    update_open_trades_json(bulk) # Simulate exit for existing trades
+    place_orders(results) 
+    update_open_trades_json(bulk) 
     
-    # Load history for reporting
     trades = load_json_file(TRADE_HISTORY_FILE, [])
     timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
     
