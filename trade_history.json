@@ -8,8 +8,8 @@
     "target": 1708.35,
     "stop_loss": 1589.62,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": -21.0,
+    "pnl_pct": -0.09,
     "note": ""
   },
   {
@@ -21,8 +21,8 @@
     "target": 259.67,
     "stop_loss": 243.98,
     "status": "OPEN",
-    "pnl": -0.0,
-    "pnl_pct": -0.0,
+    "pnl": -20.0,
+    "pnl_pct": -0.08,
     "note": ""
   },
   {
@@ -66,8 +66,8 @@
     "target": 180.28,
     "stop_loss": 166.13,
     "status": "OPEN",
-    "pnl": -45.57,
-    "pnl_pct": -0.18,
+    "pnl": -0.0,
+    "pnl_pct": -0.0,
     "note": ""
   },
   {
@@ -79,8 +79,8 @@
     "target": 1025.38,
     "stop_loss": 974.14,
     "status": "OPEN",
-    "pnl": -72.5,
-    "pnl_pct": -0.29,
+    "pnl": -76.25,
+    "pnl_pct": -0.31,
     "note": ""
   },
   {
@@ -92,8 +92,8 @@
     "target": 441.38,
     "stop_loss": 407.27,
     "status": "OPEN",
-    "pnl": -48.0,
-    "pnl_pct": -0.19,
+    "pnl": -30.0,
+    "pnl_pct": -0.12,
     "note": ""
   },
   {
@@ -105,8 +105,8 @@
     "target": 1638.22,
     "stop_loss": 1523.79,
     "status": "OPEN",
-    "pnl": 116.8,
-    "pnl_pct": 0.47,
+    "pnl": 88.0,
+    "pnl_pct": 0.35,
     "note": ""
   },
   {
@@ -150,8 +150,8 @@
     "target": 2517.96,
     "stop_loss": 2392.68,
     "status": "OPEN",
-    "pnl": 20.0,
-    "pnl_pct": 0.08,
+    "pnl": 12.0,
+    "pnl_pct": 0.05,
     "note": ""
   },
   {
@@ -179,8 +179,8 @@
     "target": 6227.69,
     "stop_loss": 5758.1,
     "status": "OPEN",
-    "pnl": 68.0,
-    "pnl_pct": 0.29,
+    "pnl": 58.0,
+    "pnl_pct": 0.25,
     "note": ""
   }
 ]
