@@ -1,5 +1,18 @@
 [
   {
+    "id": "KOTAKBANK-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "KOTAKBANK",
+    "entry": 2077.8,
+    "qty": 12,
+    "target": 2164.7,
+    "stop_loss": 2048.83,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
     "id": "MARUTI-2025-11-26",
     "date": "2025-11-26",
     "symbol": "MARUTI",
@@ -8,8 +21,8 @@
     "target": 16766.51,
     "stop_loss": 15812.5,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": -11.0,
+    "pnl_pct": -0.07,
     "note": ""
   },
   {
@@ -36,8 +49,8 @@
     "target": 179.86,
     "stop_loss": 165.78,
     "status": "OPEN",
-    "pnl": 47.04,
-    "pnl_pct": 0.19,
+    "pnl": -11.76,
+    "pnl_pct": -0.05,
     "note": ""
   },
   {
@@ -49,8 +62,8 @@
     "target": 1855.94,
     "stop_loss": 1762.42,
     "status": "OPEN",
-    "pnl": 71.5,
-    "pnl_pct": 0.31,
+    "pnl": 29.9,
+    "pnl_pct": 0.13,
     "note": ""
   },
   {
@@ -103,8 +116,8 @@
     "target": 1031.01,
     "stop_loss": 981.0,
     "status": "OPEN",
-    "pnl": 76.25,
-    "pnl_pct": 0.31,
+    "pnl": 6.25,
+    "pnl_pct": 0.03,
     "note": ""
   },
   {
@@ -116,8 +129,8 @@
     "target": 1624.29,
     "stop_loss": 1512.97,
     "status": "OPEN",
-    "pnl": 35.2,
-    "pnl_pct": 0.14,
+    "pnl": 43.2,
+    "pnl_pct": 0.18,
     "note": ""
   },
   {
@@ -129,8 +142,8 @@
     "target": 6223.08,
     "stop_loss": 5753.64,
     "status": "OPEN",
-    "pnl": -118.0,
-    "pnl_pct": -0.5,
+    "pnl": -124.0,
+    "pnl_pct": -0.53,
     "note": ""
   },
   {
@@ -142,8 +155,8 @@
     "target": 1707.42,
     "stop_loss": 1590.86,
     "status": "OPEN",
-    "pnl": -51.0,
-    "pnl_pct": -0.21,
+    "pnl": -69.0,
+    "pnl_pct": -0.28,
     "note": ""
   },
   {
@@ -168,8 +181,8 @@
     "target": 177.3,
     "stop_loss": 163.18,
     "status": "OPEN",
-    "pnl": 433.59,
-    "pnl_pct": 1.75,
+    "pnl": 373.99,
+    "pnl_pct": 1.51,
     "note": ""
   },
   {
@@ -181,8 +194,8 @@
     "target": 1853.79,
     "stop_loss": 1758.87,
     "status": "OPEN",
-    "pnl": 121.8,
-    "pnl_pct": 0.49,
+    "pnl": 77.0,
+    "pnl_pct": 0.31,
     "note": ""
   },
   {
