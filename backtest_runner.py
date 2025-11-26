@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-backtest_runner.py — deeper diagnostic edition (fixed)
+backtest_runner.py — deeper diagnostic edition (full file, ADX fix applied)
 - Downloads 2y data, robust extraction.
-- Runs SIGNAL DIAGNOSTIC with very relaxed thresholds.
-- If still zero signals, prints indicator samples (last 10 rows) for a few tickers.
-- Produces backtest_stats.json as before.
+- Runs SIGNAL DIAGNOSTIC with relaxed thresholds.
+- If zero signals, prints indicator samples (last 10 rows) for a few tickers.
+- Runs portfolio sim and writes backtest_stats.json.
 """
 import yfinance as yf
 import pandas as pd
@@ -179,17 +179,43 @@ def wilder_rsi(series, period=14):
     loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/period, adjust=False).mean()
     return 100 - (100 / (1 + gain / loss)).fillna(50)
 
+# ----- ADX: robust fixed implementation -----
 def adx(df, period=14):
-    plus_dm = df['High'].diff()
-    minus_dm = df['Low'].diff()
-    plus_dm = np.where((plus_dm > minus_dm) & (plus_dm > 0), plus_dm, 0.0)
-    minus_dm = np.where((minus_dm > plus_dm) & (minus_dm > 0), -minus_dm, 0.0)
-    tr = true_range(df).ewm(alpha=1/period, adjust=False).mean()
-    plus_di = 100 * (pd.Series(plus_dm).ewm(alpha=1/period, adjust=False).mean() / tr)
-    minus_di = 100 * (pd.Series(minus_dm).ewm(alpha=1/period, adjust=False).mean() / tr)
+    """
+    Robust ADX implementation:
+    - up_move = high.diff()
+    - down_move = prev_low - low (positive when down)
+    - plus_dm/minus_dm positive numbers only
+    - uses ewm smoothing (Wilder-style)
+    """
+    high = df['High']
+    low = df['Low']
+    prev_high = high.shift(1)
+    prev_low = low.shift(1)
+
+    up_move = high - prev_high
+    down_move = prev_low - low   # positive when price moved down
+
+    plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0.0)
+    minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0.0)
+
+    # smoothed True Range
+    tr = true_range(df)
+    sm_tr = tr.ewm(alpha=1/period, adjust=False).mean()
+
+    # smooth the DM series
+    sm_plus = pd.Series(plus_dm, index=df.index).ewm(alpha=1/period, adjust=False).mean()
+    sm_minus = pd.Series(minus_dm, index=df.index).ewm(alpha=1/period, adjust=False).mean()
+
+    # avoid divide-by-zero
+    with np.errstate(divide='ignore', invalid='ignore'):
+        plus_di = 100 * (sm_plus / sm_tr)
+        minus_di = 100 * (sm_minus / sm_tr)
+
     denom = (plus_di + minus_di).replace(0, np.nan)
-    adx_raw = (abs(plus_di - minus_di) / denom * 100).fillna(0)
-    return adx_raw.ewm(alpha=1/period, adjust=False).mean().fillna(0)
+    dx = (abs(plus_di - minus_di) / denom * 100).fillna(0)
+    adx_series = dx.ewm(alpha=1/period, adjust=False).mean().fillna(0)
+    return adx_series
 
 def prepare_df(df):
     df = df.copy()
