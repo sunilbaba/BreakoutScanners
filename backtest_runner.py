@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-backtest_runner.py — deeper diagnostic edition
+backtest_runner.py — deeper diagnostic edition (fixed)
 - Downloads 2y data, robust extraction.
 - Runs SIGNAL DIAGNOSTIC with very relaxed thresholds.
 - If still zero signals, prints indicator samples (last 10 rows) for a few tickers.
@@ -187,7 +187,6 @@ def adx(df, period=14):
     tr = true_range(df).ewm(alpha=1/period, adjust=False).mean()
     plus_di = 100 * (pd.Series(plus_dm).ewm(alpha=1/period, adjust=False).mean() / tr)
     minus_di = 100 * (pd.Series(minus_dm).ewm(alpha=1/period, adjust=False).mean() / tr)
-    # avoid division by zero - safe compute
     denom = (plus_di + minus_di).replace(0, np.nan)
     adx_raw = (abs(plus_di - minus_di) / denom * 100).fillna(0)
     return adx_raw.ewm(alpha=1/period, adjust=False).mean().fillna(0)
@@ -211,8 +210,7 @@ def count_signals_for_df(df):
     for i in range(0, len(df)-1):
         row = df.iloc[i]
         sma_ok = True if DEBUG_ALLOW_NO_SMA200 else (row['Close'] > row['SMA200'])
-        # check values exist and are numbers
-        if pd.isna(row.get('EMA20')) or pd.isna(row.get('RSI')) or pd.isna(row.get('ADX')): 
+        if pd.isna(row.get('EMA20')) or pd.isna(row.get('RSI')) or pd.isna(row.get('ADX')):
             continue
         if row['Close'] > row['EMA20'] and row['RSI'] >= DEBUG_RSI_THRESHOLD and row['ADX'] >= DEBUG_ADX_THRESHOLD and sma_ok:
             if pd.notna(row.get('ATR')) and row['ATR'] > 0:
@@ -238,7 +236,8 @@ def calc_stock_win_rate(df):
     start = max(0, len(df) - 130)
     for i in range(start, len(df)-10):
         row = df.iloc[i]
-        if pd.isna(row.get('EMA20')) or pd.isna(row.get('RSI')) or pd.isna(row.get('ADX')): continue
+        if pd.isna(row.get('EMA20')) or pd.isna(row.get('RSI')) or pd.isna(row.get('ADX')):
+            continue
         if row['Close'] > row['EMA20'] and row['RSI'] >= DEBUG_RSI_THRESHOLD and row['ADX'] >= DEBUG_ADX_THRESHOLD:
             stop = row['Close'] - row['ATR']
             tgt = row['Close'] + (3 * row['ATR'])
@@ -309,7 +308,8 @@ def run_portfolio_sim(bulk_data, tickers):
             for sym, df in processed.items():
                 if date not in df.index: continue
                 row = df.loc[date]
-                if pd.isna(row.get('EMA20')) or pd.isna(row.get('RSI')) or pd.isna(row.get('ADX')): continue
+                if pd.isna(row.get('EMA20')) or pd.isna(row.get('RSI')) or pd.isna(row.get('ADX')):
+                    continue
                 sma_ok = True if DEBUG_ALLOW_NO_SMA200 else (row['Close'] > row['SMA200'])
                 if row['Close'] > row['EMA20'] and row['RSI'] >= DEBUG_RSI_THRESHOLD and row['ADX'] >= DEBUG_ADX_THRESHOLD and sma_ok:
                     if any(t['symbol'] == sym for t in portfolio): continue
@@ -343,4 +343,105 @@ def run_portfolio_sim(bulk_data, tickers):
 # Diagnostic: count signals across tickers & show samples if needed
 # -------------------------
 def signal_diagnostic_and_samples(bulk, tickers):
-    print("=== SIGNAL DIAGNOST
+    print("=== SIGNAL DIAGNOSTIC ===")
+    total_signals = 0
+    per_ticker = {}
+    for t in tickers:
+        df = extract_df(bulk, t)
+        if df is None:
+            per_ticker[t.replace('.NS','')] = 0
+            continue
+        try:
+            cnt = count_signals_for_df(df)
+            per_ticker[t.replace('.NS','')] = int(cnt)
+            total_signals += cnt
+        except Exception:
+            per_ticker[t.replace('.NS','')] = 0
+    print("Total candidate signals (all tickers):", total_signals)
+    non_zero = {k:v for k,v in per_ticker.items() if v>0}
+    print("Tickers with signals (count):", len(non_zero))
+    print("Top tickers by signal count (top 20):")
+    top = sorted(non_zero.items(), key=lambda x: x[1], reverse=True)[:20]
+    for k,v in top:
+        print(f"  {k}: {v}")
+    zero_list = [k for k,v in per_ticker.items() if v==0]
+    print("Sample few tickers with zero:", zero_list[:10])
+    print("=== END SIGNAL DIAGNOSTIC ===")
+    if total_signals == 0:
+        print("\nNo signals found — printing indicator samples for a few tickers to inspect indicators and detect NaNs/zeros.\n")
+        sample_list = list(per_ticker.keys())[:INDICATOR_SAMPLE_TICKERS]
+        for s in sample_list:
+            sym = s + ".NS"
+            df = extract_df(bulk, sym)
+            if df is not None:
+                try:
+                    print_indicator_sample(df, s, n=10)
+                except Exception as e:
+                    print(f"Failed to print sample for {s}: {e}")
+            else:
+                print(f"No df for sample ticker {s}")
+    return total_signals, per_ticker
+
+# -------------------------
+# Main
+# -------------------------
+if __name__ == "__main__":
+    tickers = get_tickers()
+    all_syms = tickers + list(SECTOR_INDICES.values())
+    bulk = robust_download(all_syms, period=DATA_PERIOD, batch_size=BATCH_SIZE)
+    if DIAGNOSTIC:
+        def diag_bulk(bulk, wanted):
+            print("=== BULK DIAGNOSTIC ===")
+            if bulk is None or bulk.empty:
+                print("bulk is EMPTY"); return
+            print("bulk.columns type:", type(bulk.columns))
+            if isinstance(bulk.columns, pd.MultiIndex):
+                tickers_seen = list(bulk.columns.get_level_values(0).unique())
+                print("MultiIndex tickers seen (count):", len(tickers_seen))
+                print("sample tickers:", tickers_seen[:20])
+            else:
+                print("Single-DataFrame columns:", bulk.columns.tolist()[:20])
+                print("rows:", len(bulk.index))
+            available = []; missing = []
+            for t in wanted:
+                df = extract_df(bulk, t)
+                if df is None: missing.append(t)
+                else: available.append(t)
+            print("Available tickers (count):", len(available))
+            print("Missing tickers (count):", len(missing))
+            print("Sample missing (first 20):", missing[:20])
+            if available:
+                sample = available[0]
+                print("Sample available df for", sample)
+                print(extract_df(bulk, sample).head().to_string())
+            print("========================")
+        diag_bulk(bulk, tickers)
+        total_signals, per_ticker = signal_diagnostic_and_samples(bulk, tickers)
+    logger.info("📊 Calculating Win Rates for individual tickers...")
+    ticker_stats = {}
+    for t in tickers:
+        df = extract_df(bulk, t)
+        if df is not None:
+            try:
+                ticker_stats[t.replace('.NS','')] = calc_stock_win_rate(df)
+            except Exception as e:
+                logger.debug("Win rate calc failed for %s: %s", t, e)
+                ticker_stats[t.replace('.NS','')] = 0
+        else:
+            ticker_stats[t.replace('.NS','')] = 0
+    logger.info("📈 Running Portfolio Simulation...")
+    curve, ledger, win_rate, trades, profit = run_portfolio_sim(bulk, tickers)
+    output = {
+        "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+        "portfolio": {
+            "curve": curve,
+            "ledger": ledger[-50:],
+            "win_rate": win_rate,
+            "total_trades": trades,
+            "profit": profit
+        },
+        "tickers": ticker_stats,
+        "last_run": datetime.utcnow().strftime("%Y-%m-%d")
+    }
+    with open(CACHE_FILE, "w") as f: json.dump(output, f, indent=2)
+    logger.info(f"✅ Saved stats to {CACHE_FILE} (profit={profit}, trades={trades}, win_rate={win_rate}%)")
