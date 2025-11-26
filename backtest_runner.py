@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-backtest_runner.py
-- Runs ONCE daily (e.g., 8 PM IST).
+backtest_runner.py (patched debug-friendly)
 - Downloads 2 Years data for Nifty 500 (or CSV list).
-- Simulation: Runs strategy backtest.
-- Output: Saves 'backtest_stats.json' with Win Rates, Equity Curve, and Trade Ledger.
+- More robust downloads, relaxed thresholds for debugging.
+- Writes backtest_stats.json for UI.
 """
 import yfinance as yf
 import pandas as pd
@@ -18,13 +17,19 @@ from time import sleep
 # --- CONFIG ---
 DATA_PERIOD = "2y"                  # 2 years of history
 CACHE_FILE = "backtest_stats.json"
-CAPITAL = 100_000.0
+CAPITAL = 500_000.0
 RISK_PER_TRADE = 0.02
 BROKERAGE_PCT = 0.001
 MAX_POSITION_PERC = 0.25           # max capital per position (percent of total capital)
-MIN_ROWS_REQUIRED = 200            # minimal rows for indicators (SMA200)
-BATCH_SIZE = 10                    # smaller batches for yfinance reliability
+
+# Debug / Relaxed settings (user requested)
+MIN_ROWS_REQUIRED = 150            # relaxed from 200
+BATCH_SIZE = 5                     # smaller batches for reliability
 DIAGNOSTIC = True                  # prints bulk diagnostics after download
+
+# Relaxed thresholds for debugging (temporarily)
+DEBUG_RSI_THRESHOLD = 55
+DEBUG_ADX_THRESHOLD = 20
 
 # Logging
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -78,7 +83,6 @@ def robust_download(tickers, period=DATA_PERIOD, batch_size=BATCH_SIZE):
         success = False
         for attempt in range(3):
             try:
-                # use threads=False to reduce yfinance threading oddities
                 data = yf.download(batch, period=period, group_by='ticker', threads=False, progress=False, ignore_tz=True)
                 if isinstance(data, pd.DataFrame) and not data.empty:
                     frames.append(data)
@@ -128,16 +132,13 @@ def extract_df(bulk, ticker):
         # MultiIndex (many tickers)
         if isinstance(bulk.columns, pd.MultiIndex):
             level0 = list(bulk.columns.get_level_values(0).unique())
-            # direct match
             if ticker in level0:
                 df = bulk[ticker].copy().dropna()
             else:
-                # try without .NS
                 tbase = ticker.replace('.NS', '')
                 if tbase in level0:
                     df = bulk[tbase].copy().dropna()
                 else:
-                    # sometimes yfinance uses a slightly different label: try contains match
                     found = None
                     for cand in level0:
                         if cand.upper().startswith(tbase.upper()):
@@ -214,7 +215,7 @@ def calc_stock_win_rate(df):
     start = max(0, len(df) - 130)
     for i in range(start, len(df)-10):
         row = df.iloc[i]
-        if row['Close'] > row['EMA20'] and row['RSI'] > 60 and row['ADX'] > 25:
+        if row['Close'] > row['EMA20'] and row['RSI'] > DEBUG_RSI_THRESHOLD and row['ADX'] > DEBUG_ADX_THRESHOLD:
             stop = row['Close'] - row['ATR']
             target = row['Close'] + (3 * row['ATR'])
             outcome = "OPEN"
@@ -297,7 +298,7 @@ def run_portfolio_sim(bulk_data, tickers):
             for sym, df in processed.items():
                 if date not in df.index: continue
                 row = df.loc[date]
-                if row['Close'] > row['EMA20'] and row['RSI'] > 60 and row['ADX'] > 25 and row['Close'] > row['SMA200']:
+                if row['Close'] > row['EMA20'] and row['RSI'] > DEBUG_RSI_THRESHOLD and row['ADX'] > DEBUG_ADX_THRESHOLD and row['Close'] > row['SMA200']:
                     if any(t['symbol'] == sym for t in portfolio): continue
                     risk = row['ATR']
                     if not risk or risk <= 0: continue
@@ -309,7 +310,7 @@ def run_portfolio_sim(bulk_data, tickers):
                         fees = cost * BROKERAGE_PCT
                         cash -= (cost + fees)
                         portfolio.append({
-                            "symbol": sym, "entry": row['Close'], "qty": qty,
+                            "symbol": sym, "entry": row['Close'], "qty': qty,
                             "sl": row['Close'] - risk, "tgt": row['Close'] + (3*risk),
                             "entry_cost": fees
                         })
