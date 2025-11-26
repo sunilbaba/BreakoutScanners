@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-backtest_runner.py — deeper diagnostic edition (full file, ADX fix applied)
-- Downloads 2y data, robust extraction.
-- Runs SIGNAL DIAGNOSTIC with relaxed thresholds.
-- If zero signals, prints indicator samples (last 10 rows) for a few tickers.
-- Runs portfolio sim and writes backtest_stats.json.
+backtest_runner.py — production thresholds edition
+- Downloads 2y data for entire ticker list.
+- Strategy filters: RSI >= 60, ADX >= 25, Close > SMA200.
+- Realistic costs: brokerage + slippage, minimum order value.
+- Robust ADX implementation and robust downloads.
+- Outputs backtest_stats.json
 """
 import yfinance as yf
 import pandas as pd
@@ -15,31 +16,31 @@ import logging
 from datetime import datetime
 from time import sleep
 
-# --- CONFIG ---
+# --- CONFIG (production) ---
 DATA_PERIOD = "2y"
 CACHE_FILE = "backtest_stats.json"
 CAPITAL = 100_000.0
-RISK_PER_TRADE = 0.02
-BROKERAGE_PCT = 0.001
-MAX_POSITION_PERC = 0.25
+RISK_PER_TRADE = 0.02          # fraction of equity risked per trade
+BROKERAGE_PCT = 0.001          # brokerage % on traded value (round-trip modeled as entry+exit)
+SLIPPAGE_PCT = 0.0005          # 0.05% slippage per trade
+MAX_POSITION_PERC = 0.25       # max capital allocation per position (as a fraction of CAPITAL)
+MIN_ORDER_VALUE = 2000         # minimum order value (INR) to avoid tiny micro-positions
 
-# Debug / tuning
+# Data & performance
 MIN_ROWS_REQUIRED = 150
-BATCH_SIZE = 5
-DIAGNOSTIC = True
+BATCH_SIZE = 50                # download batches tuned for full Nifty500
+DIAGNOSTIC = False             # set False for production runs
 
-# VERY relaxed thresholds for deep debug
-DEBUG_RSI_THRESHOLD = 50    # allow neutral RSI
-DEBUG_ADX_THRESHOLD = 5     # allow very low ADX
+# Strategy thresholds (strict / production)
+RSI_THRESHOLD = 60
+ADX_THRESHOLD = 25
+REQUIRE_SMA200 = True
 
-# Toggle to temporarily ignore SMA200 filter
-DEBUG_ALLOW_NO_SMA200 = True
-
-# How many tickers to show indicator samples for when signals==0
+# Other
 INDICATOR_SAMPLE_TICKERS = 8
 
 # Logging
-logging.basicConfig(level=logging.INFO, format="%(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("Backtester")
 
 SECTOR_INDICES = {
@@ -53,6 +54,10 @@ SECTOR_INDICES = {
 # Data helpers
 # -------------------------
 def get_tickers():
+    """
+    Loads ticker list from ind_nifty500list.csv if present, else falls back to a reasonable default.
+    CSV expected to have a 'Symbol' column with NSE symbols (without .NS)
+    """
     if os.path.exists("ind_nifty500list.csv"):
         try:
             df = pd.read_csv("ind_nifty500list.csv")
@@ -60,7 +65,8 @@ def get_tickers():
             logger.info(f"Loaded {len(syms)} tickers from CSV")
             return syms
         except Exception as e:
-            logger.info("Failed to read CSV list, using defaults: %s", e)
+            logger.warning("Failed to read CSV list, using defaults: %s", e)
+    # safe defaults (will be replaced by CSV in production)
     return [
         "RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "SBIN.NS",
         "HINDUNILVR.NS", "ICICIBANK.NS", "LT.NS", "AXISBANK.NS", "BHARTIARTL.NS"
@@ -80,6 +86,10 @@ def _tz_safe_index(df):
     return df
 
 def robust_download(tickers, period=DATA_PERIOD, batch_size=BATCH_SIZE):
+    """
+    Download tickers in batches. Fall back to per-symbol downloads if needed.
+    Returns a combined DataFrame (multi-index columns when multiple tickers).
+    """
     logger.info(f"📥 Downloading {len(tickers)} symbols ({period}) in batches of {batch_size}...")
     frames = []
     for i in range(0, len(tickers), batch_size):
@@ -93,7 +103,7 @@ def robust_download(tickers, period=DATA_PERIOD, batch_size=BATCH_SIZE):
                     success = True
                     break
             except Exception as e:
-                logger.info("Batch download failed attempt %d for %s: %s", attempt+1, batch, e)
+                logger.debug("Batch download failed attempt %d for %s: %s", attempt+1, batch, e)
                 sleep(1.0 * (attempt+1))
         if not success:
             logger.info("Falling back to per-symbol download for batch: %s", batch)
@@ -103,6 +113,9 @@ def robust_download(tickers, period=DATA_PERIOD, batch_size=BATCH_SIZE):
                     try:
                         df = yf.download(sym, period=period, threads=False, progress=False, ignore_tz=True)
                         if isinstance(df, pd.DataFrame) and not df.empty:
+                            # single-symbol frames will have columns Open, High, Low, Close, Volume, Adj Close
+                            # convert to multiindex-like structure by renaming columns for later concat consistency
+                            df.columns = pd.Index(df.columns)
                             frames.append(df)
                             break
                     except Exception as e:
@@ -110,19 +123,23 @@ def robust_download(tickers, period=DATA_PERIOD, batch_size=BATCH_SIZE):
                         sleep(0.5)
                     tries += 1
     if not frames:
-        logger.info("No data frames downloaded.")
+        logger.error("No data frames downloaded.")
         return pd.DataFrame()
     try:
         combined = pd.concat(frames, axis=1)
         return combined
     except Exception as e:
-        logger.info("Concat failed: %s - returning first non-empty frame", e)
+        logger.warning("Concat failed: %s - attempting to return first non-empty frame", e)
         for f in frames:
             if isinstance(f, pd.DataFrame) and not f.empty:
                 return f
     return pd.DataFrame()
 
 def extract_df(bulk, ticker):
+    """
+    Given bulk output (possibly multiindexed), return a cleaned df for 'ticker' (e.g., 'RELIANCE.NS' or '^NSEI').
+    Ensures timezone-safe index and enforces MIN_ROWS_REQUIRED rows.
+    """
     try:
         if bulk is None or bulk.empty:
             return None
@@ -149,7 +166,8 @@ def extract_df(bulk, ticker):
                 return None
             return df
         else:
-            if all(c in bulk.columns for c in ['Open','High','Low','Close']):
+            # single-frame (no multiindex) - maybe we downloaded per-ticker frames earlier
+            if all(c in bulk.columns for c in ['Open', 'High', 'Low', 'Close']):
                 df = bulk.copy().dropna()
                 df = _tz_safe_index(df)
                 if len(df) < MIN_ROWS_REQUIRED:
@@ -179,7 +197,6 @@ def wilder_rsi(series, period=14):
     loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/period, adjust=False).mean()
     return 100 - (100 / (1 + gain / loss)).fillna(50)
 
-# ----- ADX: robust fixed implementation -----
 def adx(df, period=14):
     """
     Robust ADX implementation:
@@ -199,15 +216,12 @@ def adx(df, period=14):
     plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0.0)
     minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0.0)
 
-    # smoothed True Range
     tr = true_range(df)
     sm_tr = tr.ewm(alpha=1/period, adjust=False).mean()
 
-    # smooth the DM series
     sm_plus = pd.Series(plus_dm, index=df.index).ewm(alpha=1/period, adjust=False).mean()
     sm_minus = pd.Series(minus_dm, index=df.index).ewm(alpha=1/period, adjust=False).mean()
 
-    # avoid divide-by-zero
     with np.errstate(divide='ignore', invalid='ignore'):
         plus_di = 100 * (sm_plus / sm_tr)
         minus_di = 100 * (sm_minus / sm_tr)
@@ -228,77 +242,62 @@ def prepare_df(df):
     return df
 
 # -------------------------
-# Signal counting & samples
-# -------------------------
-def count_signals_for_df(df):
-    count = 0
-    df = prepare_df(df)
-    for i in range(0, len(df)-1):
-        row = df.iloc[i]
-        sma_ok = True if DEBUG_ALLOW_NO_SMA200 else (row['Close'] > row['SMA200'])
-        if pd.isna(row.get('EMA20')) or pd.isna(row.get('RSI')) or pd.isna(row.get('ADX')):
-            continue
-        if row['Close'] > row['EMA20'] and row['RSI'] >= DEBUG_RSI_THRESHOLD and row['ADX'] >= DEBUG_ADX_THRESHOLD and sma_ok:
-            if pd.notna(row.get('ATR')) and row['ATR'] > 0:
-                count += 1
-    return count
-
-def print_indicator_sample(df, ticker, n=10):
-    df = prepare_df(df)
-    tail = df.tail(n)[['Open','High','Low','Close','SMA200','EMA20','ATR','RSI','ADX']].copy()
-    print(f"=== INDICATOR SAMPLE FOR {ticker} (last {n} rows) ===")
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', 120):
-        print(tail.to_string())
-    print("=== END SAMPLE ===")
-
-# -------------------------
-# Win-rate & sim (use relaxed thresholds)
+# Win-rate & portfolio sim (production)
 # -------------------------
 def calc_stock_win_rate(df):
+    """
+    Compute per-stock win-rate using production thresholds (last ~6 months window).
+    """
     if df is None or len(df) < 150:
         return 0
     df = prepare_df(df)
     wins, total = 0, 0
     start = max(0, len(df) - 130)
-    for i in range(start, len(df)-10):
+    for i in range(start, len(df) - 10):
         row = df.iloc[i]
         if pd.isna(row.get('EMA20')) or pd.isna(row.get('RSI')) or pd.isna(row.get('ADX')):
             continue
-        if row['Close'] > row['EMA20'] and row['RSI'] >= DEBUG_RSI_THRESHOLD and row['ADX'] >= DEBUG_ADX_THRESHOLD:
-            stop = row['Close'] - row['ATR']
+        if row['Close'] > row['EMA20'] and row['RSI'] > RSI_THRESHOLD and row['ADX'] > ADX_THRESHOLD:
+            sl = row['Close'] - row['ATR']
             tgt = row['Close'] + (3 * row['ATR'])
             outcome = "OPEN"
             for j in range(1, 15):
                 if i + j >= len(df): break
                 fut = df.iloc[i + j]
-                if fut['Low'] <= stop:
+                if fut['Low'] <= sl:
                     outcome = "LOSS"; break
                 if fut['High'] >= tgt:
                     outcome = "WIN"; break
             if outcome != "OPEN":
                 total += 1
                 if outcome == "WIN": wins += 1
-    return round((wins / total * 100), 0) if total > 0 else 0
+    return round((wins / total) * 100, 1) if total > 0 else 0
 
 def run_portfolio_sim(bulk_data, tickers):
+    """
+    Production-ready portfolio simulation with realistic fees/slippage and min order value check.
+    """
     processed = {}
     for t in tickers:
         df = extract_df(bulk_data, t)
         if df is not None and len(df) >= MIN_ROWS_REQUIRED:
             processed[t] = prepare_df(df)
     logger.info("Processed tickers for sim: %d/%d", len(processed), len(tickers))
-    if len(processed) < 10:
-        logger.info("Processed list (sample): %s", sorted(list(processed.keys()))[:20])
     if not processed:
-        logger.info("No tickers processed - exiting sim.")
+        logger.error("No tickers processed - exiting sim.")
         return [], [], 0, 0, 0
+
+    # unified date set (some tickers may miss dates)
     dates = sorted(list(set().union(*[d.index for d in processed.values()])))
-    sim_dates = dates[150:]
+    sim_dates = dates[150:]  # skip early rows where indicators are NaN
+
     cash = CAPITAL
     equity_curve = [CAPITAL]
     portfolio = []
     history = []
+
     for date in sim_dates:
+        # --- EXITS ---
         active = []
         for trade in portfolio:
             sym = trade['symbol']
@@ -306,6 +305,7 @@ def run_portfolio_sim(bulk_data, tickers):
                 active.append(trade); continue
             row = processed[sym].loc[date]
             exit_p = None
+            # check open/low/high based exit logic
             if row['Open'] < trade['sl']:
                 exit_p = row['Open']
             elif row['Low'] <= trade['sl']:
@@ -314,154 +314,147 @@ def run_portfolio_sim(bulk_data, tickers):
                 exit_p = row['Open']
             elif row['High'] >= trade['tgt']:
                 exit_p = trade['tgt']
+
             if exit_p:
-                pnl = (exit_p - trade['entry']) * trade['qty']
-                cost = (exit_p * trade['qty'] * BROKERAGE_PCT)
-                real_pnl = pnl - cost - trade['entry_cost']
-                cash += (exit_p * trade['qty'] - cost)
+                # apply slippage on exit price (worse for us): for sell we subtract slippage %
+                exit_price_effective = exit_p * (1 - SLIPPAGE_PCT)
+                revenue = exit_price_effective * trade['qty']
+                cost = revenue * BROKERAGE_PCT
+                # realized pnl considers entry price (which included slippage on entry) and entry_cost recorded
+                pnl = revenue - cost - (trade['entry'] * trade['qty'] + trade['entry_cost'])
+                self_pnl = pnl
+                cash += (revenue - cost)
                 history.append({
                     "date": date.strftime("%Y-%m-%d"),
                     "symbol": sym,
-                    "entry": round(trade['entry'],2),
-                    "exit": round(exit_p,2),
-                    "pnl": round(real_pnl,2),
-                    "status": "WIN" if real_pnl>0 else "LOSS"
+                    "entry": round(trade['entry'], 2),
+                    "exit": round(exit_price_effective, 2),
+                    "pnl": round(self_pnl, 2),
+                    "status": "WIN" if self_pnl > 0 else "LOSS"
                 })
             else:
                 active.append(trade)
         portfolio = active
+
+        # --- ENTRIES ---
         if len(portfolio) < 5:
-            for sym, df in processed.items():
+            # iterate symbols in deterministic order for reproducibility
+            for sym in sorted(processed.keys()):
+                if len(portfolio) >= 5: break
+                df = processed[sym]
                 if date not in df.index: continue
                 row = df.loc[date]
+                # require indicators to exist
                 if pd.isna(row.get('EMA20')) or pd.isna(row.get('RSI')) or pd.isna(row.get('ADX')):
                     continue
-                sma_ok = True if DEBUG_ALLOW_NO_SMA200 else (row['Close'] > row['SMA200'])
-                if row['Close'] > row['EMA20'] and row['RSI'] >= DEBUG_RSI_THRESHOLD and row['ADX'] >= DEBUG_ADX_THRESHOLD and sma_ok:
-                    if any(t['symbol'] == sym for t in portfolio): continue
-                    risk = row['ATR']
-                    if not risk or risk <= 0: continue
-                    qty = int((equity_curve[-1] * RISK_PER_TRADE) / risk)
-                    if (qty * row['Close']) > (CAPITAL * MAX_POSITION_PERC):
-                        qty = int((CAPITAL * MAX_POSITION_PERC) / row['Close'])
-                    cost = qty * row['Close']
-                    if qty > 0 and cash > (cost + cost * BROKERAGE_PCT):
-                        fees = cost * BROKERAGE_PCT
-                        cash -= (cost + fees)
-                        portfolio.append({
-                            "symbol": sym, "entry": row['Close'], "qty": qty,
-                            "sl": row['Close'] - risk, "tgt": row['Close'] + (3*risk),
-                            "entry_cost": fees
-                        })
-                        if len(portfolio) >= 5: break
-        m2m = 0
+                # strategy filters (production)
+                if not (row['Close'] > row['EMA20'] and row['RSI'] > RSI_THRESHOLD and row['ADX'] > ADX_THRESHOLD):
+                    continue
+                if REQUIRE_SMA200 and (row['Close'] <= row['SMA200']):
+                    continue
+                # avoid duplicates
+                if any(t['symbol'] == sym for t in portfolio): continue
+
+                # position sizing based on ATR risk
+                atr_val = row['ATR']
+                if pd.isna(atr_val) or atr_val <= 0:
+                    continue
+                risk_per_share = atr_val
+                risk_amount = equity_curve[-1] * RISK_PER_TRADE
+                qty = int(risk_amount / risk_per_share)
+                # enforce max position limit (based on initial CAPITAL)
+                max_cost_allowed = CAPITAL * MAX_POSITION_PERC
+                if qty * row['Close'] > max_cost_allowed:
+                    qty = int(max_cost_allowed / row['Close'])
+                # enforce minimum order value
+                if qty * row['Close'] < MIN_ORDER_VALUE:
+                    continue
+                if qty <= 0:
+                    continue
+
+                # compute cost, fees and slippage for entry
+                cost = qty * row['Close']
+                est_fees = cost * BROKERAGE_PCT
+                est_slippage = cost * SLIPPAGE_PCT
+                total_required = cost + est_fees + est_slippage
+                if cash < total_required:
+                    continue
+
+                # record entry effective price (including slippage worse for buyer)
+                entry_price_effective = row['Close'] * (1 + SLIPPAGE_PCT)
+                cash -= total_required
+                portfolio.append({
+                    "symbol": sym,
+                    "entry": round(entry_price_effective, 4),
+                    "qty": qty,
+                    "sl": round(row['Close'] - atr_val, 4),
+                    "tgt": round(row['Close'] + 3 * atr_val, 4),
+                    "entry_cost": round(est_fees + est_slippage, 4)
+                })
+
+        # --- MTM / Equity ---
+        m2m = 0.0
         for t in portfolio:
             sym = t['symbol']
-            price = processed[sym].loc[date]['Close'] if date in processed[sym].index else t['entry']
+            if date in processed[sym].index:
+                price = processed[sym].loc[date]['Close']
+            else:
+                price = t['entry']
             m2m += (price * t['qty'])
-        equity_curve.append(round(cash + m2m,2))
-    wins = len([h for h in history if h['pnl']>0])
-    win_rate = round(wins / len(history) * 100, 1) if history else 0
+        equity_curve.append(round(cash + m2m, 2))
+
+    # summary
+    wins = len([t for t in history if t['pnl'] > 0])
+    win_rate = round((wins / len(history) * 100), 1) if history else 0
     profit = round(equity_curve[-1] - CAPITAL, 2)
     return equity_curve, history, win_rate, len(history), profit
 
 # -------------------------
-# Diagnostic: count signals across tickers & show samples if needed
+# Ledger/HTML helpers (kept minimal)
 # -------------------------
-def signal_diagnostic_and_samples(bulk, tickers):
-    print("=== SIGNAL DIAGNOSTIC ===")
-    total_signals = 0
-    per_ticker = {}
-    for t in tickers:
-        df = extract_df(bulk, t)
-        if df is None:
-            per_ticker[t.replace('.NS','')] = 0
-            continue
+def load_json_file(path):
+    if os.path.exists(path):
         try:
-            cnt = count_signals_for_df(df)
-            per_ticker[t.replace('.NS','')] = int(cnt)
-            total_signals += cnt
+            return json.load(open(path))
         except Exception:
-            per_ticker[t.replace('.NS','')] = 0
-    print("Total candidate signals (all tickers):", total_signals)
-    non_zero = {k:v for k,v in per_ticker.items() if v>0}
-    print("Tickers with signals (count):", len(non_zero))
-    print("Top tickers by signal count (top 20):")
-    top = sorted(non_zero.items(), key=lambda x: x[1], reverse=True)[:20]
-    for k,v in top:
-        print(f"  {k}: {v}")
-    zero_list = [k for k,v in per_ticker.items() if v==0]
-    print("Sample few tickers with zero:", zero_list[:10])
-    print("=== END SIGNAL DIAGNOSTIC ===")
-    if total_signals == 0:
-        print("\nNo signals found — printing indicator samples for a few tickers to inspect indicators and detect NaNs/zeros.\n")
-        sample_list = list(per_ticker.keys())[:INDICATOR_SAMPLE_TICKERS]
-        for s in sample_list:
-            sym = s + ".NS"
-            df = extract_df(bulk, sym)
-            if df is not None:
-                try:
-                    print_indicator_sample(df, s, n=10)
-                except Exception as e:
-                    print(f"Failed to print sample for {s}: {e}")
-            else:
-                print(f"No df for sample ticker {s}")
-    return total_signals, per_ticker
+            pass
+    return []
+
+def save_json_file(path, data):
+    with open(path, 'w') as f: json.dump(data, f, indent=2)
 
 # -------------------------
-# Main
+# MAIN
 # -------------------------
 if __name__ == "__main__":
+    logger.info("Starting production backtest...")
     tickers = get_tickers()
     all_syms = tickers + list(SECTOR_INDICES.values())
     bulk = robust_download(all_syms, period=DATA_PERIOD, batch_size=BATCH_SIZE)
-    if DIAGNOSTIC:
-        def diag_bulk(bulk, wanted):
-            print("=== BULK DIAGNOSTIC ===")
-            if bulk is None or bulk.empty:
-                print("bulk is EMPTY"); return
-            print("bulk.columns type:", type(bulk.columns))
-            if isinstance(bulk.columns, pd.MultiIndex):
-                tickers_seen = list(bulk.columns.get_level_values(0).unique())
-                print("MultiIndex tickers seen (count):", len(tickers_seen))
-                print("sample tickers:", tickers_seen[:20])
-            else:
-                print("Single-DataFrame columns:", bulk.columns.tolist()[:20])
-                print("rows:", len(bulk.index))
-            available = []; missing = []
-            for t in wanted:
-                df = extract_df(bulk, t)
-                if df is None: missing.append(t)
-                else: available.append(t)
-            print("Available tickers (count):", len(available))
-            print("Missing tickers (count):", len(missing))
-            print("Sample missing (first 20):", missing[:20])
-            if available:
-                sample = available[0]
-                print("Sample available df for", sample)
-                print(extract_df(bulk, sample).head().to_string())
-            print("========================")
-        diag_bulk(bulk, tickers)
-        total_signals, per_ticker = signal_diagnostic_and_samples(bulk, tickers)
-    logger.info("📊 Calculating Win Rates for individual tickers...")
+
+    # calculate per-ticker win rates
+    logger.info("Calculating individual ticker win rates...")
     ticker_stats = {}
     for t in tickers:
         df = extract_df(bulk, t)
         if df is not None:
             try:
-                ticker_stats[t.replace('.NS','')] = calc_stock_win_rate(df)
+                ticker_stats[t.replace('.NS', '')] = calc_stock_win_rate(df)
             except Exception as e:
                 logger.debug("Win rate calc failed for %s: %s", t, e)
-                ticker_stats[t.replace('.NS','')] = 0
+                ticker_stats[t.replace('.NS', '')] = 0
         else:
-            ticker_stats[t.replace('.NS','')] = 0
-    logger.info("📈 Running Portfolio Simulation...")
+            ticker_stats[t.replace('.NS', '')] = 0
+
+    # run portfolio sim
+    logger.info("Running portfolio simulation (production thresholds)...")
     curve, ledger, win_rate, trades, profit = run_portfolio_sim(bulk, tickers)
+
     output = {
         "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
         "portfolio": {
             "curve": curve,
-            "ledger": ledger[-50:],
+            "ledger": ledger[-50:],  # last 50 trades
             "win_rate": win_rate,
             "total_trades": trades,
             "profit": profit
@@ -469,5 +462,8 @@ if __name__ == "__main__":
         "tickers": ticker_stats,
         "last_run": datetime.utcnow().strftime("%Y-%m-%d")
     }
-    with open(CACHE_FILE, "w") as f: json.dump(output, f, indent=2)
+
+    with open(CACHE_FILE, "w") as f:
+        json.dump(output, f, indent=2)
+
     logger.info(f"✅ Saved stats to {CACHE_FILE} (profit={profit}, trades={trades}, win_rate={win_rate}%)")
