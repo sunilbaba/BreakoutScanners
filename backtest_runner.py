@@ -2,11 +2,12 @@
 """
 backtest_runner.py
 
-Very-strict pullback backtest (High win-rate: ~60%+ , few trades).
-- 2 years of daily data
-- Tight pullback to EMA20, volume dry-up, trend filter
-- Tight SL and modest TP
-- Writes backtest_stats.json
+Very-strict pullback backtest (High win-rate: aimed 60%+, few trades).
+Updated fixes:
+- Tighter SL selection (max instead of min)
+- ADX and OBV confirmation added
+- Tighter volume dry-up and pullback pct
+- Diagnostics retained
 """
 import os
 import time
@@ -20,20 +21,21 @@ import pandas as pd
 import numpy as np
 
 # -------------------------
-# CONFIG (Strict C)
+# CONFIG (Strict C) - UPDATED
 # -------------------------
 DATA_PERIOD = "2y"
 CAPITAL = 100_000.0
-RISK_PER_TRADE = 0.015   # 1.5% risk per trade (smaller risk for strict setups)
+RISK_PER_TRADE = 0.015   # 1.5% risk per trade
 BROKERAGE_PCT = 0.001
 
-VOL_MULT = 0.70          # volume must be less than 70% of vol_sma20 (dry-up)
-PULLBACK_PCT = 0.008     # within ±0.8% of EMA20
+VOL_MULT = 0.65          # tightened: volume must be < 65% of vol_sma20 (dry-up)
+PULLBACK_PCT = 0.005     # tightened: within ±0.5% of EMA20
 RSI_LOW = 45
 RSI_HIGH = 56
+ADX_MIN = 18             # require ADX >= 18 for trend strength
 BREAKOUT_LOOKBACK = 1    # follow-through: today > yesterday high
 ATR_SMA_PERIOD = 20
-MIN_HISTORY_ROWS = 250   # require ~1 year+ history
+MIN_HISTORY_ROWS = 250
 MIN_INDICATOR_ROWS = 180
 
 CONCURRENT_POSITIONS = 4
@@ -48,7 +50,7 @@ TSL_EMA10_ATR = 1.6
 TSL_SWING_ATR = 2.4
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("BacktestC")
+logger = logging.getLogger("BacktestC_fixed")
 
 # -------------------------
 # INDICATORS
@@ -219,7 +221,7 @@ def download_and_prepare_tickers(tickers, period=DATA_PERIOD, batch_size=BATCH_S
     return prepared, prepared, skipped
 
 # -------------------------
-# BACKTEST ENGINE (Strict)
+# BACKTEST ENGINE (Fixed Strict)
 # -------------------------
 class BacktestEngine:
     def __init__(self, prepared_map):
@@ -287,7 +289,7 @@ class BacktestEngine:
         return True
 
     def run(self):
-        logger.info("Running very-strict pullback backtest...")
+        logger.info("Running very-strict pullback backtest (fixed)...")
         processed = self.map
         dates = sorted(list(set().union(*[df.index for df in processed.values()])))
         for date in dates:
@@ -314,15 +316,21 @@ class BacktestEngine:
                     # basic checks
                     if pd.isna(row.get('SMA50')) or pd.isna(row.get('SMA200')) or pd.isna(row.get('EMA20')):
                         self.entry_diag['no_ind'] += 1; continue
-                    # Trend
-                    if not (row['SMA50'] > row['SMA200'] and row['EMA20'] > row['SMA50'] * 0.98):  # EMA20 rising near SMA50
+                    # Trend: SMA50 > SMA200 and EMA20 above SMA50 roughly
+                    if not (row['SMA50'] > row['SMA200'] and row['EMA20'] > row['SMA50'] * 0.98):
                         self.entry_diag['trend_fail'] += 1; continue
+                    # ADX trend strength
+                    if pd.isna(row.get('ADX')) or row['ADX'] < ADX_MIN:
+                        self.entry_diag['adx_fail'] += 1; continue
                     # Pullback tight to EMA20
                     if abs(row['Close'] - row['EMA20'])/row['EMA20'] > PULLBACK_PCT:
                         self.entry_diag['pullback_fail'] += 1; continue
                     # Volume dry-up
                     if pd.isna(row.get('VOL_SMA20')) or row['Volume'] >= VOL_MULT * row['VOL_SMA20']:
                         self.entry_diag['vol_fail'] += 1; continue
+                    # OBV confirmation
+                    if pd.isna(row.get('OBV')) or pd.isna(row.get('OBV_SMA20')) or row['OBV'] <= row['OBV_SMA20']:
+                        self.entry_diag['obv_fail'] += 1; continue
                     # RSI band
                     if pd.isna(row.get('RSI')) or row['RSI'] < RSI_LOW or row['RSI'] > RSI_HIGH:
                         self.entry_diag['rsi_fail'] += 1; continue
@@ -333,15 +341,16 @@ class BacktestEngine:
                     prev_high = df['High'].iat[i-1]
                     if row['Close'] <= prev_high:
                         self.entry_diag['no_follow'] += 1; continue
-                    # SL and TP
+                    # SL and TP: FIXED - use MAX(swing_low, close - 0.6*ATR) to make SL tighter
                     swing_low = df['Low'].iloc[max(0, i-5):i].min() if i>0 else row['Low']
-                    sl_candidate = min(swing_low, row['Close'] - 0.8 * row['ATR']) if not pd.isna(row['ATR']) else swing_low
+                    if pd.isna(row.get('ATR')): 
+                        self.entry_diag['no_atr'] += 1; continue
+                    sl_candidate = max(swing_low, row['Close'] - 0.6 * row['ATR'])
                     if sl_candidate >= row['Close']:
                         self.entry_diag['bad_sl'] += 1; continue
-                    target = row['Close'] + 1.6 * row['ATR'] if not pd.isna(row['ATR']) else row['Close'] * 1.02
+                    target = row['Close'] + 1.6 * row['ATR']
                     rr = (target - row['Close']) / (row['Close'] - sl_candidate) if (row['Close'] - sl_candidate)!=0 else 0
-                    # For strict, require rr >= 1.2 (small RR but ok for high win-rate)
-                    if rr < 1.1:
+                    if rr < 1.05:
                         self.entry_diag['rr_fail'] += 1; continue
                     qty = self.calc_qty(row['Close'], sl_candidate, self.equity_curve[-1])
                     if qty <= 0 or qty * row['Close'] > self.cash:
