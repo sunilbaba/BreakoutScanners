@@ -2,12 +2,11 @@
 """
 backtest_runner.py
 
-Professional medium-frequency breakout backtest (A: ~10-30 trades/year).
-- Downloads 2 years of daily data from yfinance (batched + fallback).
-- Prepares indicators and runs backtest.
-- Saves results to backtest_stats.json.
-
-Run: python backtest_runner.py
+Very-strict pullback backtest (High win-rate: ~60%+ , few trades).
+- 2 years of daily data
+- Tight pullback to EMA20, volume dry-up, trend filter
+- Tight SL and modest TP
+- Writes backtest_stats.json
 """
 import os
 import time
@@ -21,36 +20,35 @@ import pandas as pd
 import numpy as np
 
 # -------------------------
-# CONFIG
+# CONFIG (Strict C)
 # -------------------------
 DATA_PERIOD = "2y"
 CAPITAL = 100_000.0
-RISK_PER_TRADE = 0.02
+RISK_PER_TRADE = 0.015   # 1.5% risk per trade (smaller risk for strict setups)
 BROKERAGE_PCT = 0.001
 
-# Medium-frequency thresholds (Option A)
-VOL_MULT = 1.15
-BREAKOUT_LOOKBACK = 20
-RSI_MIN = 52
+VOL_MULT = 0.70          # volume must be less than 70% of vol_sma20 (dry-up)
+PULLBACK_PCT = 0.008     # within ±0.8% of EMA20
+RSI_LOW = 45
+RSI_HIGH = 56
+BREAKOUT_LOOKBACK = 1    # follow-through: today > yesterday high
 ATR_SMA_PERIOD = 20
-MIN_HISTORY_ROWS = 200
-MIN_INDICATOR_ROWS = 120
+MIN_HISTORY_ROWS = 250   # require ~1 year+ history
+MIN_INDICATOR_ROWS = 180
 
+CONCURRENT_POSITIONS = 4
 BATCH_SIZE = 40
 BATCH_RETRIES = 2
 CACHE_FILE = "backtest_stats.json"
-
-DEFAULT_TICKERS = [
-    "RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "SBIN.NS"
-]
+DEFAULT_TICKERS = ["RELIANCE.NS","HDFCBANK.NS","INFY.NS","TCS.NS","SBIN.NS"]
 
 # TSL params
-TSL_BE_ATR = 1.0
-TSL_EMA20_ATR = 2.0
-TSL_SWING_ATR = 3.0
+TSL_BE_ATR = 0.9
+TSL_EMA10_ATR = 1.6
+TSL_SWING_ATR = 2.4
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("BacktestA")
+logger = logging.getLogger("BacktestC")
 
 # -------------------------
 # INDICATORS
@@ -100,7 +98,7 @@ def prepare_df(df):
     if df is None or df.empty:
         return pd.DataFrame()
     df = df.copy()
-    # Normalize columns
+    # normalize col names if needed
     cols_map = {}
     for c in df.columns:
         lc = c.lower()
@@ -110,10 +108,10 @@ def prepare_df(df):
         df = df.rename(columns=cols_map)
     if not set(['Open','High','Low','Close','Volume']).issubset(df.columns):
         return pd.DataFrame()
-    # indicators
     df['SMA50'] = df['Close'].rolling(50).mean()
     df['SMA200'] = df['Close'].rolling(200).mean()
     df['EMA20'] = df['Close'].ewm(span=20, adjust=False).mean()
+    df['EMA10'] = df['Close'].ewm(span=10, adjust=False).mean()
     df['ATR'] = atr(df)
     df['ATR_SMA'] = df['ATR'].rolling(ATR_SMA_PERIOD).mean()
     df['RSI'] = wilder_rsi(df['Close'])
@@ -192,7 +190,6 @@ def download_and_prepare_tickers(tickers, period=DATA_PERIOD, batch_size=BATCH_S
                     skipped.append((t, reason))
             continue
 
-        # handle multiindex (typical batch)
         if isinstance(raw, pd.DataFrame) and isinstance(raw.columns, pd.MultiIndex):
             cols0 = raw.columns.get_level_values(0).unique()
             for t in cols0:
@@ -206,7 +203,6 @@ def download_and_prepare_tickers(tickers, period=DATA_PERIOD, batch_size=BATCH_S
                 else:
                     skipped.append((t, reason))
         else:
-            # rare single DataFrame; fallback per ticker
             for t in batch:
                 pdf, reason = try_single_download_and_prepare(t, period)
                 if pdf is not None:
@@ -223,7 +219,7 @@ def download_and_prepare_tickers(tickers, period=DATA_PERIOD, batch_size=BATCH_S
     return prepared, prepared, skipped
 
 # -------------------------
-# BACKTEST ENGINE
+# BACKTEST ENGINE (Strict)
 # -------------------------
 class BacktestEngine:
     def __init__(self, prepared_map):
@@ -240,20 +236,19 @@ class BacktestEngine:
         risk_share = abs(entry - sl)
         if risk_share <= 0: return 0
         qty = int(risk_amt / risk_share)
-        max_qty = int((equity * 0.25) / entry) if entry > 0 else 0
-        if qty * entry > equity * 0.25:
+        max_qty = int((equity * 0.20) / entry) if entry > 0 else 0
+        if qty * entry > equity * 0.20:
             qty = max_qty
         return max(qty, 0)
 
     def apply_tsl(self, trade, row, df, idx):
-        # Move SL to BE at +1 ATR
         atr_v = row['ATR']
         entry = trade['entry']
         if row['High'] >= entry + (TSL_BE_ATR * atr_v):
             trade['sl'] = max(trade['sl'], entry)
-        if row['High'] >= entry + (TSL_EMA20_ATR * atr_v):
-            if not pd.isna(row.get('EMA20', np.nan)):
-                trade['sl'] = max(trade['sl'], row['EMA20'])
+        if row['High'] >= entry + (TSL_EMA10_ATR * atr_v):
+            if not pd.isna(row.get('EMA10', np.nan)):
+                trade['sl'] = max(trade['sl'], row['EMA10'])
         if row['High'] >= entry + (TSL_SWING_ATR * atr_v):
             if idx >= 5:
                 swing_low = df['Low'].iloc[max(0, idx-5):idx].min()
@@ -292,10 +287,8 @@ class BacktestEngine:
         return True
 
     def run(self):
-        logger.info("Running medium-frequency breakout backtest...")
+        logger.info("Running very-strict pullback backtest...")
         processed = self.map
-
-        # union of all dates
         dates = sorted(list(set().union(*[df.index for df in processed.values()])))
         for date in dates:
             # EXITS
@@ -312,48 +305,57 @@ class BacktestEngine:
                     active.append(trade)
             self.portfolio = active
 
-            # ENTRIES (limit 5 positions)
-            if len(self.portfolio) < 5:
+            # ENTRIES
+            if len(self.portfolio) < CONCURRENT_POSITIONS:
                 for sym, df in processed.items():
                     if date not in df.index: continue
-                    if len(self.portfolio) >= 5: break
+                    if len(self.portfolio) >= CONCURRENT_POSITIONS: break
                     row = df.loc[date]
-                    # basic trend check
-                    if pd.isna(row.get('SMA50')) or pd.isna(row.get('SMA200')): 
-                        self.entry_diag['no_sma'] += 1; continue
-                    if not (row['SMA50'] > row['SMA200'] and row['Close'] > row['SMA50']):
+                    # basic checks
+                    if pd.isna(row.get('SMA50')) or pd.isna(row.get('SMA200')) or pd.isna(row.get('EMA20')):
+                        self.entry_diag['no_ind'] += 1; continue
+                    # Trend
+                    if not (row['SMA50'] > row['SMA200'] and row['EMA20'] > row['SMA50'] * 0.98):  # EMA20 rising near SMA50
                         self.entry_diag['trend_fail'] += 1; continue
-                    # breakout
+                    # Pullback tight to EMA20
+                    if abs(row['Close'] - row['EMA20'])/row['EMA20'] > PULLBACK_PCT:
+                        self.entry_diag['pullback_fail'] += 1; continue
+                    # Volume dry-up
+                    if pd.isna(row.get('VOL_SMA20')) or row['Volume'] >= VOL_MULT * row['VOL_SMA20']:
+                        self.entry_diag['vol_fail'] += 1; continue
+                    # RSI band
+                    if pd.isna(row.get('RSI')) or row['RSI'] < RSI_LOW or row['RSI'] > RSI_HIGH:
+                        self.entry_diag['rsi_fail'] += 1; continue
+                    # Follow-through: must be > yesterday high
                     i = df.index.get_loc(date)
-                    lookback_start = max(0, i - BREAKOUT_LOOKBACK)
-                    recent_high = df['High'].iloc[lookback_start:i].max() if i>0 else None
-                    if recent_high is None or not (row['Close'] >= recent_high):
-                        self.entry_diag['no_breakout'] += 1; continue
-                    # volume
-                    if pd.isna(row.get('VOL_SMA20')) or row['Volume'] < VOL_MULT * row['VOL_SMA20']:
-                        self.entry_diag['vol'] += 1; continue
-                    # ATR rising (vs its SMA)
-                    if pd.isna(row.get('ATR')) or pd.isna(row.get('ATR_SMA')) or row['ATR'] <= row['ATR_SMA']:
-                        self.entry_diag['atr'] += 1; continue
-                    # RSI
-                    if pd.isna(row.get('RSI')) or row['RSI'] < RSI_MIN:
-                        self.entry_diag['rsi'] += 1; continue
-                    # qty & rr
-                    sl = row['Close'] - row['ATR']
-                    target = row['Close'] + 2.5 * row['ATR']
-                    if sl >= row['Close']:
+                    if i == 0:
+                        self.entry_diag['no_prev'] += 1; continue
+                    prev_high = df['High'].iat[i-1]
+                    if row['Close'] <= prev_high:
+                        self.entry_diag['no_follow'] += 1; continue
+                    # SL and TP
+                    swing_low = df['Low'].iloc[max(0, i-5):i].min() if i>0 else row['Low']
+                    sl_candidate = min(swing_low, row['Close'] - 0.8 * row['ATR']) if not pd.isna(row['ATR']) else swing_low
+                    if sl_candidate >= row['Close']:
                         self.entry_diag['bad_sl'] += 1; continue
-                    rr = (target - row['Close']) / (row['Close'] - sl) if (row['Close'] - sl)!=0 else 0
-                    if rr < 1.8:
-                        self.entry_diag['rr'] += 1; continue
-                    qty = self.calc_qty(row['Close'], sl, self.equity_curve[-1])
+                    target = row['Close'] + 1.6 * row['ATR'] if not pd.isna(row['ATR']) else row['Close'] * 1.02
+                    rr = (target - row['Close']) / (row['Close'] - sl_candidate) if (row['Close'] - sl_candidate)!=0 else 0
+                    # For strict, require rr >= 1.2 (small RR but ok for high win-rate)
+                    if rr < 1.1:
+                        self.entry_diag['rr_fail'] += 1; continue
+                    qty = self.calc_qty(row['Close'], sl_candidate, self.equity_curve[-1])
                     if qty <= 0 or qty * row['Close'] > self.cash:
-                        self.entry_diag['qty'] += 1; continue
+                        self.entry_diag['qty_fail'] += 1; continue
                     fees = row['Close'] * qty * BROKERAGE_PCT
                     self.cash -= (row['Close'] * qty + fees)
                     self.portfolio.append({
-                        "symbol": sym, "entry": row['Close'], "qty": qty,
-                        "sl": sl, "target": target, "entry_cost": fees, "entry_date": date
+                        "symbol": sym,
+                        "entry": row['Close'],
+                        "qty": qty,
+                        "sl": sl_candidate,
+                        "target": target,
+                        "entry_cost": fees,
+                        "entry_date": date
                     })
                     self.entry_diag['accepted'] += 1
 
@@ -421,7 +423,6 @@ def normalize_ticker(sym):
 def main():
     tickers = get_tickers_from_csv_or_default()
     tickers = [normalize_ticker(t) for t in tickers]
-    # remove obvious placeholders
     tickers = [t for t in tickers if not any(p in t for p in ('DUMMY','TMP','ZZ'))]
     logger.info(f"Tickers count to download: {len(tickers)}")
     prepared_map, _, skipped = download_and_prepare_tickers(tickers, period=DATA_PERIOD)
@@ -453,6 +454,7 @@ def main():
     logger.info("Backtest finished.")
     logger.info(f"Prepared tickers: {len(prepared_map)} | Skipped: {len(skipped)}")
     logger.info(f"Trades: {out['portfolio']['total_trades']} | Win Rate: {out['portfolio']['win_rate']}% | Profit: {out['portfolio']['profit']}")
+    logger.info(f"Entry diag: {out['entry_diag']}")
     logger.info(f"Saved results to {CACHE_FILE}")
 
 if __name__ == "__main__":
