@@ -1,5 +1,72 @@
 [
   {
+    "id": "HDFCBANK-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "HDFCBANK",
+    "entry": 998.4,
+    "qty": 25,
+    "target": 1040.49,
+    "stop_loss": 984.37,
+    "status": "LOSS",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": "SL Gap Down \u26a0\ufe0f",
+    "exit_price": 981.2999877929688,
+    "net_pnl": -565.13
+  },
+  {
+    "id": "SBIN-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "SBIN",
+    "entry": 993.5,
+    "qty": 25,
+    "target": 1031.01,
+    "stop_loss": 981.0,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
+    "id": "INFY-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "INFY",
+    "entry": 1540.8,
+    "qty": 16,
+    "target": 1624.29,
+    "stop_loss": 1512.97,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
+    "id": "LTIM-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "LTIM",
+    "entry": 5871.0,
+    "qty": 4,
+    "target": 6223.08,
+    "stop_loss": 5753.64,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
+    "id": "HCLTECH-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "HCLTECH",
+    "entry": 1620.0,
+    "qty": 15,
+    "target": 1707.42,
+    "stop_loss": 1590.86,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
     "id": "ONGC-2025-11-25",
     "date": "2025-11-25",
     "symbol": "ONGC",
@@ -8,8 +75,8 @@
     "target": 257.84,
     "stop_loss": 241.85,
     "status": "OPEN",
-    "pnl": -50.5,
-    "pnl_pct": -0.2,
+    "pnl": 126.25,
+    "pnl_pct": 0.51,
     "note": ""
   },
   {
@@ -21,8 +88,8 @@
     "target": 177.3,
     "stop_loss": 163.18,
     "status": "OPEN",
-    "pnl": -56.62,
-    "pnl_pct": -0.23,
+    "pnl": 429.12,
+    "pnl_pct": 1.73,
     "note": ""
   },
   {
@@ -34,8 +101,8 @@
     "target": 1853.79,
     "stop_loss": 1758.87,
     "status": "OPEN",
-    "pnl": -81.2,
-    "pnl_pct": -0.33,
+    "pnl": 60.2,
+    "pnl_pct": 0.24,
     "note": ""
   },
   {
@@ -46,9 +113,11 @@
     "qty": 25,
     "target": 1035.71,
     "stop_loss": 981.83,
-    "status": "OPEN",
+    "status": "LOSS",
     "pnl": -137.5,
     "pnl_pct": -0.55,
-    "note": ""
+    "note": "SL Gap Down \u26a0\ufe0f",
+    "exit_price": 981.2999877929688,
+    "net_pnl": -487.41
   }
 ]
