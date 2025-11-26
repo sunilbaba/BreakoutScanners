@@ -1,0 +1,35 @@
+name: Nightly Backtest (Heavy)
+
+on:
+  schedule:
+    # Runs at 8:30 PM IST (15:00 UTC) every day
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20 # Allow time for heavy calculation
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      
+      - run: pip install pandas numpy yfinance
+      
+      - name: Run Backtester
+        run: python backtest_runner.py
+        
+      - name: Save Results
+        run: |
+          git config --global user.name 'Backtest Bot'
+          git config --global user.email 'bot@primetrade.com'
+          git add backtest_stats.json
+          git commit -m "Update Backtest Cache [skip ci]" || echo "No changes"
+          git push
