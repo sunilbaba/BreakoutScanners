@@ -1,5 +1,57 @@
 [
   {
+    "id": "TATASTEEL-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "TATASTEEL",
+    "entry": 169.3,
+    "qty": 147,
+    "target": 179.86,
+    "stop_loss": 165.78,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
+    "id": "SUNPHARMA-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "SUNPHARMA",
+    "entry": 1785.8,
+    "qty": 13,
+    "target": 1855.94,
+    "stop_loss": 1762.42,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
+    "id": "ONGC-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "ONGC",
+    "entry": 247.3,
+    "qty": 101,
+    "target": 258.99,
+    "stop_loss": 243.4,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
+    "id": "HINDUNILVR-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "HINDUNILVR",
+    "entry": 2422.0,
+    "qty": 10,
+    "target": 2515.66,
+    "stop_loss": 2390.78,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
     "id": "HDFCBANK-2025-11-26",
     "date": "2025-11-26",
     "symbol": "HDFCBANK",
@@ -23,8 +75,8 @@
     "target": 1031.01,
     "stop_loss": 981.0,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": 18.75,
+    "pnl_pct": 0.08,
     "note": ""
   },
   {
@@ -36,8 +88,8 @@
     "target": 1624.29,
     "stop_loss": 1512.97,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": 49.6,
+    "pnl_pct": 0.2,
     "note": ""
   },
   {
@@ -49,8 +101,8 @@
     "target": 6223.08,
     "stop_loss": 5753.64,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": -54.0,
+    "pnl_pct": -0.23,
     "note": ""
   },
   {
@@ -62,8 +114,8 @@
     "target": 1707.42,
     "stop_loss": 1590.86,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": 30.0,
+    "pnl_pct": 0.12,
     "note": ""
   },
   {
@@ -75,8 +127,8 @@
     "target": 257.84,
     "stop_loss": 241.85,
     "status": "OPEN",
-    "pnl": 126.25,
-    "pnl_pct": 0.51,
+    "pnl": 146.45,
+    "pnl_pct": 0.59,
     "note": ""
   },
   {
@@ -88,8 +140,8 @@
     "target": 177.3,
     "stop_loss": 163.18,
     "status": "OPEN",
-    "pnl": 429.12,
-    "pnl_pct": 1.73,
+    "pnl": 385.91,
+    "pnl_pct": 1.55,
     "note": ""
   },
   {
@@ -101,8 +153,8 @@
     "target": 1853.79,
     "stop_loss": 1758.87,
     "status": "OPEN",
-    "pnl": 60.2,
-    "pnl_pct": 0.24,
+    "pnl": 44.8,
+    "pnl_pct": 0.18,
     "note": ""
   },
   {
