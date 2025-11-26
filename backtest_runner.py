@@ -452,14 +452,11 @@ if __name__ == "__main__":
 
     output = {
         "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
-        "portfolio": {
-            "curve": curve,
-            "ledger": ledger[-50:],  # last 50 trades
-            "win_rate": win_rate,
-            "total_trades": trades,
-            "profit": profit
-        },
-        "tickers": ticker_stats,
+        "curve": curve,
+    "win_rate": win_rate,
+    "total_trades": trades,
+    "profit": profit,
+    "tickers": ticker_stats,
         "last_run": datetime.utcnow().strftime("%Y-%m-%d")
     }
 
