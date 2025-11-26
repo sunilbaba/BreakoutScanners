@@ -1,5 +1,33 @@
 [
   {
+    "id": "MARUTI-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "MARUTI",
+    "entry": 16051.0,
+    "qty": 1,
+    "target": 16766.51,
+    "stop_loss": 15812.5,
+    "status": "OPEN",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": ""
+  },
+  {
+    "id": "AXISBANK-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "AXISBANK",
+    "entry": 1291.7,
+    "qty": 19,
+    "target": 1350.01,
+    "stop_loss": 1272.26,
+    "status": "LOSS",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": "SL Gap Down \u26a0\ufe0f",
+    "exit_price": 1271.9000244140625,
+    "net_pnl": -511.65
+  },
+  {
     "id": "TATASTEEL-2025-11-26",
     "date": "2025-11-26",
     "symbol": "TATASTEEL",
@@ -8,8 +36,8 @@
     "target": 179.86,
     "stop_loss": 165.78,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": 47.04,
+    "pnl_pct": 0.19,
     "note": ""
   },
   {
@@ -21,8 +49,8 @@
     "target": 1855.94,
     "stop_loss": 1762.42,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": 71.5,
+    "pnl_pct": 0.31,
     "note": ""
   },
   {
@@ -47,8 +75,8 @@
     "target": 2515.66,
     "stop_loss": 2390.78,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": -34.0,
+    "pnl_pct": -0.14,
     "note": ""
   },
   {
@@ -75,8 +103,8 @@
     "target": 1031.01,
     "stop_loss": 981.0,
     "status": "OPEN",
-    "pnl": 18.75,
-    "pnl_pct": 0.08,
+    "pnl": 76.25,
+    "pnl_pct": 0.31,
     "note": ""
   },
   {
@@ -88,8 +116,8 @@
     "target": 1624.29,
     "stop_loss": 1512.97,
     "status": "OPEN",
-    "pnl": 49.6,
-    "pnl_pct": 0.2,
+    "pnl": 35.2,
+    "pnl_pct": 0.14,
     "note": ""
   },
   {
@@ -101,8 +129,8 @@
     "target": 6223.08,
     "stop_loss": 5753.64,
     "status": "OPEN",
-    "pnl": -54.0,
-    "pnl_pct": -0.23,
+    "pnl": -118.0,
+    "pnl_pct": -0.5,
     "note": ""
   },
   {
@@ -114,8 +142,8 @@
     "target": 1707.42,
     "stop_loss": 1590.86,
     "status": "OPEN",
-    "pnl": 30.0,
-    "pnl_pct": 0.12,
+    "pnl": -51.0,
+    "pnl_pct": -0.21,
     "note": ""
   },
   {
@@ -140,8 +168,8 @@
     "target": 177.3,
     "stop_loss": 163.18,
     "status": "OPEN",
-    "pnl": 385.91,
-    "pnl_pct": 1.55,
+    "pnl": 433.59,
+    "pnl_pct": 1.75,
     "note": ""
   },
   {
@@ -153,8 +181,8 @@
     "target": 1853.79,
     "stop_loss": 1758.87,
     "status": "OPEN",
-    "pnl": 44.8,
-    "pnl_pct": 0.18,
+    "pnl": 121.8,
+    "pnl_pct": 0.49,
     "note": ""
   },
   {
