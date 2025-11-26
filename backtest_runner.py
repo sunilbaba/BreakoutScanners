@@ -2,15 +2,13 @@
 """
 backtest_runner.py
 
-- Reads tickers from ind_nifty500list.csv (Symbol column) or uses DEFAULT_TICKERS.
-- Downloads 2 years of daily data from yfinance (batched with per-ticker fallback).
-- Prepares indicators and runs backtest engine.
-- Saves backtest_stats.json.
+Professional medium-frequency breakout backtest (A: ~10-30 trades/year).
+- Downloads 2 years of daily data from yfinance (batched + fallback).
+- Prepares indicators and runs backtest.
+- Saves results to backtest_stats.json.
 
-Install: pip install yfinance pandas numpy
 Run: python backtest_runner.py
 """
-
 import os
 import time
 import json
@@ -25,22 +23,16 @@ import numpy as np
 # -------------------------
 # CONFIG
 # -------------------------
-DATA_PERIOD = "2y"                # 2 years data
+DATA_PERIOD = "2y"
 CAPITAL = 100_000.0
 RISK_PER_TRADE = 0.02
 BROKERAGE_PCT = 0.001
 
-# Strategy thresholds (production)
-ADX_MIN = 18
-RSI_MIN = 55
-RR_MIN = 1.8
+# Medium-frequency thresholds (Option A)
+VOL_MULT = 1.15
 BREAKOUT_LOOKBACK = 20
-
-# Relaxed thresholds for debug pass
-RELAXED_ADX_MIN = 14
-RELAXED_RSI_MIN = 50
-RELAXED_RR_MIN = 1.4
-
+RSI_MIN = 52
+ATR_SMA_PERIOD = 20
 MIN_HISTORY_ROWS = 200
 MIN_INDICATOR_ROWS = 120
 
@@ -52,23 +44,22 @@ DEFAULT_TICKERS = [
     "RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "SBIN.NS"
 ]
 
-# TSL / trailing logic params
-TSL_BE_R = 1.0
-TSL_EMA20_R = 2.0
-TSL_SWING_R = 3.0
+# TSL params
+TSL_BE_ATR = 1.0
+TSL_EMA20_ATR = 2.0
+TSL_SWING_ATR = 3.0
 
-# Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("BacktestA_YF")
+logger = logging.getLogger("BacktestA")
 
 # -------------------------
-# INDICATOR HELPERS
+# INDICATORS
 # -------------------------
 def true_range(df):
-    prev_close = df['Close'].shift(1)
+    pc = df['Close'].shift(1)
     tr1 = df['High'] - df['Low']
-    tr2 = (df['High'] - prev_close).abs()
-    tr3 = (df['Low'] - prev_close).abs()
+    tr2 = (df['High'] - pc).abs()
+    tr3 = (df['Low'] - pc).abs()
     return pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
 
 def atr(df, period=14):
@@ -109,39 +100,36 @@ def prepare_df(df):
     if df is None or df.empty:
         return pd.DataFrame()
     df = df.copy()
-    # normalize column names (some yf downloads include lowercase)
-    mapping = {}
+    # Normalize columns
+    cols_map = {}
     for c in df.columns:
         lc = c.lower()
-        if lc == 'adj close':
-            mapping[c] = 'Close'
-        elif lc in ('open','high','low','close','volume'):
-            mapping[c] = lc.capitalize()
-    if mapping:
-        df = df.rename(columns=mapping)
-    # required columns
-    if not set(["Open","High","Low","Close","Volume"]).issubset(df.columns):
+        if lc == 'adj close': cols_map[c] = 'Close'
+        elif lc in ('open','high','low','close','volume'): cols_map[c] = lc.capitalize()
+    if cols_map:
+        df = df.rename(columns=cols_map)
+    if not set(['Open','High','Low','Close','Volume']).issubset(df.columns):
         return pd.DataFrame()
     # indicators
     df['SMA50'] = df['Close'].rolling(50).mean()
     df['SMA200'] = df['Close'].rolling(200).mean()
     df['EMA20'] = df['Close'].ewm(span=20, adjust=False).mean()
-    df['EMA20_SLOPE'] = df['EMA20'].diff()
     df['ATR'] = atr(df)
+    df['ATR_SMA'] = df['ATR'].rolling(ATR_SMA_PERIOD).mean()
     df['RSI'] = wilder_rsi(df['Close'])
     df['ADX'] = compute_adx(df)
     df['VOL_SMA20'] = df['Volume'].rolling(20).mean()
     df['OBV'] = compute_obv(df)
-    df['OBV_SMA'] = df['OBV'].rolling(20).mean()
-    # signal-ready rows count:
+    df['OBV_SMA20'] = df['OBV'].rolling(20).mean()
     return df
 
 # -------------------------
-# DOWNLOAD HELPERS (batched with fallback)
+# DOWNLOAD HELPERS
 # -------------------------
 def normalize_ticker(sym):
     s = str(sym).strip().upper()
-    if not s.endswith('.NS') and not s.startswith('^'):
+    if s.startswith('^'): return s
+    if not s.endswith('.NS'):
         s = s + '.NS'
     return s
 
@@ -156,7 +144,22 @@ def try_single_download_and_prepare(ticker, period=DATA_PERIOD):
     if pdf.empty:
         return None, "prepare_empty"
     raw_rows = len(df)
-    valid_rows = int(pdf.dropna(subset=['SMA50','SMA200','EMA20','ATR','RSI','ADX']).shape[0])
+    valid_rows = int(pdf.dropna(subset=['SMA50','SMA200','EMA20','ATR','RSI']).shape[0])
+    if raw_rows < MIN_HISTORY_ROWS:
+        return None, f"too_few_rows:{raw_rows}"
+    if valid_rows < MIN_INDICATOR_ROWS:
+        return None, f"not_enough_indicator_rows:{valid_rows}"
+    logger.info(f"{ticker}: raw_rows={raw_rows}, indicator_rows={valid_rows}")
+    return pdf, None
+
+def prepare_candidate_from_raw(raw, ticker):
+    if raw is None or raw.empty:
+        return None, "no_data"
+    pdf = prepare_df(raw)
+    if pdf.empty:
+        return None, "prepare_empty"
+    raw_rows = len(raw)
+    valid_rows = int(pdf.dropna(subset=['SMA50','SMA200','EMA20','ATR','RSI']).shape[0])
     if raw_rows < MIN_HISTORY_ROWS:
         return None, f"too_few_rows:{raw_rows}"
     if valid_rows < MIN_INDICATOR_ROWS:
@@ -165,32 +168,31 @@ def try_single_download_and_prepare(ticker, period=DATA_PERIOD):
     return pdf, None
 
 def download_and_prepare_tickers(tickers, period=DATA_PERIOD, batch_size=BATCH_SIZE, batch_retries=BATCH_RETRIES):
-    prepared_map = {}
+    prepared = {}
     skipped = []
     logger.info(f"Downloading {len(tickers)} tickers for {period}...")
     for start in range(0, len(tickers), batch_size):
         batch = tickers[start:start+batch_size]
         raw = None
-        for attempt in range(batch_retries+1):
+        for attempt in range(batch_retries + 1):
             try:
-                logger.info(f"Batch download attempt {attempt+1} for {len(batch)} tickers...")
                 raw = yf.download(batch, period=period, interval='1d', group_by='ticker', progress=False, threads=True, ignore_tz=True, auto_adjust=True)
                 break
             except Exception as e:
                 logger.warning(f"Batch download failed (attempt {attempt+1}): {e}")
-                time.sleep(1.5 * (attempt+1))
+                time.sleep(1.2 * (attempt+1))
                 raw = None
         if raw is None or raw.empty:
-            logger.info(f"Batch fallback: downloading individually for {len(batch)} tickers...")
+            # fallback to per-symbol
             for t in batch:
                 pdf, reason = try_single_download_and_prepare(t, period)
                 if pdf is not None:
-                    prepared_map[t] = pdf
+                    prepared[t] = pdf
                 else:
                     skipped.append((t, reason))
             continue
 
-        # raw may be multiindex or single dataframe
+        # handle multiindex (typical batch)
         if isinstance(raw, pd.DataFrame) and isinstance(raw.columns, pd.MultiIndex):
             cols0 = raw.columns.get_level_values(0).unique()
             for t in cols0:
@@ -200,44 +202,28 @@ def download_and_prepare_tickers(tickers, period=DATA_PERIOD, batch_size=BATCH_S
                     sub = None
                 pdf, reason = prepare_candidate_from_raw(sub, t)
                 if pdf is not None:
-                    prepared_map[t] = pdf
+                    prepared[t] = pdf
                 else:
                     skipped.append((t, reason))
         else:
-            # single df case (unlikely for batch), fallback to per-ticker
+            # rare single DataFrame; fallback per ticker
             for t in batch:
                 pdf, reason = try_single_download_and_prepare(t, period)
                 if pdf is not None:
-                    prepared_map[t] = pdf
+                    prepared[t] = pdf
                 else:
                     skipped.append((t, reason))
 
-    if not prepared_map:
+    if not prepared:
         logger.error("No tickers prepared successfully. Aborting.")
         return None, {}, skipped
-    counter = Counter([r for (_, r) in skipped])
-    logger.info(f"Prepared {len(prepared_map)} tickers; skipped {len(skipped)} tickers.")
-    logger.info(f"Top skip reasons: {counter.most_common(8)}")
-    return prepared_map, prepared_map, skipped
-
-def prepare_candidate_from_raw(raw, ticker):
-    if raw is None or raw.empty:
-        return None, "no_data"
-    # raw may have correct columns already
-    pdf = prepare_df(raw)
-    if pdf.empty:
-        return None, "prepare_empty"
-    raw_rows = len(raw)
-    valid_rows = int(pdf.dropna(subset=['SMA50','SMA200','EMA20','ATR','RSI','ADX']).shape[0])
-    if raw_rows < MIN_HISTORY_ROWS:
-        return None, f"too_few_rows:{raw_rows}"
-    if valid_rows < MIN_INDICATOR_ROWS:
-        return None, f"not_enough_indicator_rows:{valid_rows}"
-    logger.info(f"{ticker}: raw_rows={raw_rows}, indicator_rows={valid_rows}")
-    return pdf, None
+    skip_counter = Counter([r for (_, r) in skipped])
+    logger.info(f"Prepared {len(prepared)} tickers; skipped {len(skipped)} tickers.")
+    logger.info(f"Top skip reasons: {skip_counter.most_common(8)}")
+    return prepared, prepared, skipped
 
 # -------------------------
-# BACKTEST ENGINE (keeps previous logic)
+# BACKTEST ENGINE
 # -------------------------
 class BacktestEngine:
     def __init__(self, prepared_map):
@@ -247,7 +233,7 @@ class BacktestEngine:
         self.equity_curve = [CAPITAL]
         self.portfolio = []
         self.history = []
-        self._entry_diag = Counter()
+        self.entry_diag = Counter()
 
     def calc_qty(self, entry, sl, equity):
         risk_amt = equity * RISK_PER_TRADE
@@ -259,25 +245,18 @@ class BacktestEngine:
             qty = max_qty
         return max(qty, 0)
 
-    def calc_recent_high(self, df, date, lookback=BREAKOUT_LOOKBACK):
-        if date not in df.index:
-            return None
-        i = df.index.get_loc(date)
-        if i - lookback < 0:
-            return df['High'].iloc[:i].max() if i>0 else None
-        return df['High'].iloc[i-lookback:i].max()
-
     def apply_tsl(self, trade, row, df, idx):
+        # Move SL to BE at +1 ATR
         atr_v = row['ATR']
         entry = trade['entry']
-        if row['High'] >= entry + (TSL_BE_R * atr_v):
+        if row['High'] >= entry + (TSL_BE_ATR * atr_v):
             trade['sl'] = max(trade['sl'], entry)
-        if row['High'] >= entry + (TSL_EMA20_R * atr_v):
+        if row['High'] >= entry + (TSL_EMA20_ATR * atr_v):
             if not pd.isna(row.get('EMA20', np.nan)):
                 trade['sl'] = max(trade['sl'], row['EMA20'])
-        if row['High'] >= entry + (TSL_SWING_R * atr_v):
+        if row['High'] >= entry + (TSL_SWING_ATR * atr_v):
             if idx >= 5:
-                swing_low = df['Low'].iloc[idx-5:idx].min()
+                swing_low = df['Low'].iloc[max(0, idx-5):idx].min()
                 trade['sl'] = max(trade['sl'], swing_low)
 
     def process_exit(self, trade, row, date):
@@ -312,24 +291,14 @@ class BacktestEngine:
         self.cash += (revenue - cost)
         return True
 
-    def _run_with_thresholds(self, adx_min, rsi_min, rr_min, breakout_lookback):
-        self.cash = CAPITAL
-        self.equity_curve = [CAPITAL]
-        self.portfolio = []
-        self.history = []
-        self._entry_diag = Counter()
-
+    def run(self):
+        logger.info("Running medium-frequency breakout backtest...")
         processed = self.map
-        weekly_map = {t: df.resample('W').agg({'Open':'first','High':'max','Low':'min','Close':'last','Volume':'sum'}).dropna() for t, df in processed.items()}
-        for t, w in weekly_map.items():
-            if not w.empty:
-                w['EMA20'] = w['Close'].ewm(span=20, adjust=False).mean()
-                w['EMA20_SLOPE'] = w['EMA20'].diff()
 
-        # union dates
+        # union of all dates
         dates = sorted(list(set().union(*[df.index for df in processed.values()])))
         for date in dates:
-            # Exits
+            # EXITS
             active = []
             for trade in self.portfolio:
                 sym = trade['symbol']
@@ -343,84 +312,52 @@ class BacktestEngine:
                     active.append(trade)
             self.portfolio = active
 
-            # Entries
+            # ENTRIES (limit 5 positions)
             if len(self.portfolio) < 5:
-                filter_counts = Counter()
                 for sym, df in processed.items():
                     if date not in df.index: continue
                     if len(self.portfolio) >= 5: break
                     row = df.loc[date]
-
-                    # weekly quick checks (relaxed)
-                    wdf = weekly_map.get(sym)
-                    if wdf is None or len(wdf) < 3:
-                        pass
-                    else:
-                        last_week = wdf.iloc[-1]
-                        ema_slope = last_week.get('EMA20_SLOPE', 0)
-                        two_week_avg = wdf['Close'].iloc[-2:].mean() if len(wdf) >= 2 else last_week['Close']
-                        if (last_week['Close'] < last_week['EMA20']) and (ema_slope <= -0.5) and (two_week_avg < last_week['EMA20']):
-                            filter_counts["weekly_down"] += 1
-                            continue
-
-                    # daily basic
-                    if not (row['Close'] > row['EMA20'] and row['Close'] > row['SMA200']):
-                        filter_counts["daily_basic"] += 1
-                        continue
-
-                    # RSI/ADX
-                    if row['RSI'] < rsi_min:
-                        filter_counts["rsi"] += 1
-                        continue
-                    if row['ADX'] < adx_min:
-                        filter_counts["adx"] += 1
-                        continue
-
-                    # volume / obv (lenient)
-                    if pd.isna(row.get('VOL_SMA20', None)) or row['Volume'] < 0.8 * row['VOL_SMA20']:
-                        filter_counts["vol"] += 1
-                        continue
-                    if pd.isna(row.get('OBV', None)) or pd.isna(row.get('OBV_SMA', None)):
-                        filter_counts["obv"] += 1
-                        continue
-                    if row['OBV'] < 0.8 * row['OBV_SMA']:
-                        filter_counts["obv"] += 1
-                        continue
-
-                    # recent high breakout (lenient)
+                    # basic trend check
+                    if pd.isna(row.get('SMA50')) or pd.isna(row.get('SMA200')): 
+                        self.entry_diag['no_sma'] += 1; continue
+                    if not (row['SMA50'] > row['SMA200'] and row['Close'] > row['SMA50']):
+                        self.entry_diag['trend_fail'] += 1; continue
+                    # breakout
                     i = df.index.get_loc(date)
-                    recent_high = df['High'].iloc[max(0, i-breakout_lookback):i].max() if i>0 else None
-                    if recent_high is None or not (row['Close'] >= recent_high * 0.99):
-                        filter_counts["recent_high"] += 1
-                        continue
-
-                    # rr & qty
+                    lookback_start = max(0, i - BREAKOUT_LOOKBACK)
+                    recent_high = df['High'].iloc[lookback_start:i].max() if i>0 else None
+                    if recent_high is None or not (row['Close'] >= recent_high):
+                        self.entry_diag['no_breakout'] += 1; continue
+                    # volume
+                    if pd.isna(row.get('VOL_SMA20')) or row['Volume'] < VOL_MULT * row['VOL_SMA20']:
+                        self.entry_diag['vol'] += 1; continue
+                    # ATR rising (vs its SMA)
+                    if pd.isna(row.get('ATR')) or pd.isna(row.get('ATR_SMA')) or row['ATR'] <= row['ATR_SMA']:
+                        self.entry_diag['atr'] += 1; continue
+                    # RSI
+                    if pd.isna(row.get('RSI')) or row['RSI'] < RSI_MIN:
+                        self.entry_diag['rsi'] += 1; continue
+                    # qty & rr
                     sl = row['Close'] - row['ATR']
-                    target = row['Close'] + (2.5 * row['ATR'])
+                    target = row['Close'] + 2.5 * row['ATR']
                     if sl >= row['Close']:
-                        filter_counts["rr"] += 1
-                        continue
-                    rr = (target - row['Close']) / (row['Close'] - sl) if (row['Close'] - sl) != 0 else 0
-                    if rr < rr_min:
-                        filter_counts["rr"] += 1
-                        continue
-                    qty = int((self.equity_curve[-1] * RISK_PER_TRADE) / (row['Close'] - sl)) if (row['Close'] - sl) != 0 else 0
+                        self.entry_diag['bad_sl'] += 1; continue
+                    rr = (target - row['Close']) / (row['Close'] - sl) if (row['Close'] - sl)!=0 else 0
+                    if rr < 1.8:
+                        self.entry_diag['rr'] += 1; continue
+                    qty = self.calc_qty(row['Close'], sl, self.equity_curve[-1])
                     if qty <= 0 or qty * row['Close'] > self.cash:
-                        filter_counts["qty"] += 1
-                        continue
-
-                    # accept
+                        self.entry_diag['qty'] += 1; continue
                     fees = row['Close'] * qty * BROKERAGE_PCT
                     self.cash -= (row['Close'] * qty + fees)
                     self.portfolio.append({
                         "symbol": sym, "entry": row['Close'], "qty": qty,
                         "sl": sl, "target": target, "entry_cost": fees, "entry_date": date
                     })
-                    filter_counts["accepted"] += 1
+                    self.entry_diag['accepted'] += 1
 
-                self._entry_diag.update(filter_counts)
-
-            # Equity
+            # EQUITY update
             m2m = self.cash
             for t in self.portfolio:
                 sym = t['symbol']
@@ -436,38 +373,29 @@ class BacktestEngine:
 
         # results
         if not self.history:
-            return {
+            report = {
                 "curve": [round(x,2) for x in self.equity_curve],
                 "profit": round(self.equity_curve[-1] - CAPITAL, 2),
                 "total_trades": 0,
                 "win_rate": 0,
                 "history": [],
-                "entry_diag": dict(self._entry_diag),
+                "entry_diag": dict(self.entry_diag),
                 "last_run": datetime.utcnow().strftime("%Y-%m-%d")
             }
+            return report
 
         wins = [h for h in self.history if h['pnl'] > 0]
         win_rate = round(100 * len(wins) / len(self.history), 2) if self.history else 0
-        return {
+        report = {
             "curve": [round(x,2) for x in self.equity_curve],
             "profit": round(self.equity_curve[-1] - CAPITAL, 2),
             "total_trades": len(self.history),
             "win_rate": win_rate,
             "history": self.history,
-            "entry_diag": dict(self._entry_diag),
+            "entry_diag": dict(self.entry_diag),
             "last_run": datetime.utcnow().strftime("%Y-%m-%d")
         }
-
-    def run(self):
-        logger.info("Backtest: running strict pass (production thresholds)")
-        res = self._run_with_thresholds(ADX_MIN, RSI_MIN, RR_MIN, BREAKOUT_LOOKBACK)
-        logger.info(f"Strict pass entry breakdown: {res.get('entry_diag', {})}")
-        if res.get("total_trades", 0) > 0:
-            return res
-        logger.info("Strict pass produced 0 trades — running one RELAXED pass to surface signals")
-        res_relaxed = self._run_with_thresholds(RELAXED_ADX_MIN, RELAXED_RSI_MIN, RELAXED_RR_MIN, max(BREAKOUT_LOOKBACK, 40))
-        logger.info(f"Relaxed pass entry breakdown: {res_relaxed.get('entry_diag', {})}")
-        return res_relaxed
+        return report
 
 # -------------------------
 # MAIN
@@ -483,13 +411,20 @@ def get_tickers_from_csv_or_default():
             logger.warning(f"Failed to read CSV: {e}")
     return DEFAULT_TICKERS.copy()
 
+def normalize_ticker(sym):
+    s = str(sym).strip().upper()
+    if s.startswith('^'): return s
+    if not s.endswith('.NS'):
+        s = s + '.NS'
+    return s
+
 def main():
     tickers = get_tickers_from_csv_or_default()
     tickers = [normalize_ticker(t) for t in tickers]
     # remove obvious placeholders
     tickers = [t for t in tickers if not any(p in t for p in ('DUMMY','TMP','ZZ'))]
     logger.info(f"Tickers count to download: {len(tickers)}")
-    bulk, prepared_map, skipped = download_and_prepare_tickers(tickers, period=DATA_PERIOD)
+    prepared_map, _, skipped = download_and_prepare_tickers(tickers, period=DATA_PERIOD)
     if not prepared_map:
         logger.error("No data prepared. Exiting.")
         with open(CACHE_FILE, 'w') as f:
