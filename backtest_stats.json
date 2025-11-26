@@ -1,2007 +1,1098 @@
 {
-  "updated": "2025-11-26 19:18 UTC",
-  "prepared": 0,
+  "updated": "2025-11-26 19:29 UTC",
+  "portfolio": {
+    "curve": [
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0,
+      100000.0
+    ],
+    "profit": 0.0,
+    "total_trades": 0,
+    "win_rate": 0,
+    "history": []
+  },
+  "tickers": {
+    "AEGISLOG": 0,
+    "ALOKINDS": 0,
+    "APLLTD": 0,
+    "AUBANK": 0,
+    "AFFLE": 0,
+    "AKUMS": 0,
+    "ABSLAMC": 0,
+    "ALKEM": 0,
+    "ARE&M": 0,
+    "ADANIENSOL": 0,
+    "AKZOINDIA": 0,
+    "ABFRL": 0,
+    "ACE": 0,
+    "ABBOTINDIA": 0,
+    "AADHARHFC": 0,
+    "AIAENG": 0,
+    "ADANIPORTS": 0,
+    "AAVAS": 0,
+    "360ONE": 0,
+    "AMBUJACEM": 0,
+    "ATGL": 0,
+    "ADANIGREEN": 0,
+    "ACC": 0,
+    "APLAPOLLO": 0,
+    "ADANIPOWER": 0,
+    "AARTIIND": 0,
+    "ABCAPITAL": 0,
+    "AMBER": 0,
+    "ABB": 0,
+    "ADANIENT": 0,
+    "AJANTPHARM": 0,
+    "AWL": 0,
+    "ALKYLAMINE": 0,
+    "3MINDIA": 0,
+    "ABREL": 0,
+    "BSE": 0,
+    "MAHABANK": 0,
+    "BANDHANBNK": 0,
+    "APOLLOHOSP": 0,
+    "BHARATFORG": 0,
+    "BAYERCROP": 0,
+    "BAJFINANCE": 0,
+    "BANKBARODA": 0,
+    "BALKRISIND": 0,
+    "BALRAMCHIN": 0,
+    "BLS": 0,
+    "BERGEPAINT": 0,
+    "BAJAJFINSV": 0,
+    "BANKINDIA": 0,
+    "ANANDRATHI": 0,
+    "ATUL": 0,
+    "BAJAJ-AUTO": 0,
+    "AIIL": 0,
+    "APTUS": 0,
+    "BATAINDIA": 0,
+    "AXISBANK": 0,
+    "ANANTRAJ": 0,
+    "APARINDS": 0,
+    "BASF": 0,
+    "BDL": 0,
+    "BEL": 0,
+    "ASIANPAINT": 0,
+    "ANGELONE": 0,
+    "ASTRAZEN": 0,
+    "DMART": 0,
+    "BEML": 0,
+    "ASAHIINDIA": 0,
+    "BAJAJHLDNG": 0,
+    "ASTERDM": 0,
+    "ASHOKLEY": 0,
+    "ASTRAL": 0,
+    "AUROPHARMA": 0,
+    "APOLLOTYRE": 0,
+    "FIRSTCRY": 0,
+    "BLUESTARCO": 0,
+    "CCL": 0,
+    "BOSCHLTD": 0,
+    "CHOLAFIN": 0,
+    "CAPLIPOINT": 0,
+    "BPCL": 0,
+    "CERA": 0,
+    "CRISIL": 0,
+    "BIKAJI": 0,
+    "CESC": 0,
+    "CIPLA": 0,
+    "CDSL": 0,
+    "MAPMYINDIA": 0,
+    "BHARTIARTL": 0,
+    "CHOLAHLDNG": 0,
+    "CARBORUNIV": 0,
+    "CGPOWER": 0,
+    "BRITANNIA": 0,
+    "BBTC": 0,
+    "CHAMBLFERT": 0,
+    "BHEL": 0,
+    "CHALET": 0,
+    "BIOCON": 0,
+    "CHOICEIN": 0,
+    "CANBK": 0,
+    "CHENNPETRO": 0,
+    "BLUEDART": 0,
+    "CENTURYPLY": 0,
+    "CASTROLIND": 0,
+    "CGCL": 0,
+    "CEATLTD": 0,
+    "CANFINHOME": 0,
+    "BRIGADE": 0,
+    "BLUEJET": 0,
+    "CENTRALBK": 0,
+    "BSOFT": 0,
+    "CAMPUS": 0,
+    "CUB": 0,
+    "BHARTIHEXA": 0,
+    "DATAPATTNS": 0,
+    "DIXON": 0,
+    "ELGIEQUIP": 0,
+    "DEEPAKFERT": 0,
+    "DOMS": 0,
+    "DEEPAKNTR": 0,
+    "ENDURANCE": 0,
+    "CONCOR": 0,
+    "DIVISLAB": 0,
+    "DABUR": 0,
+    "LALPATHLAB": 0,
+    "EIHOTEL": 0,
+    "CRAFTSMAN": 0,
+    "CYIENT": 0,
+    "COCHINSHIP": 0,
+    "DEVYANI": 0,
+    "DALBHARAT": 0,
+    "COROMANDEL": 0,
+    "ERIS": 0,
+    "EICHERMOT": 0,
+    "EMCURE": 0,
+    "CONCORDBIO": 0,
+    "ELECON": 0,
+    "CLEAN": 0,
+    "EIDPARRY": 0,
+    "CAMS": 0,
+    "DCMSHRIRAM": 0,
+    "ENGINERSIN": 0,
+    "CUMMINSIND": 0,
+    "COFORGE": 0,
+    "EMAMILTD": 0,
+    "COLPAL": 0,
+    "CROMPTON": 0,
+    "CREDITACC": 0,
+    "DLF": 0,
+    "COALINDIA": 0,
+    "DELHIVERY": 0,
+    "DRREDDY": 0,
+    "GODREJIND": 0,
+    "GESHIP": 0,
+    "GODREJPROP": 0,
+    "HEG": 0,
+    "FSL": 0,
+    "EXIDEIND": 0,
+    "FINPIPE": 0,
+    "FINCABLES": 0,
+    "ESCORTS": 0,
+    "GLENMARK": 0,
+    "GRANULES": 0,
+    "GRASIM": 0,
+    "GUJGASLTD": 0,
+    "GMRAIRPORT": 0,
+    "GMDCLTD": 0,
+    "FIVESTAR": 0,
+    "GLAXO": 0,
+    "GODREJAGRO": 0,
+    "GRAVITA": 0,
+    "GODIGIT": 0,
+    "GILLETTE": 0,
+    "GPIL": 0,
+    "GLAND": 0,
+    "ETERNAL": 0,
+    "GRSE": 0,
+    "GSPL": 0,
+    "GVT&D": 0,
+    "MEDANTA": 0,
+    "GODFRYPHLP": 0,
+    "FACT": 0,
+    "FEDERALBNK": 0,
+    "FORTIS": 0,
+    "FLUOROCHEM": 0,
+    "GAIL": 0,
+    "FORCEMOT": 0,
+    "GRAPHITE": 0,
+    "NYKAA": 0,
+    "GICRE": 0,
+    "GODREJCP": 0,
+    "INDGN": 0,
+    "HDFCLIFE": 0,
+    "INDIACEM": 0,
+    "IDBI": 0,
+    "ICICIPRULI": 0,
+    "HOMEFIRST": 0,
+    "HINDALCO": 0,
+    "HINDPETRO": 0,
+    "HUDCO": 0,
+    "INDIANB": 0,
+    "HINDZINC": 0,
+    "INDIAMART": 0,
+    "HAL": 0,
+    "IIFL": 0,
+    "IEX": 0,
+    "ITC": 0,
+    "IRB": 0,
+    "IDFCFIRSTB": 0,
+    "HDFCBANK": 0,
+    "HONASA": 0,
+    "HAVELLS": 0,
+    "IFCI": 0,
+    "ITI": 0,
+    "HAPPSTMNDS": 0,
+    "HFCL": 0,
+    "POWERINDIA": 0,
+    "HINDCOPPER": 0,
+    "ICICIGI": 0,
+    "HONAUT": 0,
+    "HEROMOTOCO": 0,
+    "HCLTECH": 0,
+    "ICICIBANK": 0,
+    "HDFCAMC": 0,
+    "IRCON": 0,
+    "HINDUNILVR": 0,
+    "INOXINDIA": 0,
+    "HSCL": 0,
+    "INOXWIND": 0,
+    "JPPOWER": 0,
+    "JINDALSAW": 0,
+    "IPCALAB": 0,
+    "JYOTICNC": 0,
+    "NAUKRI": 0,
+    "INDIGO": 0,
+    "IOB": 0,
+    "J&KBANK": 0,
+    "INTELLECT": 0,
+    "JBCHEPHARM": 0,
+    "JSWINFRA": 0,
+    "JYOTHYLAB": 0,
+    "JINDALSTEL": 0,
+    "KPITTECH": 0,
+    "INDUSTOWER": 0,
+    "JKTYRE": 0,
+    "KEI": 0,
+    "INDHOTEL": 0,
+    "JSWENERGY": 0,
+    "INDUSINDBK": 0,
+    "JMFINANCIL": 0,
+    "JSWSTEEL": 0,
+    "JSL": 0,
+    "JKCEMENT": 0,
+    "IOC": 0,
+    "KPRMILL": 0,
+    "JUBLPHARMA": 0,
+    "IRCTC": 0,
+    "INFY": 0,
+    "JWL": 0,
+    "IREDA": 0,
+    "JBMA": 0,
+    "IRFC": 0,
+    "JUBLFOOD": 0,
+    "IGL": 0,
+    "JUBLINGREA": 0,
+    "JIOFIN": 0,
+    "MRPL": 0,
+    "KIRLOSBROS": 0,
+    "KEC": 0,
+    "KPIL": 0,
+    "KIRLOSENG": 0,
+    "LT": 0,
+    "KARURVYSYA": 0,
+    "LICHSGFIN": 0,
+    "KFINTECH": 0,
+    "LATENTVIEW": 0,
+    "MAHSEAMLES": 0,
+    "LODHA": 0,
+    "LAURUSLABS": 0,
+    "KOTAKBANK": 0,
+    "KAJARIACER": 0,
+    "MGL": 0,
+    "LUPIN": 0,
+    "LTFOODS": 0,
+    "KSB": 0,
+    "LTF": 0,
+    "LICI": 0,
+    "MMTC": 0,
+    "KALYANKJIL": 0,
+    "LINDEINDIA": 0,
+    "MARUTI": 0,
+    "M&MFIN": 0,
+    "LEMONTREE": 0,
+    "KIMS": 0,
+    "LTIM": 0,
+    "MANAPPURAM": 0,
+    "MRF": 0,
+    "M&M": 0,
+    "LLOYDSME": 0,
+    "MARICO": 0,
+    "MAHSCOOTER": 0,
+    "LTTS": 0,
+    "KAYNES": 0,
+    "MANKIND": 0,
+    "MFSL": 0,
+    "NUVAMA": 0,
+    "NUVOCO": 0,
+    "MAZDOCK": 0,
+    "POLICYBZR": 0,
+    "OIL": 0,
+    "MCX": 0,
+    "OBEROIRLTY": 0,
+    "NEULANDLAB": 0,
+    "NETWEB": 0,
+    "PAYTM": 0,
+    "NHPC": 0,
+    "NSLNISP": 0,
+    "MUTHOOTFIN": 0,
+    "NEWGEN": 0,
+    "MINDACORP": 0,
+    "NAVA": 0,
+    "NTPC": 0,
+    "NMDC": 0,
+    "OFSS": 0,
+    "PCBL": 0,
+    "NCC": 0,
+    "METROPOLIS": 0,
+    "MOTILALOFS": 0,
+    "NATIONALUM": 0,
+    "OLECTRA": 0,
+    "MPHASIS": 0,
+    "ONGC": 0,
+    "NESTLEIND": 0,
+    "NH": 0,
+    "OLAELEC": 0,
+    "NLCINDIA": 0,
+    "MAXHEALTH": 0,
+    "NATCOPHARM": 0,
+    "NAM-INDIA": 0,
+    "NBCC": 0,
+    "NAVINFLUOR": 0,
+    "MSUMI": 0,
+    "PATANJALI": 0,
+    "RADICO": 0,
+    "RECLTD": 0,
+    "PERSISTENT": 0,
+    "PHOENIXLTD": 0,
+    "POLYMED": 0,
+    "PNB": 0,
+    "RELIANCE": 0,
+    "PPLPHARMA": 0,
+    "RRKABEL": 0,
+    "SBICARD": 0,
+    "RKFORGE": 0,
+    "PVRINOX": 0,
+    "RITES": 0,
+    "PIIND": 0,
+    "PGEL": 0,
+    "RPOWER": 0,
+    "PAGEIND": 0,
+    "PIDILITIND": 0,
+    "SBFC": 0,
+    "RHIM": 0,
+    "PFIZER": 0,
+    "POWERGRID": 0,
+    "PTCIL": 0,
+    "PETRONET": 0,
+    "POONAWALLA": 0,
+    "RAINBOW": 0,
+    "REDINGTON": 0,
+    "PNBHOUSING": 0,
+    "PGHH": 0,
+    "PFC": 0,
+    "POLYCAB": 0,
+    "PRAJIND": 0,
+    "RBLBANK": 0,
+    "RVNL": 0,
+    "RELINFRA": 0,
+    "RCF": 0,
+    "PRESTIGE": 0,
+    "RAILTEL": 0,
+    "TBOTEK": 0,
+    "SBILIFE": 0,
+    "SAPPHIRE": 0,
+    "SOBHA": 0,
+    "SYNGENE": 0,
+    "SWANCORP": 0,
+    "SUNDRMFAST": 0,
+    "SCI": 0,
+    "SAMMAANCAP": 0,
+    "MOTHERSON": 0,
+    "SAREGAMA": 0,
+    "SCHAEFFLER": 0,
+    "SONATSOFTW": 0,
+    "SIEMENS": 0,
+    "SUZLON": 0,
+    "SKFINDIA": 0,
+    "SHREECEM": 0,
+    "SBIN": 0,
+    "SUNPHARMA": 0,
+    "SCHNEIDER": 0,
+    "STARHEALTH": 0,
+    "SUNTV": 0,
+    "SHRIRAMFIN": 0,
+    "SAIL": 0,
+    "SUNDARMFIN": 0,
+    "SOLARINDS": 0,
+    "SHYAMMETL": 0,
+    "SIGNATURE": 0,
+    "SUMICHEM": 0,
+    "SRF": 0,
+    "SARDAEN": 0,
+    "SJVN": 0,
+    "TVSMOTOR": 0,
+    "SUPREMEIND": 0,
+    "SYRMA": 0,
+    "SONACOMS": 0,
+    "TIMKEN": 0,
+    "TITAGARH": 0,
+    "ULTRACEMCO": 0,
+    "VTL": 0,
+    "TARIL": 0,
+    "TEJASNET": 0,
+    "TORNTPOWER": 0,
+    "TRIDENT": 0,
+    "THERMAX": 0,
+    "NIACL": 0,
+    "UNIONBANK": 0,
+    "TCS": 0,
+    "TATACHEM": 0,
+    "TRIVENI": 0,
+    "TATATECH": 0,
+    "UPL": 0,
+    "TATAELXSI": 0,
+    "TORNTPHARM": 0,
+    "TATACONSUM": 0,
+    "TATASTEEL": 0,
+    "TRITURBINE": 0,
+    "TIINDIA": 0,
+    "UCOBANK": 0,
+    "VBL": 0,
+    "TRENT": 0,
+    "TATAPOWER": 0,
+    "TECHNOE": 0,
+    "VGUARD": 0,
+    "TATAINVEST": 0,
+    "UBL": 0,
+    "UTIAMC": 0,
+    "TECHM": 0,
+    "USHAMART": 0,
+    "UNOMINDA": 0,
+    "TITAN": 0,
+    "DBREALTY": 0,
+    "TTML": 0,
+    "UNITDSPR": 0,
+    "RAMCOCEM": 0,
+    "TATACOMM": 0,
+    "ZFCVINDIA": 0,
+    "ZEEL": 0,
+    "VIJAYA": 0,
+    "ZENTEC": 0,
+    "YESBANK": 0,
+    "MANYAVAR": 0,
+    "IDEA": 0,
+    "WHIRLPOOL": 0,
+    "VEDL": 0,
+    "ECLERX": 0,
+    "WELCORP": 0,
+    "WOCKPHARMA": 0,
+    "WELSPUNLIV": 0,
+    "VOLTAS": 0,
+    "ZYDUSLIFE": 0,
+    "ZENSARTECH": 0,
+    "WIPRO": 0
+  },
   "skipped": [
     [
-      "360ONE.NS",
-      "missing_cols:[('Close', '360ONE.NS'), ('Volume', '360ONE.NS'), ('High', '360ONE.NS'), ('Open', '360ONE.NS'), ('Low', '360ONE.NS')]"
-    ],
-    [
-      "3MINDIA.NS",
-      "missing_cols:[('Volume', '3MINDIA.NS'), ('High', '3MINDIA.NS'), ('Open', '3MINDIA.NS'), ('Low', '3MINDIA.NS'), ('Close', '3MINDIA.NS')]"
-    ],
-    [
-      "ABB.NS",
-      "missing_cols:[('High', 'ABB.NS'), ('Open', 'ABB.NS'), ('Low', 'ABB.NS'), ('Close', 'ABB.NS'), ('Volume', 'ABB.NS')]"
-    ],
-    [
-      "ACC.NS",
-      "missing_cols:[('Volume', 'ACC.NS'), ('High', 'ACC.NS'), ('Open', 'ACC.NS'), ('Low', 'ACC.NS'), ('Close', 'ACC.NS')]"
-    ],
-    [
       "ACMESOLAR.NS",
-      "missing_cols:[('Open', 'ACMESOLAR.NS'), ('Low', 'ACMESOLAR.NS'), ('Close', 'ACMESOLAR.NS'), ('Volume', 'ACMESOLAR.NS'), ('High', 'ACMESOLAR.NS')]"
-    ],
-    [
-      "AIAENG.NS",
-      "missing_cols:[('Volume', 'AIAENG.NS'), ('High', 'AIAENG.NS'), ('Open', 'AIAENG.NS'), ('Low', 'AIAENG.NS'), ('Close', 'AIAENG.NS')]"
-    ],
-    [
-      "APLAPOLLO.NS",
-      "missing_cols:[('Close', 'APLAPOLLO.NS'), ('Volume', 'APLAPOLLO.NS'), ('High', 'APLAPOLLO.NS'), ('Open', 'APLAPOLLO.NS'), ('Low', 'APLAPOLLO.NS')]"
-    ],
-    [
-      "AUBANK.NS",
-      "missing_cols:[('Open', 'AUBANK.NS'), ('Close', 'AUBANK.NS'), ('Volume', 'AUBANK.NS'), ('High', 'AUBANK.NS'), ('Low', 'AUBANK.NS')]"
-    ],
-    [
-      "AWL.NS",
-      "missing_cols:[('Low', 'AWL.NS'), ('Open', 'AWL.NS'), ('Close', 'AWL.NS'), ('Volume', 'AWL.NS'), ('High', 'AWL.NS')]"
-    ],
-    [
-      "AADHARHFC.NS",
-      "missing_cols:[('Low', 'AADHARHFC.NS'), ('Close', 'AADHARHFC.NS'), ('Volume', 'AADHARHFC.NS'), ('High', 'AADHARHFC.NS'), ('Open', 'AADHARHFC.NS')]"
-    ],
-    [
-      "AARTIIND.NS",
-      "missing_cols:[('Open', 'AARTIIND.NS'), ('Low', 'AARTIIND.NS'), ('Close', 'AARTIIND.NS'), ('Volume', 'AARTIIND.NS'), ('High', 'AARTIIND.NS')]"
-    ],
-    [
-      "AAVAS.NS",
-      "missing_cols:[('High', 'AAVAS.NS'), ('Open', 'AAVAS.NS'), ('Low', 'AAVAS.NS'), ('Close', 'AAVAS.NS'), ('Volume', 'AAVAS.NS')]"
-    ],
-    [
-      "ABBOTINDIA.NS",
-      "missing_cols:[('Open', 'ABBOTINDIA.NS'), ('Low', 'ABBOTINDIA.NS'), ('Close', 'ABBOTINDIA.NS'), ('Volume', 'ABBOTINDIA.NS'), ('High', 'ABBOTINDIA.NS')]"
-    ],
-    [
-      "ACE.NS",
-      "missing_cols:[('Open', 'ACE.NS'), ('Low', 'ACE.NS'), ('Close', 'ACE.NS'), ('Volume', 'ACE.NS'), ('High', 'ACE.NS')]"
-    ],
-    [
-      "ADANIENSOL.NS",
-      "missing_cols:[('Volume', 'ADANIENSOL.NS'), ('High', 'ADANIENSOL.NS'), ('Open', 'ADANIENSOL.NS'), ('Low', 'ADANIENSOL.NS'), ('Close', 'ADANIENSOL.NS')]"
-    ],
-    [
-      "ADANIENT.NS",
-      "missing_cols:[('High', 'ADANIENT.NS'), ('Low', 'ADANIENT.NS'), ('Open', 'ADANIENT.NS'), ('Close', 'ADANIENT.NS'), ('Volume', 'ADANIENT.NS')]"
-    ],
-    [
-      "ADANIGREEN.NS",
-      "missing_cols:[('High', 'ADANIGREEN.NS'), ('Low', 'ADANIGREEN.NS'), ('Open', 'ADANIGREEN.NS'), ('Close', 'ADANIGREEN.NS'), ('Volume', 'ADANIGREEN.NS')]"
-    ],
-    [
-      "ADANIPORTS.NS",
-      "missing_cols:[('High', 'ADANIPORTS.NS'), ('Open', 'ADANIPORTS.NS'), ('Low', 'ADANIPORTS.NS'), ('Close', 'ADANIPORTS.NS'), ('Volume', 'ADANIPORTS.NS')]"
-    ],
-    [
-      "ADANIPOWER.NS",
-      "missing_cols:[('High', 'ADANIPOWER.NS'), ('Open', 'ADANIPOWER.NS'), ('Low', 'ADANIPOWER.NS'), ('Close', 'ADANIPOWER.NS'), ('Volume', 'ADANIPOWER.NS')]"
-    ],
-    [
-      "ATGL.NS",
-      "missing_cols:[('Close', 'ATGL.NS'), ('Volume', 'ATGL.NS'), ('High', 'ATGL.NS'), ('Open', 'ATGL.NS'), ('Low', 'ATGL.NS')]"
-    ],
-    [
-      "ABCAPITAL.NS",
-      "missing_cols:[('Open', 'ABCAPITAL.NS'), ('Low', 'ABCAPITAL.NS'), ('Close', 'ABCAPITAL.NS'), ('Volume', 'ABCAPITAL.NS'), ('High', 'ABCAPITAL.NS')]"
-    ],
-    [
-      "ABFRL.NS",
-      "missing_cols:[('Close', 'ABFRL.NS'), ('Volume', 'ABFRL.NS'), ('High', 'ABFRL.NS'), ('Open', 'ABFRL.NS'), ('Low', 'ABFRL.NS')]"
-    ],
-    [
-      "ABLBL.NS",
-      "missing_cols:[('Close', 'ABLBL.NS'), ('Volume', 'ABLBL.NS'), ('High', 'ABLBL.NS'), ('Open', 'ABLBL.NS'), ('Low', 'ABLBL.NS')]"
-    ],
-    [
-      "ABREL.NS",
-      "missing_cols:[('Low', 'ABREL.NS'), ('Close', 'ABREL.NS'), ('Volume', 'ABREL.NS'), ('High', 'ABREL.NS'), ('Open', 'ABREL.NS')]"
-    ],
-    [
-      "ABSLAMC.NS",
-      "missing_cols:[('Open', 'ABSLAMC.NS'), ('Low', 'ABSLAMC.NS'), ('Close', 'ABSLAMC.NS'), ('Volume', 'ABSLAMC.NS'), ('High', 'ABSLAMC.NS')]"
+      "not_enough_indicator_rows:59"
     ],
     [
       "ADVENTHTL.NS",
-      "missing_cols:[('Close', 'ADVENTHTL.NS'), ('Volume', 'ADVENTHTL.NS'), ('High', 'ADVENTHTL.NS'), ('Open', 'ADVENTHTL.NS'), ('Low', 'ADVENTHTL.NS')]"
-    ],
-    [
-      "AEGISLOG.NS",
-      "missing_cols:[('Low', 'AEGISLOG.NS'), ('Close', 'AEGISLOG.NS'), ('Volume', 'AEGISLOG.NS'), ('High', 'AEGISLOG.NS'), ('Open', 'AEGISLOG.NS')]"
+      "too_few_rows:10"
     ],
     [
       "AEGISVOPAK.NS",
-      "missing_cols:[('Volume', 'AEGISVOPAK.NS'), ('High', 'AEGISVOPAK.NS'), ('Open', 'AEGISVOPAK.NS'), ('Low', 'AEGISVOPAK.NS'), ('Close', 'AEGISVOPAK.NS')]"
+      "too_few_rows:124"
+    ],
+    [
+      "ABLBL.NS",
+      "too_few_rows:107"
     ],
     [
       "AFCONS.NS",
-      "missing_cols:[('High', 'AFCONS.NS'), ('Open', 'AFCONS.NS'), ('Low', 'AFCONS.NS'), ('Close', 'AFCONS.NS'), ('Volume', 'AFCONS.NS')]"
-    ],
-    [
-      "AFFLE.NS",
-      "missing_cols:[('Volume', 'AFFLE.NS'), ('High', 'AFFLE.NS'), ('Open', 'AFFLE.NS'), ('Low', 'AFFLE.NS'), ('Close', 'AFFLE.NS')]"
-    ],
-    [
-      "AJANTPHARM.NS",
-      "missing_cols:[('Volume', 'AJANTPHARM.NS'), ('High', 'AJANTPHARM.NS'), ('Open', 'AJANTPHARM.NS'), ('Low', 'AJANTPHARM.NS'), ('Close', 'AJANTPHARM.NS')]"
-    ],
-    [
-      "AKUMS.NS",
-      "missing_cols:[('High', 'AKUMS.NS'), ('Open', 'AKUMS.NS'), ('Low', 'AKUMS.NS'), ('Close', 'AKUMS.NS'), ('Volume', 'AKUMS.NS')]"
-    ],
-    [
-      "AKZOINDIA.NS",
-      "missing_cols:[('High', 'AKZOINDIA.NS'), ('Open', 'AKZOINDIA.NS'), ('Low', 'AKZOINDIA.NS'), ('Close', 'AKZOINDIA.NS'), ('Volume', 'AKZOINDIA.NS')]"
-    ],
-    [
-      "APLLTD.NS",
-      "missing_cols:[('High', 'APLLTD.NS'), ('Low', 'APLLTD.NS'), ('Open', 'APLLTD.NS'), ('Close', 'APLLTD.NS'), ('Volume', 'APLLTD.NS')]"
-    ],
-    [
-      "ALKEM.NS",
-      "missing_cols:[('Volume', 'ALKEM.NS'), ('High', 'ALKEM.NS'), ('Open', 'ALKEM.NS'), ('Low', 'ALKEM.NS'), ('Close', 'ALKEM.NS')]"
-    ],
-    [
-      "ALKYLAMINE.NS",
-      "missing_cols:[('Open', 'ALKYLAMINE.NS'), ('Low', 'ALKYLAMINE.NS'), ('Close', 'ALKYLAMINE.NS'), ('Volume', 'ALKYLAMINE.NS'), ('High', 'ALKYLAMINE.NS')]"
-    ],
-    [
-      "ALOKINDS.NS",
-      "missing_cols:[('Close', 'ALOKINDS.NS'), ('Volume', 'ALOKINDS.NS'), ('High', 'ALOKINDS.NS'), ('Open', 'ALOKINDS.NS'), ('Low', 'ALOKINDS.NS')]"
-    ],
-    [
-      "ARE&M.NS",
-      "missing_cols:[('High', 'ARE&M.NS'), ('Open', 'ARE&M.NS'), ('Low', 'ARE&M.NS'), ('Close', 'ARE&M.NS'), ('Volume', 'ARE&M.NS')]"
-    ],
-    [
-      "AMBER.NS",
-      "missing_cols:[('Close', 'AMBER.NS'), ('Volume', 'AMBER.NS'), ('High', 'AMBER.NS'), ('Open', 'AMBER.NS'), ('Low', 'AMBER.NS')]"
-    ],
-    [
-      "AMBUJACEM.NS",
-      "missing_cols:[('Volume', 'AMBUJACEM.NS'), ('High', 'AMBUJACEM.NS'), ('Open', 'AMBUJACEM.NS'), ('Low', 'AMBUJACEM.NS'), ('Close', 'AMBUJACEM.NS')]"
-    ],
-    [
-      "ANANDRATHI.NS",
-      "missing_cols:[('High', 'ANANDRATHI.NS'), ('Open', 'ANANDRATHI.NS'), ('Low', 'ANANDRATHI.NS'), ('Close', 'ANANDRATHI.NS'), ('Volume', 'ANANDRATHI.NS')]"
-    ],
-    [
-      "ANANTRAJ.NS",
-      "missing_cols:[('Volume', 'ANANTRAJ.NS'), ('High', 'ANANTRAJ.NS'), ('Open', 'ANANTRAJ.NS'), ('Low', 'ANANTRAJ.NS'), ('Close', 'ANANTRAJ.NS')]"
-    ],
-    [
-      "ANGELONE.NS",
-      "missing_cols:[('High', 'ANGELONE.NS'), ('Open', 'ANGELONE.NS'), ('Low', 'ANGELONE.NS'), ('Close', 'ANGELONE.NS'), ('Volume', 'ANGELONE.NS')]"
-    ],
-    [
-      "APARINDS.NS",
-      "missing_cols:[('Volume', 'APARINDS.NS'), ('High', 'APARINDS.NS'), ('Open', 'APARINDS.NS'), ('Low', 'APARINDS.NS'), ('Close', 'APARINDS.NS')]"
-    ],
-    [
-      "APOLLOHOSP.NS",
-      "missing_cols:[('Low', 'APOLLOHOSP.NS'), ('Close', 'APOLLOHOSP.NS'), ('Volume', 'APOLLOHOSP.NS'), ('High', 'APOLLOHOSP.NS'), ('Open', 'APOLLOHOSP.NS')]"
-    ],
-    [
-      "APOLLOTYRE.NS",
-      "missing_cols:[('High', 'APOLLOTYRE.NS'), ('Open', 'APOLLOTYRE.NS'), ('Low', 'APOLLOTYRE.NS'), ('Close', 'APOLLOTYRE.NS'), ('Volume', 'APOLLOTYRE.NS')]"
-    ],
-    [
-      "APTUS.NS",
-      "missing_cols:[('High', 'APTUS.NS'), ('Open', 'APTUS.NS'), ('Low', 'APTUS.NS'), ('Close', 'APTUS.NS'), ('Volume', 'APTUS.NS')]"
-    ],
-    [
-      "ASAHIINDIA.NS",
-      "missing_cols:[('Volume', 'ASAHIINDIA.NS'), ('High', 'ASAHIINDIA.NS'), ('Open', 'ASAHIINDIA.NS'), ('Low', 'ASAHIINDIA.NS'), ('Close', 'ASAHIINDIA.NS')]"
-    ],
-    [
-      "ASHOKLEY.NS",
-      "missing_cols:[('High', 'ASHOKLEY.NS'), ('Open', 'ASHOKLEY.NS'), ('Low', 'ASHOKLEY.NS'), ('Close', 'ASHOKLEY.NS'), ('Volume', 'ASHOKLEY.NS')]"
-    ],
-    [
-      "ASIANPAINT.NS",
-      "missing_cols:[('High', 'ASIANPAINT.NS'), ('Open', 'ASIANPAINT.NS'), ('Low', 'ASIANPAINT.NS'), ('Close', 'ASIANPAINT.NS'), ('Volume', 'ASIANPAINT.NS')]"
-    ],
-    [
-      "ASTERDM.NS",
-      "missing_cols:[('Open', 'ASTERDM.NS'), ('Low', 'ASTERDM.NS'), ('Close', 'ASTERDM.NS'), ('Volume', 'ASTERDM.NS'), ('High', 'ASTERDM.NS')]"
-    ],
-    [
-      "ASTRAZEN.NS",
-      "missing_cols:[('Open', 'ASTRAZEN.NS'), ('Low', 'ASTRAZEN.NS'), ('Close', 'ASTRAZEN.NS'), ('Volume', 'ASTRAZEN.NS'), ('High', 'ASTRAZEN.NS')]"
-    ],
-    [
-      "ASTRAL.NS",
-      "missing_cols:[('High', 'ASTRAL.NS'), ('Open', 'ASTRAL.NS'), ('Low', 'ASTRAL.NS'), ('Close', 'ASTRAL.NS'), ('Volume', 'ASTRAL.NS')]"
+      "not_enough_indicator_rows:66"
     ],
     [
       "ATHERENERG.NS",
-      "missing_cols:[('Volume', 'ATHERENERG.NS'), ('High', 'ATHERENERG.NS'), ('Low', 'ATHERENERG.NS'), ('Open', 'ATHERENERG.NS'), ('Close', 'ATHERENERG.NS')]"
-    ],
-    [
-      "ATUL.NS",
-      "missing_cols:[('Volume', 'ATUL.NS'), ('High', 'ATUL.NS'), ('Open', 'ATUL.NS'), ('Low', 'ATUL.NS'), ('Close', 'ATUL.NS')]"
-    ],
-    [
-      "AUROPHARMA.NS",
-      "missing_cols:[('Volume', 'AUROPHARMA.NS'), ('High', 'AUROPHARMA.NS'), ('Open', 'AUROPHARMA.NS'), ('Low', 'AUROPHARMA.NS'), ('Close', 'AUROPHARMA.NS')]"
-    ],
-    [
-      "AIIL.NS",
-      "missing_cols:[('High', 'AIIL.NS'), ('Low', 'AIIL.NS'), ('Open', 'AIIL.NS'), ('Close', 'AIIL.NS'), ('Volume', 'AIIL.NS')]"
-    ],
-    [
-      "DMART.NS",
-      "missing_cols:[('High', 'DMART.NS'), ('Open', 'DMART.NS'), ('Low', 'DMART.NS'), ('Close', 'DMART.NS'), ('Volume', 'DMART.NS')]"
-    ],
-    [
-      "AXISBANK.NS",
-      "missing_cols:[('Volume', 'AXISBANK.NS'), ('High', 'AXISBANK.NS'), ('Open', 'AXISBANK.NS'), ('Low', 'AXISBANK.NS'), ('Close', 'AXISBANK.NS')]"
-    ],
-    [
-      "BASF.NS",
-      "missing_cols:[('High', 'BASF.NS'), ('Open', 'BASF.NS'), ('Low', 'BASF.NS'), ('Close', 'BASF.NS'), ('Volume', 'BASF.NS')]"
-    ],
-    [
-      "BEML.NS",
-      "missing_cols:[('Volume', 'BEML.NS'), ('High', 'BEML.NS'), ('Open', 'BEML.NS'), ('Low', 'BEML.NS'), ('Close', 'BEML.NS')]"
-    ],
-    [
-      "BLS.NS",
-      "missing_cols:[('Low', 'BLS.NS'), ('Close', 'BLS.NS'), ('Volume', 'BLS.NS'), ('High', 'BLS.NS'), ('Open', 'BLS.NS')]"
-    ],
-    [
-      "BSE.NS",
-      "missing_cols:[('Open', 'BSE.NS'), ('Low', 'BSE.NS'), ('Close', 'BSE.NS'), ('Volume', 'BSE.NS'), ('High', 'BSE.NS')]"
-    ],
-    [
-      "BAJAJ-AUTO.NS",
-      "missing_cols:[('Volume', 'BAJAJ-AUTO.NS'), ('High', 'BAJAJ-AUTO.NS'), ('Open', 'BAJAJ-AUTO.NS'), ('Low', 'BAJAJ-AUTO.NS'), ('Close', 'BAJAJ-AUTO.NS')]"
-    ],
-    [
-      "BAJFINANCE.NS",
-      "missing_cols:[('High', 'BAJFINANCE.NS'), ('Open', 'BAJFINANCE.NS'), ('Low', 'BAJFINANCE.NS'), ('Close', 'BAJFINANCE.NS'), ('Volume', 'BAJFINANCE.NS')]"
-    ],
-    [
-      "BAJAJFINSV.NS",
-      "missing_cols:[('High', 'BAJAJFINSV.NS'), ('Open', 'BAJAJFINSV.NS'), ('Low', 'BAJAJFINSV.NS'), ('Close', 'BAJAJFINSV.NS'), ('Volume', 'BAJAJFINSV.NS')]"
-    ],
-    [
-      "BAJAJHLDNG.NS",
-      "missing_cols:[('Volume', 'BAJAJHLDNG.NS'), ('High', 'BAJAJHLDNG.NS'), ('Open', 'BAJAJHLDNG.NS'), ('Low', 'BAJAJHLDNG.NS'), ('Close', 'BAJAJHLDNG.NS')]"
+      "too_few_rows:143"
     ],
     [
       "BAJAJHFL.NS",
-      "missing_cols:[('Open', 'BAJAJHFL.NS'), ('Low', 'BAJAJHFL.NS'), ('Close', 'BAJAJHFL.NS'), ('Volume', 'BAJAJHFL.NS'), ('High', 'BAJAJHFL.NS')]"
-    ],
-    [
-      "BALKRISIND.NS",
-      "missing_cols:[('Open', 'BALKRISIND.NS'), ('Low', 'BALKRISIND.NS'), ('Close', 'BALKRISIND.NS'), ('Volume', 'BALKRISIND.NS'), ('High', 'BALKRISIND.NS')]"
-    ],
-    [
-      "BALRAMCHIN.NS",
-      "missing_cols:[('Volume', 'BALRAMCHIN.NS'), ('High', 'BALRAMCHIN.NS'), ('Low', 'BALRAMCHIN.NS'), ('Open', 'BALRAMCHIN.NS'), ('Close', 'BALRAMCHIN.NS')]"
-    ],
-    [
-      "BANDHANBNK.NS",
-      "missing_cols:[('High', 'BANDHANBNK.NS'), ('Open', 'BANDHANBNK.NS'), ('Low', 'BANDHANBNK.NS'), ('Close', 'BANDHANBNK.NS'), ('Volume', 'BANDHANBNK.NS')]"
-    ],
-    [
-      "BANKBARODA.NS",
-      "missing_cols:[('Open', 'BANKBARODA.NS'), ('Low', 'BANKBARODA.NS'), ('Close', 'BANKBARODA.NS'), ('Volume', 'BANKBARODA.NS'), ('High', 'BANKBARODA.NS')]"
-    ],
-    [
-      "BANKINDIA.NS",
-      "missing_cols:[('Open', 'BANKINDIA.NS'), ('Close', 'BANKINDIA.NS'), ('Volume', 'BANKINDIA.NS'), ('High', 'BANKINDIA.NS'), ('Low', 'BANKINDIA.NS')]"
-    ],
-    [
-      "MAHABANK.NS",
-      "missing_cols:[('Volume', 'MAHABANK.NS'), ('High', 'MAHABANK.NS'), ('Open', 'MAHABANK.NS'), ('Low', 'MAHABANK.NS'), ('Close', 'MAHABANK.NS')]"
-    ],
-    [
-      "BATAINDIA.NS",
-      "missing_cols:[('Open', 'BATAINDIA.NS'), ('Low', 'BATAINDIA.NS'), ('Close', 'BATAINDIA.NS'), ('Volume', 'BATAINDIA.NS'), ('High', 'BATAINDIA.NS')]"
-    ],
-    [
-      "BAYERCROP.NS",
-      "missing_cols:[('Volume', 'BAYERCROP.NS'), ('High', 'BAYERCROP.NS'), ('Low', 'BAYERCROP.NS'), ('Open', 'BAYERCROP.NS'), ('Close', 'BAYERCROP.NS')]"
-    ],
-    [
-      "BERGEPAINT.NS",
-      "missing_cols:[('High', 'BERGEPAINT.NS'), ('Open', 'BERGEPAINT.NS'), ('Low', 'BERGEPAINT.NS'), ('Close', 'BERGEPAINT.NS'), ('Volume', 'BERGEPAINT.NS')]"
-    ],
-    [
-      "BDL.NS",
-      "missing_cols:[('Volume', 'BDL.NS'), ('High', 'BDL.NS'), ('Open', 'BDL.NS'), ('Low', 'BDL.NS'), ('Close', 'BDL.NS')]"
-    ],
-    [
-      "BEL.NS",
-      "missing_cols:[('Close', 'BEL.NS'), ('Volume', 'BEL.NS'), ('High', 'BEL.NS'), ('Open', 'BEL.NS'), ('Low', 'BEL.NS')]"
-    ],
-    [
-      "BHARATFORG.NS",
-      "missing_cols:[('Open', 'BHARATFORG.NS'), ('Low', 'BHARATFORG.NS'), ('Close', 'BHARATFORG.NS'), ('Volume', 'BHARATFORG.NS'), ('High', 'BHARATFORG.NS')]"
-    ],
-    [
-      "BHEL.NS",
-      "missing_cols:[('Open', 'BHEL.NS'), ('Low', 'BHEL.NS'), ('Close', 'BHEL.NS'), ('Volume', 'BHEL.NS'), ('High', 'BHEL.NS')]"
-    ],
-    [
-      "BPCL.NS",
-      "missing_cols:[('High', 'BPCL.NS'), ('Open', 'BPCL.NS'), ('Low', 'BPCL.NS'), ('Close', 'BPCL.NS'), ('Volume', 'BPCL.NS')]"
-    ],
-    [
-      "BHARTIARTL.NS",
-      "missing_cols:[('Volume', 'BHARTIARTL.NS'), ('High', 'BHARTIARTL.NS'), ('Low', 'BHARTIARTL.NS'), ('Open', 'BHARTIARTL.NS'), ('Close', 'BHARTIARTL.NS')]"
-    ],
-    [
-      "BHARTIHEXA.NS",
-      "missing_cols:[('Volume', 'BHARTIHEXA.NS'), ('High', 'BHARTIHEXA.NS'), ('Low', 'BHARTIHEXA.NS'), ('Open', 'BHARTIHEXA.NS'), ('Close', 'BHARTIHEXA.NS')]"
-    ],
-    [
-      "BIKAJI.NS",
-      "missing_cols:[('High', 'BIKAJI.NS'), ('Open', 'BIKAJI.NS'), ('Low', 'BIKAJI.NS'), ('Close', 'BIKAJI.NS'), ('Volume', 'BIKAJI.NS')]"
-    ],
-    [
-      "BIOCON.NS",
-      "missing_cols:[('Close', 'BIOCON.NS'), ('Volume', 'BIOCON.NS'), ('High', 'BIOCON.NS'), ('Open', 'BIOCON.NS'), ('Low', 'BIOCON.NS')]"
-    ],
-    [
-      "BSOFT.NS",
-      "missing_cols:[('Volume', 'BSOFT.NS'), ('High', 'BSOFT.NS'), ('Open', 'BSOFT.NS'), ('Low', 'BSOFT.NS'), ('Close', 'BSOFT.NS')]"
-    ],
-    [
-      "BLUEDART.NS",
-      "missing_cols:[('High', 'BLUEDART.NS'), ('Open', 'BLUEDART.NS'), ('Low', 'BLUEDART.NS'), ('Close', 'BLUEDART.NS'), ('Volume', 'BLUEDART.NS')]"
-    ],
-    [
-      "BLUEJET.NS",
-      "missing_cols:[('Close', 'BLUEJET.NS'), ('Volume', 'BLUEJET.NS'), ('High', 'BLUEJET.NS'), ('Open', 'BLUEJET.NS'), ('Low', 'BLUEJET.NS')]"
-    ],
-    [
-      "BLUESTARCO.NS",
-      "missing_cols:[('Open', 'BLUESTARCO.NS'), ('Low', 'BLUESTARCO.NS'), ('Close', 'BLUESTARCO.NS'), ('Volume', 'BLUESTARCO.NS'), ('High', 'BLUESTARCO.NS')]"
-    ],
-    [
-      "BBTC.NS",
-      "missing_cols:[('Low', 'BBTC.NS'), ('Close', 'BBTC.NS'), ('Volume', 'BBTC.NS'), ('High', 'BBTC.NS'), ('Open', 'BBTC.NS')]"
-    ],
-    [
-      "BOSCHLTD.NS",
-      "missing_cols:[('High', 'BOSCHLTD.NS'), ('Open', 'BOSCHLTD.NS'), ('Low', 'BOSCHLTD.NS'), ('Close', 'BOSCHLTD.NS'), ('Volume', 'BOSCHLTD.NS')]"
-    ],
-    [
-      "FIRSTCRY.NS",
-      "missing_cols:[('Volume', 'FIRSTCRY.NS'), ('High', 'FIRSTCRY.NS'), ('Open', 'FIRSTCRY.NS'), ('Low', 'FIRSTCRY.NS'), ('Close', 'FIRSTCRY.NS')]"
-    ],
-    [
-      "BRIGADE.NS",
-      "missing_cols:[('Low', 'BRIGADE.NS'), ('Open', 'BRIGADE.NS'), ('Close', 'BRIGADE.NS'), ('Volume', 'BRIGADE.NS'), ('High', 'BRIGADE.NS')]"
-    ],
-    [
-      "BRITANNIA.NS",
-      "missing_cols:[('Close', 'BRITANNIA.NS'), ('Volume', 'BRITANNIA.NS'), ('High', 'BRITANNIA.NS'), ('Open', 'BRITANNIA.NS'), ('Low', 'BRITANNIA.NS')]"
-    ],
-    [
-      "MAPMYINDIA.NS",
-      "missing_cols:[('Open', 'MAPMYINDIA.NS'), ('Low', 'MAPMYINDIA.NS'), ('Close', 'MAPMYINDIA.NS'), ('Volume', 'MAPMYINDIA.NS'), ('High', 'MAPMYINDIA.NS')]"
-    ],
-    [
-      "CCL.NS",
-      "missing_cols:[('High', 'CCL.NS'), ('Open', 'CCL.NS'), ('Low', 'CCL.NS'), ('Close', 'CCL.NS'), ('Volume', 'CCL.NS')]"
-    ],
-    [
-      "CESC.NS",
-      "missing_cols:[('Low', 'CESC.NS'), ('Close', 'CESC.NS'), ('Volume', 'CESC.NS'), ('High', 'CESC.NS'), ('Open', 'CESC.NS')]"
-    ],
-    [
-      "CGPOWER.NS",
-      "missing_cols:[('Volume', 'CGPOWER.NS'), ('High', 'CGPOWER.NS'), ('Open', 'CGPOWER.NS'), ('Low', 'CGPOWER.NS'), ('Close', 'CGPOWER.NS')]"
-    ],
-    [
-      "CRISIL.NS",
-      "missing_cols:[('Close', 'CRISIL.NS'), ('Volume', 'CRISIL.NS'), ('High', 'CRISIL.NS'), ('Open', 'CRISIL.NS'), ('Low', 'CRISIL.NS')]"
-    ],
-    [
-      "CAMPUS.NS",
-      "missing_cols:[('High', 'CAMPUS.NS'), ('Open', 'CAMPUS.NS'), ('Low', 'CAMPUS.NS'), ('Close', 'CAMPUS.NS'), ('Volume', 'CAMPUS.NS')]"
-    ],
-    [
-      "CANFINHOME.NS",
-      "missing_cols:[('Volume', 'CANFINHOME.NS'), ('High', 'CANFINHOME.NS'), ('Open', 'CANFINHOME.NS'), ('Low', 'CANFINHOME.NS'), ('Close', 'CANFINHOME.NS')]"
-    ],
-    [
-      "CANBK.NS",
-      "missing_cols:[('High', 'CANBK.NS'), ('Open', 'CANBK.NS'), ('Low', 'CANBK.NS'), ('Close', 'CANBK.NS'), ('Volume', 'CANBK.NS')]"
-    ],
-    [
-      "CAPLIPOINT.NS",
-      "missing_cols:[('Volume', 'CAPLIPOINT.NS'), ('High', 'CAPLIPOINT.NS'), ('Open', 'CAPLIPOINT.NS'), ('Low', 'CAPLIPOINT.NS'), ('Close', 'CAPLIPOINT.NS')]"
-    ],
-    [
-      "CGCL.NS",
-      "missing_cols:[('Volume', 'CGCL.NS'), ('High', 'CGCL.NS'), ('Low', 'CGCL.NS'), ('Open', 'CGCL.NS'), ('Close', 'CGCL.NS')]"
-    ],
-    [
-      "CARBORUNIV.NS",
-      "missing_cols:[('Low', 'CARBORUNIV.NS'), ('Close', 'CARBORUNIV.NS'), ('Volume', 'CARBORUNIV.NS'), ('High', 'CARBORUNIV.NS'), ('Open', 'CARBORUNIV.NS')]"
-    ],
-    [
-      "CASTROLIND.NS",
-      "missing_cols:[('High', 'CASTROLIND.NS'), ('Open', 'CASTROLIND.NS'), ('Low', 'CASTROLIND.NS'), ('Close', 'CASTROLIND.NS'), ('Volume', 'CASTROLIND.NS')]"
-    ],
-    [
-      "CEATLTD.NS",
-      "missing_cols:[('Low', 'CEATLTD.NS'), ('Open', 'CEATLTD.NS'), ('Close', 'CEATLTD.NS'), ('Volume', 'CEATLTD.NS'), ('High', 'CEATLTD.NS')]"
-    ],
-    [
-      "CENTRALBK.NS",
-      "missing_cols:[('Volume', 'CENTRALBK.NS'), ('High', 'CENTRALBK.NS'), ('Open', 'CENTRALBK.NS'), ('Low', 'CENTRALBK.NS'), ('Close', 'CENTRALBK.NS')]"
-    ],
-    [
-      "CDSL.NS",
-      "missing_cols:[('Close', 'CDSL.NS'), ('Volume', 'CDSL.NS'), ('High', 'CDSL.NS'), ('Open', 'CDSL.NS'), ('Low', 'CDSL.NS')]"
-    ],
-    [
-      "CENTURYPLY.NS",
-      "missing_cols:[('Open', 'CENTURYPLY.NS'), ('Close', 'CENTURYPLY.NS'), ('Volume', 'CENTURYPLY.NS'), ('High', 'CENTURYPLY.NS'), ('Low', 'CENTURYPLY.NS')]"
-    ],
-    [
-      "CERA.NS",
-      "missing_cols:[('Open', 'CERA.NS'), ('Low', 'CERA.NS'), ('Close', 'CERA.NS'), ('Volume', 'CERA.NS'), ('High', 'CERA.NS')]"
-    ],
-    [
-      "CHALET.NS",
-      "missing_cols:[('Close', 'CHALET.NS'), ('Volume', 'CHALET.NS'), ('High', 'CHALET.NS'), ('Open', 'CHALET.NS'), ('Low', 'CHALET.NS')]"
-    ],
-    [
-      "CHAMBLFERT.NS",
-      "missing_cols:[('High', 'CHAMBLFERT.NS'), ('Open', 'CHAMBLFERT.NS'), ('Low', 'CHAMBLFERT.NS'), ('Close', 'CHAMBLFERT.NS'), ('Volume', 'CHAMBLFERT.NS')]"
-    ],
-    [
-      "CHENNPETRO.NS",
-      "missing_cols:[('Volume', 'CHENNPETRO.NS'), ('High', 'CHENNPETRO.NS'), ('Open', 'CHENNPETRO.NS'), ('Low', 'CHENNPETRO.NS'), ('Close', 'CHENNPETRO.NS')]"
-    ],
-    [
-      "CHOICEIN.NS",
-      "missing_cols:[('High', 'CHOICEIN.NS'), ('Open', 'CHOICEIN.NS'), ('Low', 'CHOICEIN.NS'), ('Close', 'CHOICEIN.NS'), ('Volume', 'CHOICEIN.NS')]"
-    ],
-    [
-      "CHOLAHLDNG.NS",
-      "missing_cols:[('Volume', 'CHOLAHLDNG.NS'), ('High', 'CHOLAHLDNG.NS'), ('Open', 'CHOLAHLDNG.NS'), ('Low', 'CHOLAHLDNG.NS'), ('Close', 'CHOLAHLDNG.NS')]"
-    ],
-    [
-      "CHOLAFIN.NS",
-      "missing_cols:[('High', 'CHOLAFIN.NS'), ('Open', 'CHOLAFIN.NS'), ('Low', 'CHOLAFIN.NS'), ('Close', 'CHOLAFIN.NS'), ('Volume', 'CHOLAFIN.NS')]"
-    ],
-    [
-      "CIPLA.NS",
-      "missing_cols:[('High', 'CIPLA.NS'), ('Open', 'CIPLA.NS'), ('Low', 'CIPLA.NS'), ('Close', 'CIPLA.NS'), ('Volume', 'CIPLA.NS')]"
-    ],
-    [
-      "CUB.NS",
-      "missing_cols:[('High', 'CUB.NS'), ('Open', 'CUB.NS'), ('Low', 'CUB.NS'), ('Close', 'CUB.NS'), ('Volume', 'CUB.NS')]"
-    ],
-    [
-      "CLEAN.NS",
-      "missing_cols:[('Volume', 'CLEAN.NS'), ('High', 'CLEAN.NS'), ('Open', 'CLEAN.NS'), ('Low', 'CLEAN.NS'), ('Close', 'CLEAN.NS')]"
-    ],
-    [
-      "COALINDIA.NS",
-      "missing_cols:[('High', 'COALINDIA.NS'), ('Low', 'COALINDIA.NS'), ('Open', 'COALINDIA.NS'), ('Close', 'COALINDIA.NS'), ('Volume', 'COALINDIA.NS')]"
-    ],
-    [
-      "COCHINSHIP.NS",
-      "missing_cols:[('Volume', 'COCHINSHIP.NS'), ('High', 'COCHINSHIP.NS'), ('Open', 'COCHINSHIP.NS'), ('Low', 'COCHINSHIP.NS'), ('Close', 'COCHINSHIP.NS')]"
-    ],
-    [
-      "COFORGE.NS",
-      "missing_cols:[('High', 'COFORGE.NS'), ('Open', 'COFORGE.NS'), ('Low', 'COFORGE.NS'), ('Close', 'COFORGE.NS'), ('Volume', 'COFORGE.NS')]"
-    ],
-    [
-      "COHANCE.NS",
-      "missing_cols:[('High', 'COHANCE.NS'), ('Open', 'COHANCE.NS'), ('Low', 'COHANCE.NS'), ('Close', 'COHANCE.NS'), ('Volume', 'COHANCE.NS')]"
-    ],
-    [
-      "COLPAL.NS",
-      "missing_cols:[('Open', 'COLPAL.NS'), ('Low', 'COLPAL.NS'), ('Close', 'COLPAL.NS'), ('Volume', 'COLPAL.NS'), ('High', 'COLPAL.NS')]"
-    ],
-    [
-      "CAMS.NS",
-      "missing_cols:[('Open', 'CAMS.NS'), ('Low', 'CAMS.NS'), ('Close', 'CAMS.NS'), ('Volume', 'CAMS.NS'), ('High', 'CAMS.NS')]"
-    ],
-    [
-      "CONCORDBIO.NS",
-      "missing_cols:[('Open', 'CONCORDBIO.NS'), ('Low', 'CONCORDBIO.NS'), ('Close', 'CONCORDBIO.NS'), ('Volume', 'CONCORDBIO.NS'), ('High', 'CONCORDBIO.NS')]"
-    ],
-    [
-      "CONCOR.NS",
-      "missing_cols:[('Open', 'CONCOR.NS'), ('Low', 'CONCOR.NS'), ('Close', 'CONCOR.NS'), ('Volume', 'CONCOR.NS'), ('High', 'CONCOR.NS')]"
-    ],
-    [
-      "COROMANDEL.NS",
-      "missing_cols:[('Close', 'COROMANDEL.NS'), ('Volume', 'COROMANDEL.NS'), ('High', 'COROMANDEL.NS'), ('Open', 'COROMANDEL.NS'), ('Low', 'COROMANDEL.NS')]"
-    ],
-    [
-      "CRAFTSMAN.NS",
-      "missing_cols:[('Open', 'CRAFTSMAN.NS'), ('Low', 'CRAFTSMAN.NS'), ('Close', 'CRAFTSMAN.NS'), ('Volume', 'CRAFTSMAN.NS'), ('High', 'CRAFTSMAN.NS')]"
-    ],
-    [
-      "CREDITACC.NS",
-      "missing_cols:[('Close', 'CREDITACC.NS'), ('Volume', 'CREDITACC.NS'), ('High', 'CREDITACC.NS'), ('Open', 'CREDITACC.NS'), ('Low', 'CREDITACC.NS')]"
-    ],
-    [
-      "CROMPTON.NS",
-      "missing_cols:[('Volume', 'CROMPTON.NS'), ('High', 'CROMPTON.NS'), ('Low', 'CROMPTON.NS'), ('Open', 'CROMPTON.NS'), ('Close', 'CROMPTON.NS')]"
-    ],
-    [
-      "CUMMINSIND.NS",
-      "missing_cols:[('Volume', 'CUMMINSIND.NS'), ('High', 'CUMMINSIND.NS'), ('Low', 'CUMMINSIND.NS'), ('Open', 'CUMMINSIND.NS'), ('Close', 'CUMMINSIND.NS')]"
-    ],
-    [
-      "CYIENT.NS",
-      "missing_cols:[('High', 'CYIENT.NS'), ('Open', 'CYIENT.NS'), ('Low', 'CYIENT.NS'), ('Close', 'CYIENT.NS'), ('Volume', 'CYIENT.NS')]"
-    ],
-    [
-      "DCMSHRIRAM.NS",
-      "missing_cols:[('Open', 'DCMSHRIRAM.NS'), ('Low', 'DCMSHRIRAM.NS'), ('Close', 'DCMSHRIRAM.NS'), ('Volume', 'DCMSHRIRAM.NS'), ('High', 'DCMSHRIRAM.NS')]"
-    ],
-    [
-      "DLF.NS",
-      "missing_cols:[('High', 'DLF.NS'), ('Open', 'DLF.NS'), ('Low', 'DLF.NS'), ('Close', 'DLF.NS'), ('Volume', 'DLF.NS')]"
-    ],
-    [
-      "DOMS.NS",
-      "missing_cols:[('Open', 'DOMS.NS'), ('Low', 'DOMS.NS'), ('Close', 'DOMS.NS'), ('Volume', 'DOMS.NS'), ('High', 'DOMS.NS')]"
-    ],
-    [
-      "DABUR.NS",
-      "missing_cols:[('Open', 'DABUR.NS'), ('Low', 'DABUR.NS'), ('Close', 'DABUR.NS'), ('Volume', 'DABUR.NS'), ('High', 'DABUR.NS')]"
-    ],
-    [
-      "DALBHARAT.NS",
-      "missing_cols:[('Volume', 'DALBHARAT.NS'), ('High', 'DALBHARAT.NS'), ('Open', 'DALBHARAT.NS'), ('Low', 'DALBHARAT.NS'), ('Close', 'DALBHARAT.NS')]"
-    ],
-    [
-      "DATAPATTNS.NS",
-      "missing_cols:[('Volume', 'DATAPATTNS.NS'), ('High', 'DATAPATTNS.NS'), ('Open', 'DATAPATTNS.NS'), ('Low', 'DATAPATTNS.NS'), ('Close', 'DATAPATTNS.NS')]"
-    ],
-    [
-      "DEEPAKFERT.NS",
-      "missing_cols:[('High', 'DEEPAKFERT.NS'), ('Open', 'DEEPAKFERT.NS'), ('Low', 'DEEPAKFERT.NS'), ('Close', 'DEEPAKFERT.NS'), ('Volume', 'DEEPAKFERT.NS')]"
-    ],
-    [
-      "DEEPAKNTR.NS",
-      "missing_cols:[('Close', 'DEEPAKNTR.NS'), ('Volume', 'DEEPAKNTR.NS'), ('High', 'DEEPAKNTR.NS'), ('Open', 'DEEPAKNTR.NS'), ('Low', 'DEEPAKNTR.NS')]"
-    ],
-    [
-      "DELHIVERY.NS",
-      "missing_cols:[('High', 'DELHIVERY.NS'), ('Open', 'DELHIVERY.NS'), ('Low', 'DELHIVERY.NS'), ('Close', 'DELHIVERY.NS'), ('Volume', 'DELHIVERY.NS')]"
-    ],
-    [
-      "DEVYANI.NS",
-      "missing_cols:[('High', 'DEVYANI.NS'), ('Open', 'DEVYANI.NS'), ('Low', 'DEVYANI.NS'), ('Close', 'DEVYANI.NS'), ('Volume', 'DEVYANI.NS')]"
-    ],
-    [
-      "DIVISLAB.NS",
-      "missing_cols:[('High', 'DIVISLAB.NS'), ('Open', 'DIVISLAB.NS'), ('Low', 'DIVISLAB.NS'), ('Close', 'DIVISLAB.NS'), ('Volume', 'DIVISLAB.NS')]"
-    ],
-    [
-      "DIXON.NS",
-      "missing_cols:[('Close', 'DIXON.NS'), ('Volume', 'DIXON.NS'), ('High', 'DIXON.NS'), ('Open', 'DIXON.NS'), ('Low', 'DIXON.NS')]"
+      "not_enough_indicator_rows:100"
     ],
     [
       "AGARWALEYE.NS",
-      "missing_cols:[('Volume', 'AGARWALEYE.NS'), ('High', 'AGARWALEYE.NS'), ('Open', 'AGARWALEYE.NS'), ('Low', 'AGARWALEYE.NS'), ('Close', 'AGARWALEYE.NS')]"
+      "not_enough_indicator_rows:2"
     ],
     [
-      "LALPATHLAB.NS",
-      "missing_cols:[('High', 'LALPATHLAB.NS'), ('Low', 'LALPATHLAB.NS'), ('Open', 'LALPATHLAB.NS'), ('Close', 'LALPATHLAB.NS'), ('Volume', 'LALPATHLAB.NS')]"
-    ],
-    [
-      "DRREDDY.NS",
-      "missing_cols:[('High', 'DRREDDY.NS'), ('Open', 'DRREDDY.NS'), ('Low', 'DRREDDY.NS'), ('Close', 'DRREDDY.NS'), ('Volume', 'DRREDDY.NS')]"
-    ],
-    [
-      "EIDPARRY.NS",
-      "missing_cols:[('High', 'EIDPARRY.NS'), ('Low', 'EIDPARRY.NS'), ('Open', 'EIDPARRY.NS'), ('Close', 'EIDPARRY.NS'), ('Volume', 'EIDPARRY.NS')]"
-    ],
-    [
-      "EIHOTEL.NS",
-      "missing_cols:[('Low', 'EIHOTEL.NS'), ('Close', 'EIHOTEL.NS'), ('Volume', 'EIHOTEL.NS'), ('High', 'EIHOTEL.NS'), ('Open', 'EIHOTEL.NS')]"
-    ],
-    [
-      "EICHERMOT.NS",
-      "missing_cols:[('Volume', 'EICHERMOT.NS'), ('High', 'EICHERMOT.NS'), ('Open', 'EICHERMOT.NS'), ('Low', 'EICHERMOT.NS'), ('Close', 'EICHERMOT.NS')]"
-    ],
-    [
-      "ELECON.NS",
-      "missing_cols:[('High', 'ELECON.NS'), ('Open', 'ELECON.NS'), ('Low', 'ELECON.NS'), ('Close', 'ELECON.NS'), ('Volume', 'ELECON.NS')]"
-    ],
-    [
-      "ELGIEQUIP.NS",
-      "missing_cols:[('Open', 'ELGIEQUIP.NS'), ('Low', 'ELGIEQUIP.NS'), ('Close', 'ELGIEQUIP.NS'), ('Volume', 'ELGIEQUIP.NS'), ('High', 'ELGIEQUIP.NS')]"
-    ],
-    [
-      "EMAMILTD.NS",
-      "missing_cols:[('Open', 'EMAMILTD.NS'), ('Low', 'EMAMILTD.NS'), ('Close', 'EMAMILTD.NS'), ('Volume', 'EMAMILTD.NS'), ('High', 'EMAMILTD.NS')]"
-    ],
-    [
-      "EMCURE.NS",
-      "missing_cols:[('Open', 'EMCURE.NS'), ('Low', 'EMCURE.NS'), ('Close', 'EMCURE.NS'), ('Volume', 'EMCURE.NS'), ('High', 'EMCURE.NS')]"
-    ],
-    [
-      "ENDURANCE.NS",
-      "missing_cols:[('Volume', 'ENDURANCE.NS'), ('High', 'ENDURANCE.NS'), ('Open', 'ENDURANCE.NS'), ('Low', 'ENDURANCE.NS'), ('Close', 'ENDURANCE.NS')]"
-    ],
-    [
-      "ENGINERSIN.NS",
-      "missing_cols:[('Volume', 'ENGINERSIN.NS'), ('High', 'ENGINERSIN.NS'), ('Open', 'ENGINERSIN.NS'), ('Low', 'ENGINERSIN.NS'), ('Close', 'ENGINERSIN.NS')]"
-    ],
-    [
-      "ERIS.NS",
-      "missing_cols:[('High', 'ERIS.NS'), ('Open', 'ERIS.NS'), ('Low', 'ERIS.NS'), ('Close', 'ERIS.NS'), ('Volume', 'ERIS.NS')]"
-    ],
-    [
-      "ESCORTS.NS",
-      "missing_cols:[('Volume', 'ESCORTS.NS'), ('High', 'ESCORTS.NS'), ('Open', 'ESCORTS.NS'), ('Low', 'ESCORTS.NS'), ('Close', 'ESCORTS.NS')]"
-    ],
-    [
-      "ETERNAL.NS",
-      "missing_cols:[('High', 'ETERNAL.NS'), ('Open', 'ETERNAL.NS'), ('Low', 'ETERNAL.NS'), ('Close', 'ETERNAL.NS'), ('Volume', 'ETERNAL.NS')]"
-    ],
-    [
-      "EXIDEIND.NS",
-      "missing_cols:[('Volume', 'EXIDEIND.NS'), ('High', 'EXIDEIND.NS'), ('Open', 'EXIDEIND.NS'), ('Low', 'EXIDEIND.NS'), ('Close', 'EXIDEIND.NS')]"
-    ],
-    [
-      "NYKAA.NS",
-      "missing_cols:[('Volume', 'NYKAA.NS'), ('High', 'NYKAA.NS'), ('Open', 'NYKAA.NS'), ('Low', 'NYKAA.NS'), ('Close', 'NYKAA.NS')]"
-    ],
-    [
-      "FEDERALBNK.NS",
-      "missing_cols:[('High', 'FEDERALBNK.NS'), ('Open', 'FEDERALBNK.NS'), ('Low', 'FEDERALBNK.NS'), ('Close', 'FEDERALBNK.NS'), ('Volume', 'FEDERALBNK.NS')]"
-    ],
-    [
-      "FACT.NS",
-      "missing_cols:[('Volume', 'FACT.NS'), ('High', 'FACT.NS'), ('Open', 'FACT.NS'), ('Low', 'FACT.NS'), ('Close', 'FACT.NS')]"
-    ],
-    [
-      "FINCABLES.NS",
-      "missing_cols:[('Close', 'FINCABLES.NS'), ('Volume', 'FINCABLES.NS'), ('High', 'FINCABLES.NS'), ('Low', 'FINCABLES.NS'), ('Open', 'FINCABLES.NS')]"
-    ],
-    [
-      "FINPIPE.NS",
-      "missing_cols:[('High', 'FINPIPE.NS'), ('Open', 'FINPIPE.NS'), ('Low', 'FINPIPE.NS'), ('Close', 'FINPIPE.NS'), ('Volume', 'FINPIPE.NS')]"
-    ],
-    [
-      "FSL.NS",
-      "missing_cols:[('Volume', 'FSL.NS'), ('High', 'FSL.NS'), ('Open', 'FSL.NS'), ('Low', 'FSL.NS'), ('Close', 'FSL.NS')]"
-    ],
-    [
-      "FIVESTAR.NS",
-      "missing_cols:[('Close', 'FIVESTAR.NS'), ('Volume', 'FIVESTAR.NS'), ('High', 'FIVESTAR.NS'), ('Open', 'FIVESTAR.NS'), ('Low', 'FIVESTAR.NS')]"
-    ],
-    [
-      "FORCEMOT.NS",
-      "missing_cols:[('Volume', 'FORCEMOT.NS'), ('High', 'FORCEMOT.NS'), ('Open', 'FORCEMOT.NS'), ('Low', 'FORCEMOT.NS'), ('Close', 'FORCEMOT.NS')]"
-    ],
-    [
-      "FORTIS.NS",
-      "missing_cols:[('Volume', 'FORTIS.NS'), ('High', 'FORTIS.NS'), ('Open', 'FORTIS.NS'), ('Low', 'FORTIS.NS'), ('Close', 'FORTIS.NS')]"
-    ],
-    [
-      "GAIL.NS",
-      "missing_cols:[('High', 'GAIL.NS'), ('Open', 'GAIL.NS'), ('Low', 'GAIL.NS'), ('Close', 'GAIL.NS'), ('Volume', 'GAIL.NS')]"
-    ],
-    [
-      "GVT&D.NS",
-      "missing_cols:[('High', 'GVT&D.NS'), ('Open', 'GVT&D.NS'), ('Low', 'GVT&D.NS'), ('Close', 'GVT&D.NS'), ('Volume', 'GVT&D.NS')]"
-    ],
-    [
-      "GMRAIRPORT.NS",
-      "missing_cols:[('Volume', 'GMRAIRPORT.NS'), ('High', 'GMRAIRPORT.NS'), ('Open', 'GMRAIRPORT.NS'), ('Low', 'GMRAIRPORT.NS'), ('Close', 'GMRAIRPORT.NS')]"
-    ],
-    [
-      "GRSE.NS",
-      "missing_cols:[('Open', 'GRSE.NS'), ('Low', 'GRSE.NS'), ('Close', 'GRSE.NS'), ('Volume', 'GRSE.NS'), ('High', 'GRSE.NS')]"
-    ],
-    [
-      "GICRE.NS",
-      "missing_cols:[('Volume', 'GICRE.NS'), ('High', 'GICRE.NS'), ('Open', 'GICRE.NS'), ('Low', 'GICRE.NS'), ('Close', 'GICRE.NS')]"
-    ],
-    [
-      "GILLETTE.NS",
-      "missing_cols:[('High', 'GILLETTE.NS'), ('Open', 'GILLETTE.NS'), ('Low', 'GILLETTE.NS'), ('Close', 'GILLETTE.NS'), ('Volume', 'GILLETTE.NS')]"
-    ],
-    [
-      "GLAND.NS",
-      "missing_cols:[('Volume', 'GLAND.NS'), ('High', 'GLAND.NS'), ('Open', 'GLAND.NS'), ('Low', 'GLAND.NS'), ('Close', 'GLAND.NS')]"
-    ],
-    [
-      "GLAXO.NS",
-      "missing_cols:[('Volume', 'GLAXO.NS'), ('High', 'GLAXO.NS'), ('Low', 'GLAXO.NS'), ('Open', 'GLAXO.NS'), ('Close', 'GLAXO.NS')]"
-    ],
-    [
-      "GLENMARK.NS",
-      "missing_cols:[('Volume', 'GLENMARK.NS'), ('High', 'GLENMARK.NS'), ('Open', 'GLENMARK.NS'), ('Low', 'GLENMARK.NS'), ('Close', 'GLENMARK.NS')]"
-    ],
-    [
-      "MEDANTA.NS",
-      "missing_cols:[('Volume', 'MEDANTA.NS'), ('High', 'MEDANTA.NS'), ('Open', 'MEDANTA.NS'), ('Low', 'MEDANTA.NS'), ('Close', 'MEDANTA.NS')]"
-    ],
-    [
-      "GODIGIT.NS",
-      "missing_cols:[('Close', 'GODIGIT.NS'), ('Volume', 'GODIGIT.NS'), ('High', 'GODIGIT.NS'), ('Open', 'GODIGIT.NS'), ('Low', 'GODIGIT.NS')]"
-    ],
-    [
-      "GPIL.NS",
-      "missing_cols:[('High', 'GPIL.NS'), ('Open', 'GPIL.NS'), ('Low', 'GPIL.NS'), ('Close', 'GPIL.NS'), ('Volume', 'GPIL.NS')]"
-    ],
-    [
-      "GODFRYPHLP.NS",
-      "missing_cols:[('Volume', 'GODFRYPHLP.NS'), ('High', 'GODFRYPHLP.NS'), ('Open', 'GODFRYPHLP.NS'), ('Low', 'GODFRYPHLP.NS'), ('Close', 'GODFRYPHLP.NS')]"
-    ],
-    [
-      "GODREJAGRO.NS",
-      "missing_cols:[('Low', 'GODREJAGRO.NS'), ('Close', 'GODREJAGRO.NS'), ('Volume', 'GODREJAGRO.NS'), ('High', 'GODREJAGRO.NS'), ('Open', 'GODREJAGRO.NS')]"
-    ],
-    [
-      "GODREJCP.NS",
-      "missing_cols:[('Open', 'GODREJCP.NS'), ('Low', 'GODREJCP.NS'), ('Close', 'GODREJCP.NS'), ('Volume', 'GODREJCP.NS'), ('High', 'GODREJCP.NS')]"
-    ],
-    [
-      "GODREJIND.NS",
-      "missing_cols:[('High', 'GODREJIND.NS'), ('Open', 'GODREJIND.NS'), ('Low', 'GODREJIND.NS'), ('Close', 'GODREJIND.NS'), ('Volume', 'GODREJIND.NS')]"
-    ],
-    [
-      "GODREJPROP.NS",
-      "missing_cols:[('Volume', 'GODREJPROP.NS'), ('High', 'GODREJPROP.NS'), ('Low', 'GODREJPROP.NS'), ('Open', 'GODREJPROP.NS'), ('Close', 'GODREJPROP.NS')]"
-    ],
-    [
-      "GRANULES.NS",
-      "missing_cols:[('Open', 'GRANULES.NS'), ('Low', 'GRANULES.NS'), ('Close', 'GRANULES.NS'), ('Volume', 'GRANULES.NS'), ('High', 'GRANULES.NS')]"
-    ],
-    [
-      "GRAPHITE.NS",
-      "missing_cols:[('Open', 'GRAPHITE.NS'), ('Low', 'GRAPHITE.NS'), ('Close', 'GRAPHITE.NS'), ('Volume', 'GRAPHITE.NS'), ('High', 'GRAPHITE.NS')]"
-    ],
-    [
-      "GRASIM.NS",
-      "missing_cols:[('High', 'GRASIM.NS'), ('Open', 'GRASIM.NS'), ('Low', 'GRASIM.NS'), ('Close', 'GRASIM.NS'), ('Volume', 'GRASIM.NS')]"
-    ],
-    [
-      "GRAVITA.NS",
-      "missing_cols:[('High', 'GRAVITA.NS'), ('Open', 'GRAVITA.NS'), ('Low', 'GRAVITA.NS'), ('Close', 'GRAVITA.NS'), ('Volume', 'GRAVITA.NS')]"
-    ],
-    [
-      "GESHIP.NS",
-      "missing_cols:[('High', 'GESHIP.NS'), ('Open', 'GESHIP.NS'), ('Low', 'GESHIP.NS'), ('Close', 'GESHIP.NS'), ('Volume', 'GESHIP.NS')]"
-    ],
-    [
-      "FLUOROCHEM.NS",
-      "missing_cols:[('Volume', 'FLUOROCHEM.NS'), ('High', 'FLUOROCHEM.NS'), ('Low', 'FLUOROCHEM.NS'), ('Open', 'FLUOROCHEM.NS'), ('Close', 'FLUOROCHEM.NS')]"
-    ],
-    [
-      "GUJGASLTD.NS",
-      "missing_cols:[('Open', 'GUJGASLTD.NS'), ('Low', 'GUJGASLTD.NS'), ('Close', 'GUJGASLTD.NS'), ('Volume', 'GUJGASLTD.NS'), ('High', 'GUJGASLTD.NS')]"
-    ],
-    [
-      "GMDCLTD.NS",
-      "missing_cols:[('Close', 'GMDCLTD.NS'), ('Volume', 'GMDCLTD.NS'), ('High', 'GMDCLTD.NS'), ('Open', 'GMDCLTD.NS'), ('Low', 'GMDCLTD.NS')]"
-    ],
-    [
-      "GSPL.NS",
-      "missing_cols:[('Open', 'GSPL.NS'), ('Close', 'GSPL.NS'), ('Volume', 'GSPL.NS'), ('High', 'GSPL.NS'), ('Low', 'GSPL.NS')]"
-    ],
-    [
-      "HEG.NS",
-      "missing_cols:[('High', 'HEG.NS'), ('Open', 'HEG.NS'), ('Low', 'HEG.NS'), ('Close', 'HEG.NS'), ('Volume', 'HEG.NS')]"
+      "COHANCE.NS",
+      "too_few_rows:140"
     ],
     [
       "HBLENGINE.NS",
-      "missing_cols:[('Volume', 'HBLENGINE.NS'), ('High', 'HBLENGINE.NS'), ('Open', 'HBLENGINE.NS'), ('Low', 'HBLENGINE.NS'), ('Close', 'HBLENGINE.NS')]"
-    ],
-    [
-      "HCLTECH.NS",
-      "missing_cols:[('High', 'HCLTECH.NS'), ('Open', 'HCLTECH.NS'), ('Low', 'HCLTECH.NS'), ('Close', 'HCLTECH.NS'), ('Volume', 'HCLTECH.NS')]"
-    ],
-    [
-      "HDFCAMC.NS",
-      "missing_cols:[('High', 'HDFCAMC.NS'), ('Open', 'HDFCAMC.NS'), ('Low', 'HDFCAMC.NS'), ('Close', 'HDFCAMC.NS'), ('Volume', 'HDFCAMC.NS')]"
-    ],
-    [
-      "HDFCBANK.NS",
-      "missing_cols:[('Open', 'HDFCBANK.NS'), ('Low', 'HDFCBANK.NS'), ('Close', 'HDFCBANK.NS'), ('Volume', 'HDFCBANK.NS'), ('High', 'HDFCBANK.NS')]"
-    ],
-    [
-      "HDFCLIFE.NS",
-      "missing_cols:[('High', 'HDFCLIFE.NS'), ('Open', 'HDFCLIFE.NS'), ('Low', 'HDFCLIFE.NS'), ('Close', 'HDFCLIFE.NS'), ('Volume', 'HDFCLIFE.NS')]"
-    ],
-    [
-      "HFCL.NS",
-      "missing_cols:[('High', 'HFCL.NS'), ('Open', 'HFCL.NS'), ('Low', 'HFCL.NS'), ('Close', 'HFCL.NS'), ('Volume', 'HFCL.NS')]"
-    ],
-    [
-      "HAPPSTMNDS.NS",
-      "missing_cols:[('Volume', 'HAPPSTMNDS.NS'), ('High', 'HAPPSTMNDS.NS'), ('Open', 'HAPPSTMNDS.NS'), ('Low', 'HAPPSTMNDS.NS'), ('Close', 'HAPPSTMNDS.NS')]"
-    ],
-    [
-      "HAVELLS.NS",
-      "missing_cols:[('Volume', 'HAVELLS.NS'), ('High', 'HAVELLS.NS'), ('Low', 'HAVELLS.NS'), ('Open', 'HAVELLS.NS'), ('Close', 'HAVELLS.NS')]"
-    ],
-    [
-      "HEROMOTOCO.NS",
-      "missing_cols:[('Open', 'HEROMOTOCO.NS'), ('Low', 'HEROMOTOCO.NS'), ('Close', 'HEROMOTOCO.NS'), ('Volume', 'HEROMOTOCO.NS'), ('High', 'HEROMOTOCO.NS')]"
-    ],
-    [
-      "HEXT.NS",
-      "missing_cols:[('Low', 'HEXT.NS'), ('Open', 'HEXT.NS'), ('Close', 'HEXT.NS'), ('Volume', 'HEXT.NS'), ('High', 'HEXT.NS')]"
-    ],
-    [
-      "HSCL.NS",
-      "missing_cols:[('High', 'HSCL.NS'), ('Open', 'HSCL.NS'), ('Low', 'HSCL.NS'), ('Close', 'HSCL.NS'), ('Volume', 'HSCL.NS')]"
-    ],
-    [
-      "HINDALCO.NS",
-      "missing_cols:[('Low', 'HINDALCO.NS'), ('Close', 'HINDALCO.NS'), ('Volume', 'HINDALCO.NS'), ('High', 'HINDALCO.NS'), ('Open', 'HINDALCO.NS')]"
-    ],
-    [
-      "HAL.NS",
-      "missing_cols:[('High', 'HAL.NS'), ('Open', 'HAL.NS'), ('Low', 'HAL.NS'), ('Close', 'HAL.NS'), ('Volume', 'HAL.NS')]"
-    ],
-    [
-      "HINDCOPPER.NS",
-      "missing_cols:[('Volume', 'HINDCOPPER.NS'), ('High', 'HINDCOPPER.NS'), ('Open', 'HINDCOPPER.NS'), ('Low', 'HINDCOPPER.NS'), ('Close', 'HINDCOPPER.NS')]"
-    ],
-    [
-      "HINDPETRO.NS",
-      "missing_cols:[('High', 'HINDPETRO.NS'), ('Open', 'HINDPETRO.NS'), ('Low', 'HINDPETRO.NS'), ('Close', 'HINDPETRO.NS'), ('Volume', 'HINDPETRO.NS')]"
-    ],
-    [
-      "HINDUNILVR.NS",
-      "missing_cols:[('Open', 'HINDUNILVR.NS'), ('Close', 'HINDUNILVR.NS'), ('Volume', 'HINDUNILVR.NS'), ('High', 'HINDUNILVR.NS'), ('Low', 'HINDUNILVR.NS')]"
-    ],
-    [
-      "HINDZINC.NS",
-      "missing_cols:[('High', 'HINDZINC.NS'), ('Open', 'HINDZINC.NS'), ('Low', 'HINDZINC.NS'), ('Close', 'HINDZINC.NS'), ('Volume', 'HINDZINC.NS')]"
-    ],
-    [
-      "POWERINDIA.NS",
-      "missing_cols:[('High', 'POWERINDIA.NS'), ('Low', 'POWERINDIA.NS'), ('Open', 'POWERINDIA.NS'), ('Close', 'POWERINDIA.NS'), ('Volume', 'POWERINDIA.NS')]"
-    ],
-    [
-      "HOMEFIRST.NS",
-      "missing_cols:[('High', 'HOMEFIRST.NS'), ('Open', 'HOMEFIRST.NS'), ('Low', 'HOMEFIRST.NS'), ('Close', 'HOMEFIRST.NS'), ('Volume', 'HOMEFIRST.NS')]"
-    ],
-    [
-      "HONASA.NS",
-      "missing_cols:[('Close', 'HONASA.NS'), ('Volume', 'HONASA.NS'), ('High', 'HONASA.NS'), ('Open', 'HONASA.NS'), ('Low', 'HONASA.NS')]"
-    ],
-    [
-      "HONAUT.NS",
-      "missing_cols:[('Volume', 'HONAUT.NS'), ('High', 'HONAUT.NS'), ('Open', 'HONAUT.NS'), ('Low', 'HONAUT.NS'), ('Close', 'HONAUT.NS')]"
-    ],
-    [
-      "HUDCO.NS",
-      "missing_cols:[('High', 'HUDCO.NS'), ('Open', 'HUDCO.NS'), ('Low', 'HUDCO.NS'), ('Close', 'HUDCO.NS'), ('Volume', 'HUDCO.NS')]"
-    ],
-    [
-      "HYUNDAI.NS",
-      "missing_cols:[('Close', 'HYUNDAI.NS'), ('Volume', 'HYUNDAI.NS'), ('High', 'HYUNDAI.NS'), ('Open', 'HYUNDAI.NS'), ('Low', 'HYUNDAI.NS')]"
-    ],
-    [
-      "ICICIBANK.NS",
-      "missing_cols:[('High', 'ICICIBANK.NS'), ('Open', 'ICICIBANK.NS'), ('Low', 'ICICIBANK.NS'), ('Close', 'ICICIBANK.NS'), ('Volume', 'ICICIBANK.NS')]"
-    ],
-    [
-      "ICICIGI.NS",
-      "missing_cols:[('High', 'ICICIGI.NS'), ('Open', 'ICICIGI.NS'), ('Low', 'ICICIGI.NS'), ('Close', 'ICICIGI.NS'), ('Volume', 'ICICIGI.NS')]"
-    ],
-    [
-      "ICICIPRULI.NS",
-      "missing_cols:[('Close', 'ICICIPRULI.NS'), ('Volume', 'ICICIPRULI.NS'), ('High', 'ICICIPRULI.NS'), ('Open', 'ICICIPRULI.NS'), ('Low', 'ICICIPRULI.NS')]"
-    ],
-    [
-      "IDBI.NS",
-      "missing_cols:[('Volume', 'IDBI.NS'), ('High', 'IDBI.NS'), ('Open', 'IDBI.NS'), ('Low', 'IDBI.NS'), ('Close', 'IDBI.NS')]"
-    ],
-    [
-      "IDFCFIRSTB.NS",
-      "missing_cols:[('High', 'IDFCFIRSTB.NS'), ('Open', 'IDFCFIRSTB.NS'), ('Low', 'IDFCFIRSTB.NS'), ('Close', 'IDFCFIRSTB.NS'), ('Volume', 'IDFCFIRSTB.NS')]"
-    ],
-    [
-      "IFCI.NS",
-      "missing_cols:[('High', 'IFCI.NS'), ('Open', 'IFCI.NS'), ('Low', 'IFCI.NS'), ('Close', 'IFCI.NS'), ('Volume', 'IFCI.NS')]"
-    ],
-    [
-      "IIFL.NS",
-      "missing_cols:[('High', 'IIFL.NS'), ('Open', 'IIFL.NS'), ('Low', 'IIFL.NS'), ('Close', 'IIFL.NS'), ('Volume', 'IIFL.NS')]"
-    ],
-    [
-      "INOXINDIA.NS",
-      "missing_cols:[('Close', 'INOXINDIA.NS'), ('Volume', 'INOXINDIA.NS'), ('High', 'INOXINDIA.NS'), ('Open', 'INOXINDIA.NS'), ('Low', 'INOXINDIA.NS')]"
-    ],
-    [
-      "IRB.NS",
-      "missing_cols:[('High', 'IRB.NS'), ('Open', 'IRB.NS'), ('Low', 'IRB.NS'), ('Close', 'IRB.NS'), ('Volume', 'IRB.NS')]"
-    ],
-    [
-      "IRCON.NS",
-      "missing_cols:[('Volume', 'IRCON.NS'), ('High', 'IRCON.NS'), ('Open', 'IRCON.NS'), ('Low', 'IRCON.NS'), ('Close', 'IRCON.NS')]"
+      "not_enough_indicator_rows:39"
     ],
     [
       "ITCHOTELS.NS",
-      "missing_cols:[('Volume', 'ITCHOTELS.NS'), ('High', 'ITCHOTELS.NS'), ('Open', 'ITCHOTELS.NS'), ('Low', 'ITCHOTELS.NS'), ('Close', 'ITCHOTELS.NS')]"
+      "not_enough_indicator_rows:5"
     ],
     [
-      "ITC.NS",
-      "missing_cols:[('High', 'ITC.NS'), ('Open', 'ITC.NS'), ('Low', 'ITC.NS'), ('Close', 'ITC.NS'), ('Volume', 'ITC.NS')]"
+      "HYUNDAI.NS",
+      "not_enough_indicator_rows:75"
     ],
     [
-      "ITI.NS",
-      "missing_cols:[('High', 'ITI.NS'), ('Open', 'ITI.NS'), ('Low', 'ITI.NS'), ('Close', 'ITI.NS'), ('Volume', 'ITI.NS')]"
-    ],
-    [
-      "INDGN.NS",
-      "missing_cols:[('High', 'INDGN.NS'), ('Low', 'INDGN.NS'), ('Open', 'INDGN.NS'), ('Close', 'INDGN.NS'), ('Volume', 'INDGN.NS')]"
-    ],
-    [
-      "INDIACEM.NS",
-      "missing_cols:[('Close', 'INDIACEM.NS'), ('Volume', 'INDIACEM.NS'), ('High', 'INDIACEM.NS'), ('Open', 'INDIACEM.NS'), ('Low', 'INDIACEM.NS')]"
-    ],
-    [
-      "INDIAMART.NS",
-      "missing_cols:[('Volume', 'INDIAMART.NS'), ('High', 'INDIAMART.NS'), ('Open', 'INDIAMART.NS'), ('Low', 'INDIAMART.NS'), ('Close', 'INDIAMART.NS')]"
-    ],
-    [
-      "INDIANB.NS",
-      "missing_cols:[('High', 'INDIANB.NS'), ('Open', 'INDIANB.NS'), ('Low', 'INDIANB.NS'), ('Close', 'INDIANB.NS'), ('Volume', 'INDIANB.NS')]"
-    ],
-    [
-      "IEX.NS",
-      "missing_cols:[('High', 'IEX.NS'), ('Open', 'IEX.NS'), ('Low', 'IEX.NS'), ('Close', 'IEX.NS'), ('Volume', 'IEX.NS')]"
-    ],
-    [
-      "INDHOTEL.NS",
-      "missing_cols:[('Close', 'INDHOTEL.NS'), ('Volume', 'INDHOTEL.NS'), ('High', 'INDHOTEL.NS'), ('Open', 'INDHOTEL.NS'), ('Low', 'INDHOTEL.NS')]"
-    ],
-    [
-      "IOC.NS",
-      "missing_cols:[('Volume', 'IOC.NS'), ('High', 'IOC.NS'), ('Low', 'IOC.NS'), ('Open', 'IOC.NS'), ('Close', 'IOC.NS')]"
-    ],
-    [
-      "IOB.NS",
-      "missing_cols:[('High', 'IOB.NS'), ('Low', 'IOB.NS'), ('Open', 'IOB.NS'), ('Close', 'IOB.NS'), ('Volume', 'IOB.NS')]"
-    ],
-    [
-      "IRCTC.NS",
-      "missing_cols:[('Volume', 'IRCTC.NS'), ('High', 'IRCTC.NS'), ('Low', 'IRCTC.NS'), ('Open', 'IRCTC.NS'), ('Close', 'IRCTC.NS')]"
-    ],
-    [
-      "IRFC.NS",
-      "missing_cols:[('Low', 'IRFC.NS'), ('Close', 'IRFC.NS'), ('Volume', 'IRFC.NS'), ('High', 'IRFC.NS'), ('Open', 'IRFC.NS')]"
-    ],
-    [
-      "IREDA.NS",
-      "missing_cols:[('Low', 'IREDA.NS'), ('Close', 'IREDA.NS'), ('Volume', 'IREDA.NS'), ('High', 'IREDA.NS'), ('Open', 'IREDA.NS')]"
-    ],
-    [
-      "IGL.NS",
-      "missing_cols:[('High', 'IGL.NS'), ('Open', 'IGL.NS'), ('Low', 'IGL.NS'), ('Close', 'IGL.NS'), ('Volume', 'IGL.NS')]"
-    ],
-    [
-      "INDUSTOWER.NS",
-      "missing_cols:[('High', 'INDUSTOWER.NS'), ('Open', 'INDUSTOWER.NS'), ('Low', 'INDUSTOWER.NS'), ('Close', 'INDUSTOWER.NS'), ('Volume', 'INDUSTOWER.NS')]"
-    ],
-    [
-      "INDUSINDBK.NS",
-      "missing_cols:[('Low', 'INDUSINDBK.NS'), ('Open', 'INDUSINDBK.NS'), ('Close', 'INDUSINDBK.NS'), ('Volume', 'INDUSINDBK.NS'), ('High', 'INDUSINDBK.NS')]"
-    ],
-    [
-      "NAUKRI.NS",
-      "missing_cols:[('Close', 'NAUKRI.NS'), ('Volume', 'NAUKRI.NS'), ('High', 'NAUKRI.NS'), ('Open', 'NAUKRI.NS'), ('Low', 'NAUKRI.NS')]"
-    ],
-    [
-      "INFY.NS",
-      "missing_cols:[('Volume', 'INFY.NS'), ('High', 'INFY.NS'), ('Open', 'INFY.NS'), ('Low', 'INFY.NS'), ('Close', 'INFY.NS')]"
-    ],
-    [
-      "INOXWIND.NS",
-      "missing_cols:[('Close', 'INOXWIND.NS'), ('Volume', 'INOXWIND.NS'), ('High', 'INOXWIND.NS'), ('Open', 'INOXWIND.NS'), ('Low', 'INOXWIND.NS')]"
-    ],
-    [
-      "INTELLECT.NS",
-      "missing_cols:[('High', 'INTELLECT.NS'), ('Open', 'INTELLECT.NS'), ('Low', 'INTELLECT.NS'), ('Close', 'INTELLECT.NS'), ('Volume', 'INTELLECT.NS')]"
-    ],
-    [
-      "INDIGO.NS",
-      "missing_cols:[('Volume', 'INDIGO.NS'), ('High', 'INDIGO.NS'), ('Low', 'INDIGO.NS'), ('Open', 'INDIGO.NS'), ('Close', 'INDIGO.NS')]"
-    ],
-    [
-      "IGIL.NS",
-      "missing_cols:[('Close', 'IGIL.NS'), ('Volume', 'IGIL.NS'), ('High', 'IGIL.NS'), ('Open', 'IGIL.NS'), ('Low', 'IGIL.NS')]"
+      "HEXT.NS",
+      "too_few_rows:188"
     ],
     [
       "IKS.NS",
-      "missing_cols:[('Low', 'IKS.NS'), ('Open', 'IKS.NS'), ('Close', 'IKS.NS'), ('Volume', 'IKS.NS'), ('High', 'IKS.NS')]"
+      "not_enough_indicator_rows:34"
     ],
     [
-      "IPCALAB.NS",
-      "missing_cols:[('High', 'IPCALAB.NS'), ('Open', 'IPCALAB.NS'), ('Low', 'IPCALAB.NS'), ('Close', 'IPCALAB.NS'), ('Volume', 'IPCALAB.NS')]"
-    ],
-    [
-      "JBCHEPHARM.NS",
-      "missing_cols:[('Volume', 'JBCHEPHARM.NS'), ('High', 'JBCHEPHARM.NS'), ('Open', 'JBCHEPHARM.NS'), ('Low', 'JBCHEPHARM.NS'), ('Close', 'JBCHEPHARM.NS')]"
-    ],
-    [
-      "JKCEMENT.NS",
-      "missing_cols:[('Volume', 'JKCEMENT.NS'), ('High', 'JKCEMENT.NS'), ('Open', 'JKCEMENT.NS'), ('Low', 'JKCEMENT.NS'), ('Close', 'JKCEMENT.NS')]"
-    ],
-    [
-      "JBMA.NS",
-      "missing_cols:[('Volume', 'JBMA.NS'), ('High', 'JBMA.NS'), ('Open', 'JBMA.NS'), ('Low', 'JBMA.NS'), ('Close', 'JBMA.NS')]"
-    ],
-    [
-      "JKTYRE.NS",
-      "missing_cols:[('Volume', 'JKTYRE.NS'), ('High', 'JKTYRE.NS'), ('Open', 'JKTYRE.NS'), ('Low', 'JKTYRE.NS'), ('Close', 'JKTYRE.NS')]"
-    ],
-    [
-      "JMFINANCIL.NS",
-      "missing_cols:[('High', 'JMFINANCIL.NS'), ('Open', 'JMFINANCIL.NS'), ('Low', 'JMFINANCIL.NS'), ('Close', 'JMFINANCIL.NS'), ('Volume', 'JMFINANCIL.NS')]"
-    ],
-    [
-      "JSWENERGY.NS",
-      "missing_cols:[('Close', 'JSWENERGY.NS'), ('Volume', 'JSWENERGY.NS'), ('High', 'JSWENERGY.NS'), ('Open', 'JSWENERGY.NS'), ('Low', 'JSWENERGY.NS')]"
-    ],
-    [
-      "JSWINFRA.NS",
-      "missing_cols:[('High', 'JSWINFRA.NS'), ('Open', 'JSWINFRA.NS'), ('Low', 'JSWINFRA.NS'), ('Close', 'JSWINFRA.NS'), ('Volume', 'JSWINFRA.NS')]"
-    ],
-    [
-      "JSWSTEEL.NS",
-      "missing_cols:[('Volume', 'JSWSTEEL.NS'), ('High', 'JSWSTEEL.NS'), ('Open', 'JSWSTEEL.NS'), ('Low', 'JSWSTEEL.NS'), ('Close', 'JSWSTEEL.NS')]"
-    ],
-    [
-      "JPPOWER.NS",
-      "missing_cols:[('High', 'JPPOWER.NS'), ('Open', 'JPPOWER.NS'), ('Low', 'JPPOWER.NS'), ('Close', 'JPPOWER.NS'), ('Volume', 'JPPOWER.NS')]"
-    ],
-    [
-      "J&KBANK.NS",
-      "missing_cols:[('High', 'J&KBANK.NS'), ('Open', 'J&KBANK.NS'), ('Low', 'J&KBANK.NS'), ('Close', 'J&KBANK.NS'), ('Volume', 'J&KBANK.NS')]"
-    ],
-    [
-      "JINDALSAW.NS",
-      "missing_cols:[('Volume', 'JINDALSAW.NS'), ('High', 'JINDALSAW.NS'), ('Open', 'JINDALSAW.NS'), ('Low', 'JINDALSAW.NS'), ('Close', 'JINDALSAW.NS')]"
-    ],
-    [
-      "JSL.NS",
-      "missing_cols:[('Open', 'JSL.NS'), ('Low', 'JSL.NS'), ('Close', 'JSL.NS'), ('Volume', 'JSL.NS'), ('High', 'JSL.NS')]"
-    ],
-    [
-      "JINDALSTEL.NS",
-      "missing_cols:[('Open', 'JINDALSTEL.NS'), ('Low', 'JINDALSTEL.NS'), ('Close', 'JINDALSTEL.NS'), ('Volume', 'JINDALSTEL.NS'), ('High', 'JINDALSTEL.NS')]"
-    ],
-    [
-      "JIOFIN.NS",
-      "missing_cols:[('Open', 'JIOFIN.NS'), ('Low', 'JIOFIN.NS'), ('Close', 'JIOFIN.NS'), ('Volume', 'JIOFIN.NS'), ('High', 'JIOFIN.NS')]"
-    ],
-    [
-      "JUBLFOOD.NS",
-      "missing_cols:[('Open', 'JUBLFOOD.NS'), ('Low', 'JUBLFOOD.NS'), ('Close', 'JUBLFOOD.NS'), ('Volume', 'JUBLFOOD.NS'), ('High', 'JUBLFOOD.NS')]"
-    ],
-    [
-      "JUBLINGREA.NS",
-      "missing_cols:[('Volume', 'JUBLINGREA.NS'), ('High', 'JUBLINGREA.NS'), ('Open', 'JUBLINGREA.NS'), ('Low', 'JUBLINGREA.NS'), ('Close', 'JUBLINGREA.NS')]"
-    ],
-    [
-      "JUBLPHARMA.NS",
-      "missing_cols:[('High', 'JUBLPHARMA.NS'), ('Open', 'JUBLPHARMA.NS'), ('Low', 'JUBLPHARMA.NS'), ('Close', 'JUBLPHARMA.NS'), ('Volume', 'JUBLPHARMA.NS')]"
-    ],
-    [
-      "JWL.NS",
-      "missing_cols:[('Volume', 'JWL.NS'), ('High', 'JWL.NS'), ('Open', 'JWL.NS'), ('Low', 'JWL.NS'), ('Close', 'JWL.NS')]"
-    ],
-    [
-      "JYOTHYLAB.NS",
-      "missing_cols:[('Open', 'JYOTHYLAB.NS'), ('Low', 'JYOTHYLAB.NS'), ('Close', 'JYOTHYLAB.NS'), ('Volume', 'JYOTHYLAB.NS'), ('High', 'JYOTHYLAB.NS')]"
-    ],
-    [
-      "JYOTICNC.NS",
-      "missing_cols:[('Close', 'JYOTICNC.NS'), ('Volume', 'JYOTICNC.NS'), ('High', 'JYOTICNC.NS'), ('Open', 'JYOTICNC.NS'), ('Low', 'JYOTICNC.NS')]"
-    ],
-    [
-      "KPRMILL.NS",
-      "missing_cols:[('Volume', 'KPRMILL.NS'), ('High', 'KPRMILL.NS'), ('Open', 'KPRMILL.NS'), ('Low', 'KPRMILL.NS'), ('Close', 'KPRMILL.NS')]"
-    ],
-    [
-      "KEI.NS",
-      "missing_cols:[('Volume', 'KEI.NS'), ('High', 'KEI.NS'), ('Low', 'KEI.NS'), ('Open', 'KEI.NS'), ('Close', 'KEI.NS')]"
-    ],
-    [
-      "KPITTECH.NS",
-      "missing_cols:[('High', 'KPITTECH.NS'), ('Open', 'KPITTECH.NS'), ('Low', 'KPITTECH.NS'), ('Close', 'KPITTECH.NS'), ('Volume', 'KPITTECH.NS')]"
-    ],
-    [
-      "KSB.NS",
-      "missing_cols:[('Close', 'KSB.NS'), ('Volume', 'KSB.NS'), ('High', 'KSB.NS'), ('Open', 'KSB.NS'), ('Low', 'KSB.NS')]"
-    ],
-    [
-      "KAJARIACER.NS",
-      "missing_cols:[('Volume', 'KAJARIACER.NS'), ('High', 'KAJARIACER.NS'), ('Open', 'KAJARIACER.NS'), ('Low', 'KAJARIACER.NS'), ('Close', 'KAJARIACER.NS')]"
-    ],
-    [
-      "KPIL.NS",
-      "missing_cols:[('High', 'KPIL.NS'), ('Open', 'KPIL.NS'), ('Low', 'KPIL.NS'), ('Close', 'KPIL.NS'), ('Volume', 'KPIL.NS')]"
-    ],
-    [
-      "KALYANKJIL.NS",
-      "missing_cols:[('Open', 'KALYANKJIL.NS'), ('Low', 'KALYANKJIL.NS'), ('Close', 'KALYANKJIL.NS'), ('Volume', 'KALYANKJIL.NS'), ('High', 'KALYANKJIL.NS')]"
-    ],
-    [
-      "KARURVYSYA.NS",
-      "missing_cols:[('Volume', 'KARURVYSYA.NS'), ('High', 'KARURVYSYA.NS'), ('Open', 'KARURVYSYA.NS'), ('Low', 'KARURVYSYA.NS'), ('Close', 'KARURVYSYA.NS')]"
-    ],
-    [
-      "KAYNES.NS",
-      "missing_cols:[('High', 'KAYNES.NS'), ('Open', 'KAYNES.NS'), ('Low', 'KAYNES.NS'), ('Close', 'KAYNES.NS'), ('Volume', 'KAYNES.NS')]"
-    ],
-    [
-      "KEC.NS",
-      "missing_cols:[('Open', 'KEC.NS'), ('Low', 'KEC.NS'), ('Close', 'KEC.NS'), ('Volume', 'KEC.NS'), ('High', 'KEC.NS')]"
-    ],
-    [
-      "KFINTECH.NS",
-      "missing_cols:[('Close', 'KFINTECH.NS'), ('Volume', 'KFINTECH.NS'), ('High', 'KFINTECH.NS'), ('Open', 'KFINTECH.NS'), ('Low', 'KFINTECH.NS')]"
-    ],
-    [
-      "KIRLOSBROS.NS",
-      "missing_cols:[('Close', 'KIRLOSBROS.NS'), ('Volume', 'KIRLOSBROS.NS'), ('High', 'KIRLOSBROS.NS'), ('Open', 'KIRLOSBROS.NS'), ('Low', 'KIRLOSBROS.NS')]"
-    ],
-    [
-      "KIRLOSENG.NS",
-      "missing_cols:[('High', 'KIRLOSENG.NS'), ('Open', 'KIRLOSENG.NS'), ('Low', 'KIRLOSENG.NS'), ('Close', 'KIRLOSENG.NS'), ('Volume', 'KIRLOSENG.NS')]"
-    ],
-    [
-      "KOTAKBANK.NS",
-      "missing_cols:[('High', 'KOTAKBANK.NS'), ('Open', 'KOTAKBANK.NS'), ('Low', 'KOTAKBANK.NS'), ('Close', 'KOTAKBANK.NS'), ('Volume', 'KOTAKBANK.NS')]"
-    ],
-    [
-      "KIMS.NS",
-      "missing_cols:[('Volume', 'KIMS.NS'), ('High', 'KIMS.NS'), ('Open', 'KIMS.NS'), ('Low', 'KIMS.NS'), ('Close', 'KIMS.NS')]"
-    ],
-    [
-      "LTF.NS",
-      "missing_cols:[('Close', 'LTF.NS'), ('Volume', 'LTF.NS'), ('High', 'LTF.NS'), ('Open', 'LTF.NS'), ('Low', 'LTF.NS')]"
-    ],
-    [
-      "LTTS.NS",
-      "missing_cols:[('Open', 'LTTS.NS'), ('Low', 'LTTS.NS'), ('Close', 'LTTS.NS'), ('Volume', 'LTTS.NS'), ('High', 'LTTS.NS')]"
-    ],
-    [
-      "LICHSGFIN.NS",
-      "missing_cols:[('Open', 'LICHSGFIN.NS'), ('Close', 'LICHSGFIN.NS'), ('Volume', 'LICHSGFIN.NS'), ('High', 'LICHSGFIN.NS'), ('Low', 'LICHSGFIN.NS')]"
-    ],
-    [
-      "LTFOODS.NS",
-      "missing_cols:[('High', 'LTFOODS.NS'), ('Open', 'LTFOODS.NS'), ('Low', 'LTFOODS.NS'), ('Close', 'LTFOODS.NS'), ('Volume', 'LTFOODS.NS')]"
-    ],
-    [
-      "LTIM.NS",
-      "missing_cols:[('Volume', 'LTIM.NS'), ('High', 'LTIM.NS'), ('Open', 'LTIM.NS'), ('Low', 'LTIM.NS'), ('Close', 'LTIM.NS')]"
-    ],
-    [
-      "LT.NS",
-      "missing_cols:[('Open', 'LT.NS'), ('Low', 'LT.NS'), ('Close', 'LT.NS'), ('Volume', 'LT.NS'), ('High', 'LT.NS')]"
-    ],
-    [
-      "LATENTVIEW.NS",
-      "missing_cols:[('High', 'LATENTVIEW.NS'), ('Open', 'LATENTVIEW.NS'), ('Low', 'LATENTVIEW.NS'), ('Close', 'LATENTVIEW.NS'), ('Volume', 'LATENTVIEW.NS')]"
-    ],
-    [
-      "LAURUSLABS.NS",
-      "missing_cols:[('Volume', 'LAURUSLABS.NS'), ('High', 'LAURUSLABS.NS'), ('Open', 'LAURUSLABS.NS'), ('Low', 'LAURUSLABS.NS'), ('Close', 'LAURUSLABS.NS')]"
+      "IGIL.NS",
+      "not_enough_indicator_rows:32"
     ],
     [
       "THELEELA.NS",
-      "missing_cols:[('Volume', 'THELEELA.NS'), ('High', 'THELEELA.NS'), ('Open', 'THELEELA.NS'), ('Low', 'THELEELA.NS'), ('Close', 'THELEELA.NS')]"
-    ],
-    [
-      "LEMONTREE.NS",
-      "missing_cols:[('High', 'LEMONTREE.NS'), ('Low', 'LEMONTREE.NS'), ('Open', 'LEMONTREE.NS'), ('Close', 'LEMONTREE.NS'), ('Volume', 'LEMONTREE.NS')]"
-    ],
-    [
-      "LICI.NS",
-      "missing_cols:[('Close', 'LICI.NS'), ('Volume', 'LICI.NS'), ('High', 'LICI.NS'), ('Open', 'LICI.NS'), ('Low', 'LICI.NS')]"
-    ],
-    [
-      "LINDEINDIA.NS",
-      "missing_cols:[('Open', 'LINDEINDIA.NS'), ('Low', 'LINDEINDIA.NS'), ('Close', 'LINDEINDIA.NS'), ('Volume', 'LINDEINDIA.NS'), ('High', 'LINDEINDIA.NS')]"
-    ],
-    [
-      "LLOYDSME.NS",
-      "missing_cols:[('Volume', 'LLOYDSME.NS'), ('High', 'LLOYDSME.NS'), ('Open', 'LLOYDSME.NS'), ('Low', 'LLOYDSME.NS'), ('Close', 'LLOYDSME.NS')]"
-    ],
-    [
-      "LODHA.NS",
-      "missing_cols:[('Volume', 'LODHA.NS'), ('High', 'LODHA.NS'), ('Open', 'LODHA.NS'), ('Low', 'LODHA.NS'), ('Close', 'LODHA.NS')]"
-    ],
-    [
-      "LUPIN.NS",
-      "missing_cols:[('High', 'LUPIN.NS'), ('Open', 'LUPIN.NS'), ('Low', 'LUPIN.NS'), ('Close', 'LUPIN.NS'), ('Volume', 'LUPIN.NS')]"
-    ],
-    [
-      "MMTC.NS",
-      "missing_cols:[('Volume', 'MMTC.NS'), ('High', 'MMTC.NS'), ('Open', 'MMTC.NS'), ('Low', 'MMTC.NS'), ('Close', 'MMTC.NS')]"
-    ],
-    [
-      "MRF.NS",
-      "missing_cols:[('Close', 'MRF.NS'), ('Volume', 'MRF.NS'), ('High', 'MRF.NS'), ('Open', 'MRF.NS'), ('Low', 'MRF.NS')]"
-    ],
-    [
-      "MGL.NS",
-      "missing_cols:[('Volume', 'MGL.NS'), ('High', 'MGL.NS'), ('Low', 'MGL.NS'), ('Open', 'MGL.NS'), ('Close', 'MGL.NS')]"
-    ],
-    [
-      "MAHSCOOTER.NS",
-      "missing_cols:[('Open', 'MAHSCOOTER.NS'), ('Low', 'MAHSCOOTER.NS'), ('Close', 'MAHSCOOTER.NS'), ('Volume', 'MAHSCOOTER.NS'), ('High', 'MAHSCOOTER.NS')]"
-    ],
-    [
-      "MAHSEAMLES.NS",
-      "missing_cols:[('Volume', 'MAHSEAMLES.NS'), ('High', 'MAHSEAMLES.NS'), ('Open', 'MAHSEAMLES.NS'), ('Low', 'MAHSEAMLES.NS'), ('Close', 'MAHSEAMLES.NS')]"
-    ],
-    [
-      "M&MFIN.NS",
-      "missing_cols:[('High', 'M&MFIN.NS'), ('Open', 'M&MFIN.NS'), ('Low', 'M&MFIN.NS'), ('Close', 'M&MFIN.NS'), ('Volume', 'M&MFIN.NS')]"
-    ],
-    [
-      "M&M.NS",
-      "missing_cols:[('Volume', 'M&M.NS'), ('High', 'M&M.NS'), ('Open', 'M&M.NS'), ('Low', 'M&M.NS'), ('Close', 'M&M.NS')]"
-    ],
-    [
-      "MANAPPURAM.NS",
-      "missing_cols:[('High', 'MANAPPURAM.NS'), ('Open', 'MANAPPURAM.NS'), ('Low', 'MANAPPURAM.NS'), ('Close', 'MANAPPURAM.NS'), ('Volume', 'MANAPPURAM.NS')]"
-    ],
-    [
-      "MRPL.NS",
-      "missing_cols:[('Open', 'MRPL.NS'), ('Low', 'MRPL.NS'), ('Close', 'MRPL.NS'), ('Volume', 'MRPL.NS'), ('High', 'MRPL.NS')]"
-    ],
-    [
-      "MANKIND.NS",
-      "missing_cols:[('High', 'MANKIND.NS'), ('Open', 'MANKIND.NS'), ('Low', 'MANKIND.NS'), ('Close', 'MANKIND.NS'), ('Volume', 'MANKIND.NS')]"
-    ],
-    [
-      "MARICO.NS",
-      "missing_cols:[('High', 'MARICO.NS'), ('Open', 'MARICO.NS'), ('Low', 'MARICO.NS'), ('Close', 'MARICO.NS'), ('Volume', 'MARICO.NS')]"
-    ],
-    [
-      "MARUTI.NS",
-      "missing_cols:[('High', 'MARUTI.NS'), ('Open', 'MARUTI.NS'), ('Low', 'MARUTI.NS'), ('Close', 'MARUTI.NS'), ('Volume', 'MARUTI.NS')]"
-    ],
-    [
-      "MFSL.NS",
-      "missing_cols:[('High', 'MFSL.NS'), ('Open', 'MFSL.NS'), ('Low', 'MFSL.NS'), ('Close', 'MFSL.NS'), ('Volume', 'MFSL.NS')]"
-    ],
-    [
-      "MAXHEALTH.NS",
-      "missing_cols:[('Volume', 'MAXHEALTH.NS'), ('High', 'MAXHEALTH.NS'), ('Open', 'MAXHEALTH.NS'), ('Low', 'MAXHEALTH.NS'), ('Close', 'MAXHEALTH.NS')]"
-    ],
-    [
-      "MAZDOCK.NS",
-      "missing_cols:[('Volume', 'MAZDOCK.NS'), ('High', 'MAZDOCK.NS'), ('Open', 'MAZDOCK.NS'), ('Low', 'MAZDOCK.NS'), ('Close', 'MAZDOCK.NS')]"
-    ],
-    [
-      "METROPOLIS.NS",
-      "missing_cols:[('High', 'METROPOLIS.NS'), ('Open', 'METROPOLIS.NS'), ('Low', 'METROPOLIS.NS'), ('Close', 'METROPOLIS.NS'), ('Volume', 'METROPOLIS.NS')]"
-    ],
-    [
-      "MINDACORP.NS",
-      "missing_cols:[('Open', 'MINDACORP.NS'), ('Close', 'MINDACORP.NS'), ('Volume', 'MINDACORP.NS'), ('High', 'MINDACORP.NS'), ('Low', 'MINDACORP.NS')]"
-    ],
-    [
-      "MSUMI.NS",
-      "missing_cols:[('Close', 'MSUMI.NS'), ('Volume', 'MSUMI.NS'), ('High', 'MSUMI.NS'), ('Open', 'MSUMI.NS'), ('Low', 'MSUMI.NS')]"
-    ],
-    [
-      "MOTILALOFS.NS",
-      "missing_cols:[('High', 'MOTILALOFS.NS'), ('Open', 'MOTILALOFS.NS'), ('Low', 'MOTILALOFS.NS'), ('Close', 'MOTILALOFS.NS'), ('Volume', 'MOTILALOFS.NS')]"
-    ],
-    [
-      "MPHASIS.NS",
-      "missing_cols:[('High', 'MPHASIS.NS'), ('Open', 'MPHASIS.NS'), ('Low', 'MPHASIS.NS'), ('Close', 'MPHASIS.NS'), ('Volume', 'MPHASIS.NS')]"
-    ],
-    [
-      "MCX.NS",
-      "missing_cols:[('High', 'MCX.NS'), ('Low', 'MCX.NS'), ('Open', 'MCX.NS'), ('Close', 'MCX.NS'), ('Volume', 'MCX.NS')]"
-    ],
-    [
-      "MUTHOOTFIN.NS",
-      "missing_cols:[('Open', 'MUTHOOTFIN.NS'), ('Low', 'MUTHOOTFIN.NS'), ('Close', 'MUTHOOTFIN.NS'), ('Volume', 'MUTHOOTFIN.NS'), ('High', 'MUTHOOTFIN.NS')]"
-    ],
-    [
-      "NATCOPHARM.NS",
-      "missing_cols:[('Close', 'NATCOPHARM.NS'), ('Volume', 'NATCOPHARM.NS'), ('High', 'NATCOPHARM.NS'), ('Open', 'NATCOPHARM.NS'), ('Low', 'NATCOPHARM.NS')]"
-    ],
-    [
-      "NBCC.NS",
-      "missing_cols:[('High', 'NBCC.NS'), ('Open', 'NBCC.NS'), ('Low', 'NBCC.NS'), ('Close', 'NBCC.NS'), ('Volume', 'NBCC.NS')]"
-    ],
-    [
-      "NCC.NS",
-      "missing_cols:[('High', 'NCC.NS'), ('Open', 'NCC.NS'), ('Low', 'NCC.NS'), ('Close', 'NCC.NS'), ('Volume', 'NCC.NS')]"
-    ],
-    [
-      "NHPC.NS",
-      "missing_cols:[('High', 'NHPC.NS'), ('Open', 'NHPC.NS'), ('Low', 'NHPC.NS'), ('Close', 'NHPC.NS'), ('Volume', 'NHPC.NS')]"
-    ],
-    [
-      "NLCINDIA.NS",
-      "missing_cols:[('Close', 'NLCINDIA.NS'), ('Volume', 'NLCINDIA.NS'), ('High', 'NLCINDIA.NS'), ('Open', 'NLCINDIA.NS'), ('Low', 'NLCINDIA.NS')]"
-    ],
-    [
-      "NMDC.NS",
-      "missing_cols:[('Open', 'NMDC.NS'), ('Low', 'NMDC.NS'), ('Close', 'NMDC.NS'), ('Volume', 'NMDC.NS'), ('High', 'NMDC.NS')]"
-    ],
-    [
-      "NSLNISP.NS",
-      "missing_cols:[('Low', 'NSLNISP.NS'), ('Close', 'NSLNISP.NS'), ('Volume', 'NSLNISP.NS'), ('High', 'NSLNISP.NS'), ('Open', 'NSLNISP.NS')]"
+      "too_few_rows:122"
     ],
     [
       "NTPCGREEN.NS",
-      "missing_cols:[('High', 'NTPCGREEN.NS'), ('Open', 'NTPCGREEN.NS'), ('Low', 'NTPCGREEN.NS'), ('Close', 'NTPCGREEN.NS'), ('Volume', 'NTPCGREEN.NS')]"
-    ],
-    [
-      "NTPC.NS",
-      "missing_cols:[('Open', 'NTPC.NS'), ('Low', 'NTPC.NS'), ('Close', 'NTPC.NS'), ('Volume', 'NTPC.NS'), ('High', 'NTPC.NS')]"
-    ],
-    [
-      "NH.NS",
-      "missing_cols:[('High', 'NH.NS'), ('Open', 'NH.NS'), ('Low', 'NH.NS'), ('Close', 'NH.NS'), ('Volume', 'NH.NS')]"
-    ],
-    [
-      "NATIONALUM.NS",
-      "missing_cols:[('Open', 'NATIONALUM.NS'), ('Low', 'NATIONALUM.NS'), ('Close', 'NATIONALUM.NS'), ('Volume', 'NATIONALUM.NS'), ('High', 'NATIONALUM.NS')]"
-    ],
-    [
-      "NAVA.NS",
-      "missing_cols:[('High', 'NAVA.NS'), ('Open', 'NAVA.NS'), ('Low', 'NAVA.NS'), ('Close', 'NAVA.NS'), ('Volume', 'NAVA.NS')]"
-    ],
-    [
-      "NAVINFLUOR.NS",
-      "missing_cols:[('Open', 'NAVINFLUOR.NS'), ('Low', 'NAVINFLUOR.NS'), ('Close', 'NAVINFLUOR.NS'), ('Volume', 'NAVINFLUOR.NS'), ('High', 'NAVINFLUOR.NS')]"
-    ],
-    [
-      "NESTLEIND.NS",
-      "missing_cols:[('Open', 'NESTLEIND.NS'), ('Low', 'NESTLEIND.NS'), ('Close', 'NESTLEIND.NS'), ('Volume', 'NESTLEIND.NS'), ('High', 'NESTLEIND.NS')]"
-    ],
-    [
-      "NETWEB.NS",
-      "missing_cols:[('Open', 'NETWEB.NS'), ('Low', 'NETWEB.NS'), ('Close', 'NETWEB.NS'), ('Volume', 'NETWEB.NS'), ('High', 'NETWEB.NS')]"
-    ],
-    [
-      "NEULANDLAB.NS",
-      "missing_cols:[('Close', 'NEULANDLAB.NS'), ('Volume', 'NEULANDLAB.NS'), ('High', 'NEULANDLAB.NS'), ('Open', 'NEULANDLAB.NS'), ('Low', 'NEULANDLAB.NS')]"
-    ],
-    [
-      "NEWGEN.NS",
-      "missing_cols:[('Close', 'NEWGEN.NS'), ('Volume', 'NEWGEN.NS'), ('High', 'NEWGEN.NS'), ('Open', 'NEWGEN.NS'), ('Low', 'NEWGEN.NS')]"
-    ],
-    [
-      "NAM-INDIA.NS",
-      "missing_cols:[('Volume', 'NAM-INDIA.NS'), ('High', 'NAM-INDIA.NS'), ('Open', 'NAM-INDIA.NS'), ('Low', 'NAM-INDIA.NS'), ('Close', 'NAM-INDIA.NS')]"
-    ],
-    [
-      "NIVABUPA.NS",
-      "missing_cols:[('Low', 'NIVABUPA.NS'), ('Open', 'NIVABUPA.NS'), ('Close', 'NIVABUPA.NS'), ('Volume', 'NIVABUPA.NS'), ('High', 'NIVABUPA.NS')]"
-    ],
-    [
-      "NUVAMA.NS",
-      "missing_cols:[('Volume', 'NUVAMA.NS'), ('High', 'NUVAMA.NS'), ('Open', 'NUVAMA.NS'), ('Low', 'NUVAMA.NS'), ('Close', 'NUVAMA.NS')]"
-    ],
-    [
-      "NUVOCO.NS",
-      "missing_cols:[('Volume', 'NUVOCO.NS'), ('High', 'NUVOCO.NS'), ('Open', 'NUVOCO.NS'), ('Low', 'NUVOCO.NS'), ('Close', 'NUVOCO.NS')]"
-    ],
-    [
-      "OBEROIRLTY.NS",
-      "missing_cols:[('High', 'OBEROIRLTY.NS'), ('Open', 'OBEROIRLTY.NS'), ('Low', 'OBEROIRLTY.NS'), ('Close', 'OBEROIRLTY.NS'), ('Volume', 'OBEROIRLTY.NS')]"
-    ],
-    [
-      "ONGC.NS",
-      "missing_cols:[('Open', 'ONGC.NS'), ('Low', 'ONGC.NS'), ('Close', 'ONGC.NS'), ('Volume', 'ONGC.NS'), ('High', 'ONGC.NS')]"
-    ],
-    [
-      "OIL.NS",
-      "missing_cols:[('High', 'OIL.NS'), ('Open', 'OIL.NS'), ('Low', 'OIL.NS'), ('Close', 'OIL.NS'), ('Volume', 'OIL.NS')]"
-    ],
-    [
-      "OLAELEC.NS",
-      "missing_cols:[('Open', 'OLAELEC.NS'), ('Low', 'OLAELEC.NS'), ('Close', 'OLAELEC.NS'), ('Volume', 'OLAELEC.NS'), ('High', 'OLAELEC.NS')]"
-    ],
-    [
-      "OLECTRA.NS",
-      "missing_cols:[('High', 'OLECTRA.NS'), ('Open', 'OLECTRA.NS'), ('Low', 'OLECTRA.NS'), ('Close', 'OLECTRA.NS'), ('Volume', 'OLECTRA.NS')]"
-    ],
-    [
-      "PAYTM.NS",
-      "missing_cols:[('High', 'PAYTM.NS'), ('Low', 'PAYTM.NS'), ('Open', 'PAYTM.NS'), ('Close', 'PAYTM.NS'), ('Volume', 'PAYTM.NS')]"
+      "not_enough_indicator_rows:51"
     ],
     [
       "ONESOURCE.NS",
-      "missing_cols:[('Volume', 'ONESOURCE.NS'), ('High', 'ONESOURCE.NS'), ('Open', 'ONESOURCE.NS'), ('Low', 'ONESOURCE.NS'), ('Close', 'ONESOURCE.NS')]"
+      "not_enough_indicator_rows:10"
     ],
     [
-      "OFSS.NS",
-      "missing_cols:[('Volume', 'OFSS.NS'), ('High', 'OFSS.NS'), ('Open', 'OFSS.NS'), ('Low', 'OFSS.NS'), ('Close', 'OFSS.NS')]"
-    ],
-    [
-      "POLICYBZR.NS",
-      "missing_cols:[('Volume', 'POLICYBZR.NS'), ('High', 'POLICYBZR.NS'), ('Open', 'POLICYBZR.NS'), ('Low', 'POLICYBZR.NS'), ('Close', 'POLICYBZR.NS')]"
-    ],
-    [
-      "PCBL.NS",
-      "missing_cols:[('Close', 'PCBL.NS'), ('Volume', 'PCBL.NS'), ('High', 'PCBL.NS'), ('Open', 'PCBL.NS'), ('Low', 'PCBL.NS')]"
-    ],
-    [
-      "PGEL.NS",
-      "missing_cols:[('Volume', 'PGEL.NS'), ('High', 'PGEL.NS'), ('Low', 'PGEL.NS'), ('Open', 'PGEL.NS'), ('Close', 'PGEL.NS')]"
-    ],
-    [
-      "PIIND.NS",
-      "missing_cols:[('Open', 'PIIND.NS'), ('Low', 'PIIND.NS'), ('Close', 'PIIND.NS'), ('Volume', 'PIIND.NS'), ('High', 'PIIND.NS')]"
-    ],
-    [
-      "PNBHOUSING.NS",
-      "missing_cols:[('High', 'PNBHOUSING.NS'), ('Open', 'PNBHOUSING.NS'), ('Low', 'PNBHOUSING.NS'), ('Close', 'PNBHOUSING.NS'), ('Volume', 'PNBHOUSING.NS')]"
-    ],
-    [
-      "PTCIL.NS",
-      "missing_cols:[('Volume', 'PTCIL.NS'), ('High', 'PTCIL.NS'), ('Open', 'PTCIL.NS'), ('Low', 'PTCIL.NS'), ('Close', 'PTCIL.NS')]"
-    ],
-    [
-      "PVRINOX.NS",
-      "missing_cols:[('High', 'PVRINOX.NS'), ('Open', 'PVRINOX.NS'), ('Low', 'PVRINOX.NS'), ('Close', 'PVRINOX.NS'), ('Volume', 'PVRINOX.NS')]"
-    ],
-    [
-      "PAGEIND.NS",
-      "missing_cols:[('Open', 'PAGEIND.NS'), ('Low', 'PAGEIND.NS'), ('Close', 'PAGEIND.NS'), ('Volume', 'PAGEIND.NS'), ('High', 'PAGEIND.NS')]"
-    ],
-    [
-      "PATANJALI.NS",
-      "missing_cols:[('Low', 'PATANJALI.NS'), ('Open', 'PATANJALI.NS'), ('Close', 'PATANJALI.NS'), ('Volume', 'PATANJALI.NS'), ('High', 'PATANJALI.NS')]"
-    ],
-    [
-      "PERSISTENT.NS",
-      "missing_cols:[('Volume', 'PERSISTENT.NS'), ('High', 'PERSISTENT.NS'), ('Open', 'PERSISTENT.NS'), ('Low', 'PERSISTENT.NS'), ('Close', 'PERSISTENT.NS')]"
-    ],
-    [
-      "PETRONET.NS",
-      "missing_cols:[('Close', 'PETRONET.NS'), ('Volume', 'PETRONET.NS'), ('High', 'PETRONET.NS'), ('Open', 'PETRONET.NS'), ('Low', 'PETRONET.NS')]"
-    ],
-    [
-      "PFIZER.NS",
-      "missing_cols:[('High', 'PFIZER.NS'), ('Open', 'PFIZER.NS'), ('Low', 'PFIZER.NS'), ('Close', 'PFIZER.NS'), ('Volume', 'PFIZER.NS')]"
-    ],
-    [
-      "PHOENIXLTD.NS",
-      "missing_cols:[('Close', 'PHOENIXLTD.NS'), ('Volume', 'PHOENIXLTD.NS'), ('High', 'PHOENIXLTD.NS'), ('Open', 'PHOENIXLTD.NS'), ('Low', 'PHOENIXLTD.NS')]"
-    ],
-    [
-      "PIDILITIND.NS",
-      "missing_cols:[('High', 'PIDILITIND.NS'), ('Open', 'PIDILITIND.NS'), ('Low', 'PIDILITIND.NS'), ('Close', 'PIDILITIND.NS'), ('Volume', 'PIDILITIND.NS')]"
-    ],
-    [
-      "PPLPHARMA.NS",
-      "missing_cols:[('Volume', 'PPLPHARMA.NS'), ('High', 'PPLPHARMA.NS'), ('Open', 'PPLPHARMA.NS'), ('Low', 'PPLPHARMA.NS'), ('Close', 'PPLPHARMA.NS')]"
-    ],
-    [
-      "POLYMED.NS",
-      "missing_cols:[('Open', 'POLYMED.NS'), ('Low', 'POLYMED.NS'), ('Close', 'POLYMED.NS'), ('Volume', 'POLYMED.NS'), ('High', 'POLYMED.NS')]"
-    ],
-    [
-      "POLYCAB.NS",
-      "missing_cols:[('High', 'POLYCAB.NS'), ('Open', 'POLYCAB.NS'), ('Low', 'POLYCAB.NS'), ('Close', 'POLYCAB.NS'), ('Volume', 'POLYCAB.NS')]"
-    ],
-    [
-      "POONAWALLA.NS",
-      "missing_cols:[('Open', 'POONAWALLA.NS'), ('Low', 'POONAWALLA.NS'), ('Close', 'POONAWALLA.NS'), ('Volume', 'POONAWALLA.NS'), ('High', 'POONAWALLA.NS')]"
-    ],
-    [
-      "PFC.NS",
-      "missing_cols:[('Open', 'PFC.NS'), ('Low', 'PFC.NS'), ('Close', 'PFC.NS'), ('Volume', 'PFC.NS'), ('High', 'PFC.NS')]"
-    ],
-    [
-      "POWERGRID.NS",
-      "missing_cols:[('Close', 'POWERGRID.NS'), ('Volume', 'POWERGRID.NS'), ('High', 'POWERGRID.NS'), ('Open', 'POWERGRID.NS'), ('Low', 'POWERGRID.NS')]"
-    ],
-    [
-      "PRAJIND.NS",
-      "missing_cols:[('Close', 'PRAJIND.NS'), ('Volume', 'PRAJIND.NS'), ('High', 'PRAJIND.NS'), ('Open', 'PRAJIND.NS'), ('Low', 'PRAJIND.NS')]"
+      "NIVABUPA.NS",
+      "not_enough_indicator_rows:58"
     ],
     [
       "PREMIERENE.NS",
-      "missing_cols:[('Volume', 'PREMIERENE.NS'), ('High', 'PREMIERENE.NS'), ('Open', 'PREMIERENE.NS'), ('Low', 'PREMIERENE.NS'), ('Close', 'PREMIERENE.NS')]"
-    ],
-    [
-      "PRESTIGE.NS",
-      "missing_cols:[('Open', 'PRESTIGE.NS'), ('Close', 'PRESTIGE.NS'), ('Volume', 'PRESTIGE.NS'), ('High', 'PRESTIGE.NS'), ('Low', 'PRESTIGE.NS')]"
-    ],
-    [
-      "PGHH.NS",
-      "missing_cols:[('High', 'PGHH.NS'), ('Open', 'PGHH.NS'), ('Low', 'PGHH.NS'), ('Close', 'PGHH.NS'), ('Volume', 'PGHH.NS')]"
-    ],
-    [
-      "PNB.NS",
-      "missing_cols:[('Close', 'PNB.NS'), ('Volume', 'PNB.NS'), ('High', 'PNB.NS'), ('Open', 'PNB.NS'), ('Low', 'PNB.NS')]"
-    ],
-    [
-      "RRKABEL.NS",
-      "missing_cols:[('Open', 'RRKABEL.NS'), ('Low', 'RRKABEL.NS'), ('Close', 'RRKABEL.NS'), ('Volume', 'RRKABEL.NS'), ('High', 'RRKABEL.NS')]"
-    ],
-    [
-      "RBLBANK.NS",
-      "missing_cols:[('High', 'RBLBANK.NS'), ('Open', 'RBLBANK.NS'), ('Low', 'RBLBANK.NS'), ('Close', 'RBLBANK.NS'), ('Volume', 'RBLBANK.NS')]"
-    ],
-    [
-      "RECLTD.NS",
-      "missing_cols:[('Open', 'RECLTD.NS'), ('Low', 'RECLTD.NS'), ('Close', 'RECLTD.NS'), ('Volume', 'RECLTD.NS'), ('High', 'RECLTD.NS')]"
-    ],
-    [
-      "RHIM.NS",
-      "missing_cols:[('Close', 'RHIM.NS'), ('Volume', 'RHIM.NS'), ('High', 'RHIM.NS'), ('Open', 'RHIM.NS'), ('Low', 'RHIM.NS')]"
-    ],
-    [
-      "RITES.NS",
-      "missing_cols:[('High', 'RITES.NS'), ('Open', 'RITES.NS'), ('Low', 'RITES.NS'), ('Close', 'RITES.NS'), ('Volume', 'RITES.NS')]"
-    ],
-    [
-      "RADICO.NS",
-      "missing_cols:[('High', 'RADICO.NS'), ('Low', 'RADICO.NS'), ('Open', 'RADICO.NS'), ('Close', 'RADICO.NS'), ('Volume', 'RADICO.NS')]"
-    ],
-    [
-      "RVNL.NS",
-      "missing_cols:[('Volume', 'RVNL.NS'), ('High', 'RVNL.NS'), ('Open', 'RVNL.NS'), ('Low', 'RVNL.NS'), ('Close', 'RVNL.NS')]"
-    ],
-    [
-      "RAILTEL.NS",
-      "missing_cols:[('High', 'RAILTEL.NS'), ('Open', 'RAILTEL.NS'), ('Low', 'RAILTEL.NS'), ('Close', 'RAILTEL.NS'), ('Volume', 'RAILTEL.NS')]"
-    ],
-    [
-      "RAINBOW.NS",
-      "missing_cols:[('Volume', 'RAINBOW.NS'), ('High', 'RAINBOW.NS'), ('Open', 'RAINBOW.NS'), ('Low', 'RAINBOW.NS'), ('Close', 'RAINBOW.NS')]"
-    ],
-    [
-      "RKFORGE.NS",
-      "missing_cols:[('High', 'RKFORGE.NS'), ('Open', 'RKFORGE.NS'), ('Low', 'RKFORGE.NS'), ('Close', 'RKFORGE.NS'), ('Volume', 'RKFORGE.NS')]"
-    ],
-    [
-      "RCF.NS",
-      "missing_cols:[('Close', 'RCF.NS'), ('Volume', 'RCF.NS'), ('High', 'RCF.NS'), ('Open', 'RCF.NS'), ('Low', 'RCF.NS')]"
-    ],
-    [
-      "REDINGTON.NS",
-      "missing_cols:[('Close', 'REDINGTON.NS'), ('Volume', 'REDINGTON.NS'), ('High', 'REDINGTON.NS'), ('Open', 'REDINGTON.NS'), ('Low', 'REDINGTON.NS')]"
-    ],
-    [
-      "RELIANCE.NS",
-      "missing_cols:[('Open', 'RELIANCE.NS'), ('Low', 'RELIANCE.NS'), ('Close', 'RELIANCE.NS'), ('Volume', 'RELIANCE.NS'), ('High', 'RELIANCE.NS')]"
-    ],
-    [
-      "RELINFRA.NS",
-      "missing_cols:[('High', 'RELINFRA.NS'), ('Open', 'RELINFRA.NS'), ('Low', 'RELINFRA.NS'), ('Close', 'RELINFRA.NS'), ('Volume', 'RELINFRA.NS')]"
-    ],
-    [
-      "RPOWER.NS",
-      "missing_cols:[('Close', 'RPOWER.NS'), ('Volume', 'RPOWER.NS'), ('High', 'RPOWER.NS'), ('Open', 'RPOWER.NS'), ('Low', 'RPOWER.NS')]"
-    ],
-    [
-      "SBFC.NS",
-      "missing_cols:[('Low', 'SBFC.NS'), ('Close', 'SBFC.NS'), ('Volume', 'SBFC.NS'), ('High', 'SBFC.NS'), ('Open', 'SBFC.NS')]"
-    ],
-    [
-      "SBICARD.NS",
-      "missing_cols:[('Open', 'SBICARD.NS'), ('Close', 'SBICARD.NS'), ('Volume', 'SBICARD.NS'), ('High', 'SBICARD.NS'), ('Low', 'SBICARD.NS')]"
-    ],
-    [
-      "SBILIFE.NS",
-      "missing_cols:[('Close', 'SBILIFE.NS'), ('Volume', 'SBILIFE.NS'), ('High', 'SBILIFE.NS'), ('Open', 'SBILIFE.NS'), ('Low', 'SBILIFE.NS')]"
-    ],
-    [
-      "SJVN.NS",
-      "missing_cols:[('Low', 'SJVN.NS'), ('Open', 'SJVN.NS'), ('Close', 'SJVN.NS'), ('Volume', 'SJVN.NS'), ('High', 'SJVN.NS')]"
-    ],
-    [
-      "SKFINDIA.NS",
-      "missing_cols:[('Close', 'SKFINDIA.NS'), ('Volume', 'SKFINDIA.NS'), ('High', 'SKFINDIA.NS'), ('Open', 'SKFINDIA.NS'), ('Low', 'SKFINDIA.NS')]"
-    ],
-    [
-      "SRF.NS",
-      "missing_cols:[('High', 'SRF.NS'), ('Open', 'SRF.NS'), ('Low', 'SRF.NS'), ('Close', 'SRF.NS'), ('Volume', 'SRF.NS')]"
-    ],
-    [
-      "SAGILITY.NS",
-      "missing_cols:[('Close', 'SAGILITY.NS'), ('Volume', 'SAGILITY.NS'), ('High', 'SAGILITY.NS'), ('Open', 'SAGILITY.NS'), ('Low', 'SAGILITY.NS')]"
+      "not_enough_indicator_rows:109"
     ],
     [
       "SAILIFE.NS",
-      "missing_cols:[('Volume', 'SAILIFE.NS'), ('High', 'SAILIFE.NS'), ('Open', 'SAILIFE.NS'), ('Low', 'SAILIFE.NS'), ('Close', 'SAILIFE.NS')]"
-    ],
-    [
-      "SAMMAANCAP.NS",
-      "missing_cols:[('High', 'SAMMAANCAP.NS'), ('Open', 'SAMMAANCAP.NS'), ('Low', 'SAMMAANCAP.NS'), ('Close', 'SAMMAANCAP.NS'), ('Volume', 'SAMMAANCAP.NS')]"
-    ],
-    [
-      "MOTHERSON.NS",
-      "missing_cols:[('Volume', 'MOTHERSON.NS'), ('High', 'MOTHERSON.NS'), ('Open', 'MOTHERSON.NS'), ('Low', 'MOTHERSON.NS'), ('Close', 'MOTHERSON.NS')]"
-    ],
-    [
-      "SAPPHIRE.NS",
-      "missing_cols:[('Open', 'SAPPHIRE.NS'), ('Close', 'SAPPHIRE.NS'), ('Volume', 'SAPPHIRE.NS'), ('High', 'SAPPHIRE.NS'), ('Low', 'SAPPHIRE.NS')]"
-    ],
-    [
-      "SARDAEN.NS",
-      "missing_cols:[('High', 'SARDAEN.NS'), ('Open', 'SARDAEN.NS'), ('Low', 'SARDAEN.NS'), ('Close', 'SARDAEN.NS'), ('Volume', 'SARDAEN.NS')]"
-    ],
-    [
-      "SAREGAMA.NS",
-      "missing_cols:[('Volume', 'SAREGAMA.NS'), ('High', 'SAREGAMA.NS'), ('Low', 'SAREGAMA.NS'), ('Open', 'SAREGAMA.NS'), ('Close', 'SAREGAMA.NS')]"
-    ],
-    [
-      "SCHAEFFLER.NS",
-      "missing_cols:[('High', 'SCHAEFFLER.NS'), ('Open', 'SCHAEFFLER.NS'), ('Low', 'SCHAEFFLER.NS'), ('Close', 'SCHAEFFLER.NS'), ('Volume', 'SCHAEFFLER.NS')]"
-    ],
-    [
-      "SCHNEIDER.NS",
-      "missing_cols:[('Open', 'SCHNEIDER.NS'), ('Low', 'SCHNEIDER.NS'), ('Close', 'SCHNEIDER.NS'), ('Volume', 'SCHNEIDER.NS'), ('High', 'SCHNEIDER.NS')]"
-    ],
-    [
-      "SCI.NS",
-      "missing_cols:[('Close', 'SCI.NS'), ('Volume', 'SCI.NS'), ('High', 'SCI.NS'), ('Low', 'SCI.NS'), ('Open', 'SCI.NS')]"
-    ],
-    [
-      "SHREECEM.NS",
-      "missing_cols:[('Close', 'SHREECEM.NS'), ('Volume', 'SHREECEM.NS'), ('High', 'SHREECEM.NS'), ('Open', 'SHREECEM.NS'), ('Low', 'SHREECEM.NS')]"
-    ],
-    [
-      "SHRIRAMFIN.NS",
-      "missing_cols:[('Volume', 'SHRIRAMFIN.NS'), ('High', 'SHRIRAMFIN.NS'), ('Open', 'SHRIRAMFIN.NS'), ('Low', 'SHRIRAMFIN.NS'), ('Close', 'SHRIRAMFIN.NS')]"
-    ],
-    [
-      "SHYAMMETL.NS",
-      "missing_cols:[('High', 'SHYAMMETL.NS'), ('Open', 'SHYAMMETL.NS'), ('Low', 'SHYAMMETL.NS'), ('Close', 'SHYAMMETL.NS'), ('Volume', 'SHYAMMETL.NS')]"
-    ],
-    [
-      "ENRIN.NS",
-      "missing_cols:[('Open', 'ENRIN.NS'), ('Low', 'ENRIN.NS'), ('Close', 'ENRIN.NS'), ('Volume', 'ENRIN.NS'), ('High', 'ENRIN.NS')]"
-    ],
-    [
-      "SIEMENS.NS",
-      "missing_cols:[('High', 'SIEMENS.NS'), ('Open', 'SIEMENS.NS'), ('Low', 'SIEMENS.NS'), ('Close', 'SIEMENS.NS'), ('Volume', 'SIEMENS.NS')]"
-    ],
-    [
-      "SIGNATURE.NS",
-      "missing_cols:[('Close', 'SIGNATURE.NS'), ('Volume', 'SIGNATURE.NS'), ('High', 'SIGNATURE.NS'), ('Open', 'SIGNATURE.NS'), ('Low', 'SIGNATURE.NS')]"
-    ],
-    [
-      "SOBHA.NS",
-      "missing_cols:[('Close', 'SOBHA.NS'), ('Volume', 'SOBHA.NS'), ('High', 'SOBHA.NS'), ('Open', 'SOBHA.NS'), ('Low', 'SOBHA.NS')]"
-    ],
-    [
-      "SOLARINDS.NS",
-      "missing_cols:[('Open', 'SOLARINDS.NS'), ('Low', 'SOLARINDS.NS'), ('Close', 'SOLARINDS.NS'), ('Volume', 'SOLARINDS.NS'), ('High', 'SOLARINDS.NS')]"
-    ],
-    [
-      "SONACOMS.NS",
-      "missing_cols:[('High', 'SONACOMS.NS'), ('Open', 'SONACOMS.NS'), ('Low', 'SONACOMS.NS'), ('Close', 'SONACOMS.NS'), ('Volume', 'SONACOMS.NS')]"
-    ],
-    [
-      "SONATSOFTW.NS",
-      "missing_cols:[('High', 'SONATSOFTW.NS'), ('Open', 'SONATSOFTW.NS'), ('Low', 'SONATSOFTW.NS'), ('Close', 'SONATSOFTW.NS'), ('Volume', 'SONATSOFTW.NS')]"
-    ],
-    [
-      "STARHEALTH.NS",
-      "missing_cols:[('High', 'STARHEALTH.NS'), ('Open', 'STARHEALTH.NS'), ('Low', 'STARHEALTH.NS'), ('Close', 'STARHEALTH.NS'), ('Volume', 'STARHEALTH.NS')]"
-    ],
-    [
-      "SBIN.NS",
-      "missing_cols:[('Open', 'SBIN.NS'), ('Close', 'SBIN.NS'), ('Volume', 'SBIN.NS'), ('High', 'SBIN.NS'), ('Low', 'SBIN.NS')]"
-    ],
-    [
-      "SAIL.NS",
-      "missing_cols:[('High', 'SAIL.NS'), ('Low', 'SAIL.NS'), ('Open', 'SAIL.NS'), ('Close', 'SAIL.NS'), ('Volume', 'SAIL.NS')]"
-    ],
-    [
-      "SUMICHEM.NS",
-      "missing_cols:[('High', 'SUMICHEM.NS'), ('Open', 'SUMICHEM.NS'), ('Low', 'SUMICHEM.NS'), ('Close', 'SUMICHEM.NS'), ('Volume', 'SUMICHEM.NS')]"
-    ],
-    [
-      "SUNPHARMA.NS",
-      "missing_cols:[('Open', 'SUNPHARMA.NS'), ('Low', 'SUNPHARMA.NS'), ('Close', 'SUNPHARMA.NS'), ('Volume', 'SUNPHARMA.NS'), ('High', 'SUNPHARMA.NS')]"
-    ],
-    [
-      "SUNTV.NS",
-      "missing_cols:[('Low', 'SUNTV.NS'), ('Close', 'SUNTV.NS'), ('Volume', 'SUNTV.NS'), ('High', 'SUNTV.NS'), ('Open', 'SUNTV.NS')]"
-    ],
-    [
-      "SUNDARMFIN.NS",
-      "missing_cols:[('High', 'SUNDARMFIN.NS'), ('Open', 'SUNDARMFIN.NS'), ('Low', 'SUNDARMFIN.NS'), ('Close', 'SUNDARMFIN.NS'), ('Volume', 'SUNDARMFIN.NS')]"
-    ],
-    [
-      "SUNDRMFAST.NS",
-      "missing_cols:[('Volume', 'SUNDRMFAST.NS'), ('High', 'SUNDRMFAST.NS'), ('Open', 'SUNDRMFAST.NS'), ('Low', 'SUNDRMFAST.NS'), ('Close', 'SUNDRMFAST.NS')]"
-    ],
-    [
-      "SUPREMEIND.NS",
-      "missing_cols:[('Volume', 'SUPREMEIND.NS'), ('High', 'SUPREMEIND.NS'), ('Open', 'SUPREMEIND.NS'), ('Low', 'SUPREMEIND.NS'), ('Close', 'SUPREMEIND.NS')]"
-    ],
-    [
-      "SUZLON.NS",
-      "missing_cols:[('Volume', 'SUZLON.NS'), ('High', 'SUZLON.NS'), ('Open', 'SUZLON.NS'), ('Low', 'SUZLON.NS'), ('Close', 'SUZLON.NS')]"
-    ],
-    [
-      "SWANCORP.NS",
-      "missing_cols:[('Open', 'SWANCORP.NS'), ('Low', 'SWANCORP.NS'), ('Close', 'SWANCORP.NS'), ('Volume', 'SWANCORP.NS'), ('High', 'SWANCORP.NS')]"
+      "not_enough_indicator_rows:36"
     ],
     [
       "SWIGGY.NS",
-      "missing_cols:[('Volume', 'SWIGGY.NS'), ('High', 'SWIGGY.NS'), ('Open', 'SWIGGY.NS'), ('Low', 'SWIGGY.NS'), ('Close', 'SWIGGY.NS')]"
+      "not_enough_indicator_rows:59"
     ],
     [
-      "SYNGENE.NS",
-      "missing_cols:[('Close', 'SYNGENE.NS'), ('Volume', 'SYNGENE.NS'), ('High', 'SYNGENE.NS'), ('Open', 'SYNGENE.NS'), ('Low', 'SYNGENE.NS')]"
+      "SAGILITY.NS",
+      "not_enough_indicator_rows:60"
     ],
     [
-      "SYRMA.NS",
-      "missing_cols:[('High', 'SYRMA.NS'), ('Open', 'SYRMA.NS'), ('Low', 'SYRMA.NS'), ('Close', 'SYRMA.NS'), ('Volume', 'SYRMA.NS')]"
-    ],
-    [
-      "TBOTEK.NS",
-      "missing_cols:[('High', 'TBOTEK.NS'), ('Open', 'TBOTEK.NS'), ('Low', 'TBOTEK.NS'), ('Close', 'TBOTEK.NS'), ('Volume', 'TBOTEK.NS')]"
-    ],
-    [
-      "TVSMOTOR.NS",
-      "missing_cols:[('Close', 'TVSMOTOR.NS'), ('Volume', 'TVSMOTOR.NS'), ('High', 'TVSMOTOR.NS'), ('Open', 'TVSMOTOR.NS'), ('Low', 'TVSMOTOR.NS')]"
-    ],
-    [
-      "TATACHEM.NS",
-      "missing_cols:[('Close', 'TATACHEM.NS'), ('Volume', 'TATACHEM.NS'), ('High', 'TATACHEM.NS'), ('Open', 'TATACHEM.NS'), ('Low', 'TATACHEM.NS')]"
-    ],
-    [
-      "TATACOMM.NS",
-      "missing_cols:[('High', 'TATACOMM.NS'), ('Open', 'TATACOMM.NS'), ('Low', 'TATACOMM.NS'), ('Close', 'TATACOMM.NS'), ('Volume', 'TATACOMM.NS')]"
-    ],
-    [
-      "TCS.NS",
-      "missing_cols:[('High', 'TCS.NS'), ('Low', 'TCS.NS'), ('Open', 'TCS.NS'), ('Close', 'TCS.NS'), ('Volume', 'TCS.NS')]"
-    ],
-    [
-      "TATACONSUM.NS",
-      "missing_cols:[('High', 'TATACONSUM.NS'), ('Open', 'TATACONSUM.NS'), ('Low', 'TATACONSUM.NS'), ('Close', 'TATACONSUM.NS'), ('Volume', 'TATACONSUM.NS')]"
-    ],
-    [
-      "TATAELXSI.NS",
-      "missing_cols:[('Volume', 'TATAELXSI.NS'), ('High', 'TATAELXSI.NS'), ('Open', 'TATAELXSI.NS'), ('Low', 'TATAELXSI.NS'), ('Close', 'TATAELXSI.NS')]"
-    ],
-    [
-      "TATAINVEST.NS",
-      "missing_cols:[('Open', 'TATAINVEST.NS'), ('Low', 'TATAINVEST.NS'), ('Close', 'TATAINVEST.NS'), ('Volume', 'TATAINVEST.NS'), ('High', 'TATAINVEST.NS')]"
-    ],
-    [
-      "TATAPOWER.NS",
-      "missing_cols:[('High', 'TATAPOWER.NS'), ('Open', 'TATAPOWER.NS'), ('Low', 'TATAPOWER.NS'), ('Close', 'TATAPOWER.NS'), ('Volume', 'TATAPOWER.NS')]"
-    ],
-    [
-      "TATASTEEL.NS",
-      "missing_cols:[('Open', 'TATASTEEL.NS'), ('Low', 'TATASTEEL.NS'), ('Close', 'TATASTEEL.NS'), ('Volume', 'TATASTEEL.NS'), ('High', 'TATASTEEL.NS')]"
-    ],
-    [
-      "TATATECH.NS",
-      "missing_cols:[('Close', 'TATATECH.NS'), ('Volume', 'TATATECH.NS'), ('High', 'TATATECH.NS'), ('Open', 'TATATECH.NS'), ('Low', 'TATATECH.NS')]"
-    ],
-    [
-      "TTML.NS",
-      "missing_cols:[('High', 'TTML.NS'), ('Open', 'TTML.NS'), ('Low', 'TTML.NS'), ('Close', 'TTML.NS'), ('Volume', 'TTML.NS')]"
-    ],
-    [
-      "TECHM.NS",
-      "missing_cols:[('Volume', 'TECHM.NS'), ('High', 'TECHM.NS'), ('Open', 'TECHM.NS'), ('Low', 'TECHM.NS'), ('Close', 'TECHM.NS')]"
-    ],
-    [
-      "TECHNOE.NS",
-      "missing_cols:[('Open', 'TECHNOE.NS'), ('Low', 'TECHNOE.NS'), ('Close', 'TECHNOE.NS'), ('Volume', 'TECHNOE.NS'), ('High', 'TECHNOE.NS')]"
-    ],
-    [
-      "TEJASNET.NS",
-      "missing_cols:[('Open', 'TEJASNET.NS'), ('Low', 'TEJASNET.NS'), ('Close', 'TEJASNET.NS'), ('Volume', 'TEJASNET.NS'), ('High', 'TEJASNET.NS')]"
-    ],
-    [
-      "NIACL.NS",
-      "missing_cols:[('High', 'NIACL.NS'), ('Open', 'NIACL.NS'), ('Low', 'NIACL.NS'), ('Close', 'NIACL.NS'), ('Volume', 'NIACL.NS')]"
-    ],
-    [
-      "RAMCOCEM.NS",
-      "missing_cols:[('Volume', 'RAMCOCEM.NS'), ('High', 'RAMCOCEM.NS'), ('Open', 'RAMCOCEM.NS'), ('Low', 'RAMCOCEM.NS'), ('Close', 'RAMCOCEM.NS')]"
-    ],
-    [
-      "THERMAX.NS",
-      "missing_cols:[('Volume', 'THERMAX.NS'), ('High', 'THERMAX.NS'), ('Open', 'THERMAX.NS'), ('Low', 'THERMAX.NS'), ('Close', 'THERMAX.NS')]"
-    ],
-    [
-      "TIMKEN.NS",
-      "missing_cols:[('Volume', 'TIMKEN.NS'), ('High', 'TIMKEN.NS'), ('Open', 'TIMKEN.NS'), ('Low', 'TIMKEN.NS'), ('Close', 'TIMKEN.NS')]"
-    ],
-    [
-      "TITAGARH.NS",
-      "missing_cols:[('Open', 'TITAGARH.NS'), ('Close', 'TITAGARH.NS'), ('Volume', 'TITAGARH.NS'), ('High', 'TITAGARH.NS'), ('Low', 'TITAGARH.NS')]"
-    ],
-    [
-      "TITAN.NS",
-      "missing_cols:[('Volume', 'TITAN.NS'), ('High', 'TITAN.NS'), ('Open', 'TITAN.NS'), ('Low', 'TITAN.NS'), ('Close', 'TITAN.NS')]"
-    ],
-    [
-      "TORNTPHARM.NS",
-      "missing_cols:[('Low', 'TORNTPHARM.NS'), ('Close', 'TORNTPHARM.NS'), ('Volume', 'TORNTPHARM.NS'), ('High', 'TORNTPHARM.NS'), ('Open', 'TORNTPHARM.NS')]"
-    ],
-    [
-      "TORNTPOWER.NS",
-      "missing_cols:[('Volume', 'TORNTPOWER.NS'), ('High', 'TORNTPOWER.NS'), ('Open', 'TORNTPOWER.NS'), ('Low', 'TORNTPOWER.NS'), ('Close', 'TORNTPOWER.NS')]"
-    ],
-    [
-      "TARIL.NS",
-      "missing_cols:[('Volume', 'TARIL.NS'), ('High', 'TARIL.NS'), ('Open', 'TARIL.NS'), ('Low', 'TARIL.NS'), ('Close', 'TARIL.NS')]"
-    ],
-    [
-      "TRENT.NS",
-      "missing_cols:[('Volume', 'TRENT.NS'), ('High', 'TRENT.NS'), ('Open', 'TRENT.NS'), ('Low', 'TRENT.NS'), ('Close', 'TRENT.NS')]"
-    ],
-    [
-      "TRIDENT.NS",
-      "missing_cols:[('High', 'TRIDENT.NS'), ('Open', 'TRIDENT.NS'), ('Low', 'TRIDENT.NS'), ('Close', 'TRIDENT.NS'), ('Volume', 'TRIDENT.NS')]"
-    ],
-    [
-      "TRIVENI.NS",
-      "missing_cols:[('High', 'TRIVENI.NS'), ('Low', 'TRIVENI.NS'), ('Open', 'TRIVENI.NS'), ('Close', 'TRIVENI.NS'), ('Volume', 'TRIVENI.NS')]"
-    ],
-    [
-      "TRITURBINE.NS",
-      "missing_cols:[('Close', 'TRITURBINE.NS'), ('Volume', 'TRITURBINE.NS'), ('High', 'TRITURBINE.NS'), ('Open', 'TRITURBINE.NS'), ('Low', 'TRITURBINE.NS')]"
-    ],
-    [
-      "TIINDIA.NS",
-      "missing_cols:[('Volume', 'TIINDIA.NS'), ('High', 'TIINDIA.NS'), ('Low', 'TIINDIA.NS'), ('Open', 'TIINDIA.NS'), ('Close', 'TIINDIA.NS')]"
-    ],
-    [
-      "UCOBANK.NS",
-      "missing_cols:[('High', 'UCOBANK.NS'), ('Open', 'UCOBANK.NS'), ('Low', 'UCOBANK.NS'), ('Close', 'UCOBANK.NS'), ('Volume', 'UCOBANK.NS')]"
-    ],
-    [
-      "UNOMINDA.NS",
-      "missing_cols:[('Volume', 'UNOMINDA.NS'), ('High', 'UNOMINDA.NS'), ('Open', 'UNOMINDA.NS'), ('Low', 'UNOMINDA.NS'), ('Close', 'UNOMINDA.NS')]"
-    ],
-    [
-      "UPL.NS",
-      "missing_cols:[('Open', 'UPL.NS'), ('Close', 'UPL.NS'), ('Volume', 'UPL.NS'), ('High', 'UPL.NS'), ('Low', 'UPL.NS')]"
-    ],
-    [
-      "UTIAMC.NS",
-      "missing_cols:[('High', 'UTIAMC.NS'), ('Open', 'UTIAMC.NS'), ('Low', 'UTIAMC.NS'), ('Close', 'UTIAMC.NS'), ('Volume', 'UTIAMC.NS')]"
-    ],
-    [
-      "ULTRACEMCO.NS",
-      "missing_cols:[('Open', 'ULTRACEMCO.NS'), ('Low', 'ULTRACEMCO.NS'), ('Close', 'ULTRACEMCO.NS'), ('Volume', 'ULTRACEMCO.NS'), ('High', 'ULTRACEMCO.NS')]"
-    ],
-    [
-      "UNIONBANK.NS",
-      "missing_cols:[('Volume', 'UNIONBANK.NS'), ('High', 'UNIONBANK.NS'), ('Open', 'UNIONBANK.NS'), ('Low', 'UNIONBANK.NS'), ('Close', 'UNIONBANK.NS')]"
-    ],
-    [
-      "UBL.NS",
-      "missing_cols:[('High', 'UBL.NS'), ('Open', 'UBL.NS'), ('Low', 'UBL.NS'), ('Close', 'UBL.NS'), ('Volume', 'UBL.NS')]"
-    ],
-    [
-      "UNITDSPR.NS",
-      "missing_cols:[('High', 'UNITDSPR.NS'), ('Open', 'UNITDSPR.NS'), ('Low', 'UNITDSPR.NS'), ('Close', 'UNITDSPR.NS'), ('Volume', 'UNITDSPR.NS')]"
-    ],
-    [
-      "USHAMART.NS",
-      "missing_cols:[('Open', 'USHAMART.NS'), ('Low', 'USHAMART.NS'), ('Close', 'USHAMART.NS'), ('Volume', 'USHAMART.NS'), ('High', 'USHAMART.NS')]"
-    ],
-    [
-      "VGUARD.NS",
-      "missing_cols:[('Volume', 'VGUARD.NS'), ('High', 'VGUARD.NS'), ('Open', 'VGUARD.NS'), ('Low', 'VGUARD.NS'), ('Close', 'VGUARD.NS')]"
-    ],
-    [
-      "DBREALTY.NS",
-      "missing_cols:[('High', 'DBREALTY.NS'), ('Open', 'DBREALTY.NS'), ('Low', 'DBREALTY.NS'), ('Close', 'DBREALTY.NS'), ('Volume', 'DBREALTY.NS')]"
-    ],
-    [
-      "VTL.NS",
-      "missing_cols:[('High', 'VTL.NS'), ('Open', 'VTL.NS'), ('Low', 'VTL.NS'), ('Close', 'VTL.NS'), ('Volume', 'VTL.NS')]"
-    ],
-    [
-      "VBL.NS",
-      "missing_cols:[('Volume', 'VBL.NS'), ('High', 'VBL.NS'), ('Open', 'VBL.NS'), ('Low', 'VBL.NS'), ('Close', 'VBL.NS')]"
-    ],
-    [
-      "MANYAVAR.NS",
-      "missing_cols:[('Open', 'MANYAVAR.NS'), ('Low', 'MANYAVAR.NS'), ('Close', 'MANYAVAR.NS'), ('Volume', 'MANYAVAR.NS'), ('High', 'MANYAVAR.NS')]"
-    ],
-    [
-      "VEDL.NS",
-      "missing_cols:[('High', 'VEDL.NS'), ('Open', 'VEDL.NS'), ('Low', 'VEDL.NS'), ('Close', 'VEDL.NS'), ('Volume', 'VEDL.NS')]"
+      "ENRIN.NS",
+      "too_few_rows:109"
     ],
     [
       "VENTIVE.NS",
-      "missing_cols:[('Close', 'VENTIVE.NS'), ('Volume', 'VENTIVE.NS'), ('High', 'VENTIVE.NS'), ('Open', 'VENTIVE.NS'), ('Low', 'VENTIVE.NS')]"
-    ],
-    [
-      "VIJAYA.NS",
-      "missing_cols:[('Open', 'VIJAYA.NS'), ('Low', 'VIJAYA.NS'), ('Close', 'VIJAYA.NS'), ('Volume', 'VIJAYA.NS'), ('High', 'VIJAYA.NS')]"
-    ],
-    [
-      "VMM.NS",
-      "missing_cols:[('Open', 'VMM.NS'), ('Low', 'VMM.NS'), ('Close', 'VMM.NS'), ('Volume', 'VMM.NS'), ('High', 'VMM.NS')]"
-    ],
-    [
-      "IDEA.NS",
-      "missing_cols:[('Close', 'IDEA.NS'), ('Volume', 'IDEA.NS'), ('High', 'IDEA.NS'), ('Open', 'IDEA.NS'), ('Low', 'IDEA.NS')]"
-    ],
-    [
-      "VOLTAS.NS",
-      "missing_cols:[('Close', 'VOLTAS.NS'), ('Volume', 'VOLTAS.NS'), ('High', 'VOLTAS.NS'), ('Open', 'VOLTAS.NS'), ('Low', 'VOLTAS.NS')]"
+      "not_enough_indicator_rows:28"
     ],
     [
       "WAAREEENER.NS",
-      "missing_cols:[('High', 'WAAREEENER.NS'), ('Open', 'WAAREEENER.NS'), ('Low', 'WAAREEENER.NS'), ('Close', 'WAAREEENER.NS'), ('Volume', 'WAAREEENER.NS')]"
+      "not_enough_indicator_rows:71"
     ],
     [
-      "WELCORP.NS",
-      "missing_cols:[('High', 'WELCORP.NS'), ('Open', 'WELCORP.NS'), ('Low', 'WELCORP.NS'), ('Close', 'WELCORP.NS'), ('Volume', 'WELCORP.NS')]"
-    ],
-    [
-      "WELSPUNLIV.NS",
-      "missing_cols:[('High', 'WELSPUNLIV.NS'), ('Open', 'WELSPUNLIV.NS'), ('Low', 'WELSPUNLIV.NS'), ('Close', 'WELSPUNLIV.NS'), ('Volume', 'WELSPUNLIV.NS')]"
-    ],
-    [
-      "WHIRLPOOL.NS",
-      "missing_cols:[('Open', 'WHIRLPOOL.NS'), ('Low', 'WHIRLPOOL.NS'), ('Close', 'WHIRLPOOL.NS'), ('Volume', 'WHIRLPOOL.NS'), ('High', 'WHIRLPOOL.NS')]"
-    ],
-    [
-      "WIPRO.NS",
-      "missing_cols:[('High', 'WIPRO.NS'), ('Open', 'WIPRO.NS'), ('Low', 'WIPRO.NS'), ('Close', 'WIPRO.NS'), ('Volume', 'WIPRO.NS')]"
-    ],
-    [
-      "WOCKPHARMA.NS",
-      "missing_cols:[('High', 'WOCKPHARMA.NS'), ('Low', 'WOCKPHARMA.NS'), ('Open', 'WOCKPHARMA.NS'), ('Close', 'WOCKPHARMA.NS'), ('Volume', 'WOCKPHARMA.NS')]"
-    ],
-    [
-      "YESBANK.NS",
-      "missing_cols:[('Volume', 'YESBANK.NS'), ('High', 'YESBANK.NS'), ('Open', 'YESBANK.NS'), ('Low', 'YESBANK.NS'), ('Close', 'YESBANK.NS')]"
-    ],
-    [
-      "ZFCVINDIA.NS",
-      "missing_cols:[('Low', 'ZFCVINDIA.NS'), ('Open', 'ZFCVINDIA.NS'), ('Close', 'ZFCVINDIA.NS'), ('Volume', 'ZFCVINDIA.NS'), ('High', 'ZFCVINDIA.NS')]"
-    ],
-    [
-      "ZEEL.NS",
-      "missing_cols:[('High', 'ZEEL.NS'), ('Open', 'ZEEL.NS'), ('Low', 'ZEEL.NS'), ('Close', 'ZEEL.NS'), ('Volume', 'ZEEL.NS')]"
-    ],
-    [
-      "ZENTEC.NS",
-      "missing_cols:[('High', 'ZENTEC.NS'), ('Open', 'ZENTEC.NS'), ('Low', 'ZENTEC.NS'), ('Close', 'ZENTEC.NS'), ('Volume', 'ZENTEC.NS')]"
-    ],
-    [
-      "ZENSARTECH.NS",
-      "missing_cols:[('High', 'ZENSARTECH.NS'), ('Open', 'ZENSARTECH.NS'), ('Low', 'ZENSARTECH.NS'), ('Close', 'ZENSARTECH.NS'), ('Volume', 'ZENSARTECH.NS')]"
-    ],
-    [
-      "ZYDUSLIFE.NS",
-      "missing_cols:[('Volume', 'ZYDUSLIFE.NS'), ('High', 'ZYDUSLIFE.NS'), ('Open', 'ZYDUSLIFE.NS'), ('Low', 'ZYDUSLIFE.NS'), ('Close', 'ZYDUSLIFE.NS')]"
-    ],
-    [
-      "ECLERX.NS",
-      "missing_cols:[('Close', 'ECLERX.NS'), ('Volume', 'ECLERX.NS'), ('High', 'ECLERX.NS'), ('Open', 'ECLERX.NS'), ('Low', 'ECLERX.NS')]"
+      "VMM.NS",
+      "not_enough_indicator_rows:36"
     ]
   ],
+  "avg_win": 0,
+  "avg_loss": 0,
+  "avg_rr": 0,
+  "max_drawdown": 0,
+  "sharpe_ratio": 0,
   "last_run": "2025-11-26"
 }
