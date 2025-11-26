@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """
 backtest_runner.py
-- Runs ONCE (on demand).
-- Downloads 2 years of data for NIFTY500 (per-ticker robust download).
-- Backtest: Smart-Strict (Option B) rules with A3 TSL.
-- Output: Saves 'backtest_stats.json' with enhanced metrics.
+- Robust 2-year backtest for NIFTY500 (per-ticker downloads, defensive).
+- Smart-Strict A3 strategy with hybrid TSL (BE -> EMA20 -> swing low).
+- Produces backtest_stats.json with enhanced metrics and skipped-tickers diagnostics.
 """
 
 import os
 import json
 import logging
+import time
 from datetime import datetime
 import math
-import time
 
 import yfinance as yf
 import pandas as pd
@@ -38,7 +37,8 @@ TSL_BE_R = 1.0
 TSL_EMA20_R = 2.0
 TSL_SWING_R = 3.0
 
-MIN_HISTORY_ROWS = 250  # minimum rows for instrument to be considered
+# History thresholds
+MIN_HISTORY_ROWS = 200  # 2-year ~504 trading days; 200 is safe lower bound
 
 CACHE_FILE = "backtest_stats.json"
 
@@ -101,12 +101,29 @@ def compute_obv(df):
             obv.append(obv[-1])
     return pd.Series(obv, index=df.index)
 
-def prepare_df(df):
+# -------------------------
+# PREPARE DF (less aggressive dropna; diagnostic flag)
+# -------------------------
+def prepare_df(df, require_full=False):
     """
-    Expects df with Open/High/Low/Close/Volume (index = DatetimeIndex).
-    Returns df with indicators and drops NaNs.
+    Build indicators but avoid dropping too many rows.
+    If require_full=True, drop rows that don't have all indicators.
+    Otherwise keep rows but mark where key indicators are available with _has_all_inds.
     """
     df = df.copy()
+
+    # Normalize column names (case-insensitive)
+    for col in ["Open", "High", "Low", "Close", "Volume"]:
+        if col not in df.columns:
+            for c in df.columns:
+                if c.lower() == col.lower():
+                    df[col] = df[c]
+                    break
+
+    # If still missing required columns, return empty
+    if not set(["Open", "High", "Low", "Close", "Volume"]).issubset(df.columns):
+        return pd.DataFrame()
+
     # Price structure
     df["SMA50"] = df["Close"].rolling(50).mean()
     df["SMA200"] = df["Close"].rolling(200).mean()
@@ -125,12 +142,19 @@ def prepare_df(df):
     df["OBV"] = compute_obv(df)
     df["OBV_SMA"] = df["OBV"].rolling(20).mean()
 
-    # Drop rows with NaNs produced by long rolling windows
-    df.dropna(inplace=True)
-    return df
+    # Mark rows where all key indicators exist (SMA200 etc.)
+    key_inds = ["SMA50","SMA200","EMA20","ATR","RSI","ADX","VOL_SMA20","OBV","OBV_SMA"]
+    df["_has_all_inds"] = df[key_inds].notna().all(axis=1)
+
+    if require_full:
+        df = df[df["_has_all_inds"]].copy()
+        df.drop(columns=["_has_all_inds"], inplace=True)
+        return df
+    else:
+        return df
 
 # -------------------------
-# WEEKLY
+# WEEKLY aggregation
 # -------------------------
 def make_weekly(df):
     weekly = df.resample("W").agg({
@@ -168,8 +192,8 @@ class BacktestEngine:
         if per_share_risk <= 0:
             return 0
         qty = int(risk_amt / per_share_risk)
-        # limit position percent
-        max_shares = int((equity * 0.25) / entry)  # 25% max position
+        # limit position percent (25%)
+        max_shares = int((equity * 0.25) / entry) if entry > 0 else 0
         if qty * entry > equity * 0.25:
             qty = max_shares
         return max(qty, 0)
@@ -180,17 +204,18 @@ class BacktestEngine:
         Returns True if exited, else False.
         """
         exit_price = None
-        # stop loss conditions (gap or intraday)
-        if row["Low"] <= trade["sl"]:
-            exit_price = trade["sl"]
+
+        # stop loss (gap or intraday)
         if row["Open"] < trade["sl"]:
             exit_price = row["Open"]
+        elif row["Low"] <= trade["sl"]:
+            exit_price = trade["sl"]
 
-        # target conditions
-        if row["High"] >= trade["target"]:
-            exit_price = trade["target"]
+        # target
         if row["Open"] > trade["target"]:
             exit_price = row["Open"]
+        elif row["High"] >= trade["target"]:
+            exit_price = trade["target"]
 
         if exit_price is None:
             return False
@@ -201,7 +226,6 @@ class BacktestEngine:
         entry_cost = trade["entry"] * qty * BROKERAGE_PCT
         pnl = revenue - cost - (trade["entry"] * qty + entry_cost)
 
-        # record trade
         self.history.append({
             "symbol": trade["symbol"],
             "entry": round(trade["entry"], 2),
@@ -215,37 +239,32 @@ class BacktestEngine:
             "pnl": round(pnl, 2)
         })
 
-        # cash update
         self.cash += (revenue - cost)
         return True
 
     def apply_tsl(self, trade, row, df, idx):
         """
-        Hybrid A3 TSL
-        trade: dict with keys entry, sl, target, qty, symbol
-        row: today's row (Series)
-        df: full dataframe of symbol
-        idx: integer location of today's index in df
+        Hybrid A3 TSL: Move SL to BE at +1R, to EMA20 at +2R, to swing-low at +3R.
         """
         atr_v = row["ATR"]
         entry = trade["entry"]
-        # +1R -> move to BE
+
+        # +1R -> break-even
         if row["High"] >= entry + (TSL_BE_R * atr_v):
             trade["sl"] = max(trade["sl"], entry)
 
-        # +2R -> move to EMA20 (today's EMA20)
+        # +2R -> EMA20
         if row["High"] >= entry + (TSL_EMA20_R * atr_v):
-            if "EMA20" in row:
+            if "EMA20" in row and not pd.isna(row["EMA20"]):
                 trade["sl"] = max(trade["sl"], row["EMA20"])
 
-        # +3R -> move to swing low of previous 5 candles
+        # +3R -> swing low of previous 5 candles
         if row["High"] >= entry + (TSL_SWING_R * atr_v):
             if idx >= 5:
                 swing_low = df["Low"].iloc[idx-5:idx].min()
                 trade["sl"] = max(trade["sl"], swing_low)
 
     def calc_recent_high(self, df, date, lookback=BREAKOUT_LOOKBACK):
-        # highest high over lookback excluding current day (shifted)
         recent = df["High"].rolling(lookback).max().shift(1)
         try:
             return recent.loc[date]
@@ -272,10 +291,10 @@ class BacktestEngine:
             if df is None or len(df) < MIN_HISTORY_ROWS:
                 continue
 
-            # prepare indicators (if not already prepared)
+            # If indicators not already present, compute them
             if "ATR" not in df.columns or "EMA20" not in df.columns:
                 try:
-                    df = prepare_df(df)
+                    df = prepare_df(df, require_full=False)
                 except Exception:
                     continue
 
@@ -316,7 +335,7 @@ class BacktestEngine:
                     continue
                 row = df.loc[date]
                 idx = df.index.get_loc(date)
-                # apply tsl before checking exits
+                # apply tsl
                 self.apply_tsl(trade, row, df, idx)
                 exited = self.process_exit(trade, row, date)
                 if not exited:
@@ -350,7 +369,7 @@ class BacktestEngine:
                     if row["RSI"] < RSI_MIN or row["ADX"] < ADX_MIN:
                         continue
 
-                    # volume filter (relaxed from strict)
+                    # volume filter (relaxed)
                     if pd.isna(row.get("VOL_SMA20", None)) or row["Volume"] < VOLUME_SPIKE * row["VOL_SMA20"]:
                         continue
 
@@ -457,7 +476,7 @@ class BacktestEngine:
         }
 
 # -------------------------
-# Robust download + prepare
+# Robust download + prepare (diagnostic)
 # -------------------------
 def download_and_prepare_tickers(tickers, min_rows=MIN_HISTORY_ROWS, period=DATA_PERIOD):
     """
@@ -465,13 +484,14 @@ def download_and_prepare_tickers(tickers, min_rows=MIN_HISTORY_ROWS, period=DATA
     and returns:
       - bulk: a concatenated MultiIndex DataFrame (ticker -> Open/High/...)
       - prepared_map: dict[ticker] = prepared df (cleaned)
-      - skipped: list of tickers skipped (delisted or insufficient data)
+      - skipped: list of (ticker, reason) tuples
     """
     prepared_map = {}
     skipped = []
-    logger.info(f"Downloading {len(tickers)} tickers individually (robust mode)...")
+    logger.info(f"Downloading {len(tickers)} tickers individually (diagnostic mode)...")
 
     for t in tickers:
+        reason = None
         try:
             raw = yf.download(
                 t,
@@ -483,34 +503,52 @@ def download_and_prepare_tickers(tickers, min_rows=MIN_HISTORY_ROWS, period=DATA
                 auto_adjust=True
             )
             if raw is None or raw.empty:
-                logger.warning(f"Skipping {t} — no data (may be delisted).")
-                skipped.append(t)
+                reason = "no_data"
+                logger.warning(f"{t}: no data (possibly delisted).")
+                skipped.append((t, reason))
                 continue
 
-            # Ensure columns exist
+            # Quick normalize: ensure required columns exist
             req_cols = {"Open", "High", "Low", "Close", "Volume"}
-            if not req_cols.issubset(set(raw.columns)):
-                logger.warning(f"Skipping {t} — missing required columns. Found: {list(raw.columns)}")
-                skipped.append(t)
+            available = set(raw.columns)
+            if not req_cols.issubset(available):
+                reason = f"missing_cols:{list(available)}"
+                logger.warning(f"{t}: skipping — missing required cols. Found: {list(available)}")
+                skipped.append((t, reason))
                 continue
 
-            if len(raw) < min_rows:
-                logger.info(f"Skipping {t} — insufficient history ({len(raw)} rows).")
-                skipped.append(t)
+            raw_rows = len(raw)
+            if raw_rows < min_rows:
+                reason = f"too_few_rows:{raw_rows}"
+                logger.info(f"{t}: skipping — insufficient raw history ({raw_rows} rows < {min_rows}).")
+                skipped.append((t, reason))
                 continue
 
             df = raw[["Open", "High", "Low", "Close", "Volume"]].copy()
-            df = prepare_df(df)
-            if df is None or df.empty or len(df) < min_rows:
-                logger.info(f"Skipping {t} after prepare_df — insufficient rows.")
-                skipped.append(t)
+            pdf = prepare_df(df, require_full=False)
+            if pdf is None or pdf.empty:
+                reason = "prepare_empty"
+                logger.info(f"{t}: prepare_df returned empty.")
+                skipped.append((t, reason))
                 continue
 
-            prepared_map[t] = df
-            logger.info(f"Prepared {t}: {len(df)} rows.")
+            full_rows = int(pdf["_has_all_inds"].sum())
+            if full_rows < min_rows:
+                if full_rows < 120:
+                    reason = f"not_enough_indicator_rows:{full_rows}"
+                    logger.info(f"{t}: insufficient indicator rows ({full_rows}) — skipping.")
+                    skipped.append((t, reason))
+                    continue
+                else:
+                    logger.info(f"{t}: OK — {raw_rows} raw rows, {full_rows} rows with full indicators (kept).")
+
+            prepared_map[t] = pdf
+            logger.info(f"Prepared {t}: raw_rows={raw_rows}, indicator_full_rows={full_rows}")
+
         except Exception as e:
-            logger.warning(f"Failed to fetch/prepare {t}: {repr(e)}")
-            skipped.append(t)
+            reason = f"exception:{repr(e)}"
+            logger.warning(f"{t}: failed to fetch/prepare — {e}")
+            skipped.append((t, reason))
             continue
 
     if not prepared_map:
@@ -542,7 +580,7 @@ def extract_df(bulk, ticker):
         return None
 
 # -------------------------
-# Main runner
+# MAIN runner
 # -------------------------
 def run_backtest_main():
     # Load NIFTY500 list if available
@@ -571,18 +609,27 @@ def run_backtest_main():
     bulk, prepared_map, skipped = download_and_prepare_tickers(tickers, min_rows=MIN_HISTORY_ROWS, period=DATA_PERIOD)
     if bulk is None:
         logger.error("No data prepared. Exiting.")
+        # write skipped diagnostics for inspection
+        out = {
+            "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+            "prepared": 0,
+            "skipped": skipped,
+            "last_run": datetime.utcnow().strftime("%Y-%m-%d")
+        }
+        with open(CACHE_FILE, "w") as f:
+            json.dump(out, f, indent=2)
         return
 
-    # Instantiate engine (BacktestEngine class must be defined above)
+    # Instantiate engine
     try:
         engine = BacktestEngine(bulk, list(prepared_map.keys()))
-    except NameError as e:
+    except NameError:
         logger.error("BacktestEngine not defined or not in scope.")
         raise
 
     report = engine.run()
 
-    # Compose output JSON (enhanced)
+    # Compose output JSON
     out = {
         "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
         "portfolio": {
@@ -614,7 +661,7 @@ def run_backtest_main():
     logger.info(f"Trades: {out['portfolio']['total_trades']}")
     logger.info(f"Win Rate: {out['portfolio']['win_rate']}%")
     logger.info(f"Profit: {out['portfolio']['profit']}")
-    logger.info("Saved backtest_stats.json")
+    logger.info(f"Saved {CACHE_FILE}")
     logger.info("=========================================================")
 
     return out
