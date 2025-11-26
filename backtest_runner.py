@@ -17,7 +17,7 @@ from time import sleep
 # --- CONFIG ---
 DATA_PERIOD = "2y"                  # 2 years of history
 CACHE_FILE = "backtest_stats.json"
-CAPITAL = 500_000.0
+CAPITAL = 100_000.0
 RISK_PER_TRADE = 0.02
 BROKERAGE_PCT = 0.001
 MAX_POSITION_PERC = 0.25           # max capital per position (percent of total capital)
@@ -310,7 +310,7 @@ def run_portfolio_sim(bulk_data, tickers):
                         fees = cost * BROKERAGE_PCT
                         cash -= (cost + fees)
                         portfolio.append({
-                            "symbol": sym, "entry": row['Close'], "qty': qty,
+                            "symbol": sym, "entry": row['Close'], "qty": qty,
                             "sl": row['Close'] - risk, "tgt": row['Close'] + (3*risk),
                             "entry_cost": fees
                         })
