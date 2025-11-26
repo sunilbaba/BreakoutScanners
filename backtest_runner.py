@@ -3,8 +3,8 @@
 backtest_runner.py
 Robust 2-year backtest for NIFTY500:
 - Batched downloads with per-ticker fallback.
-- Defensive prepare_df (doesn't drop entire DF).
-- Diagnostic skipped-tickers report.
+- Defensive indicator prep.
+- Entry diagnostics (why signals were rejected).
 - Produces backtest_stats.json
 """
 
@@ -28,7 +28,7 @@ RISK_PER_TRADE = 0.02
 BROKERAGE_PCT = 0.001
 
 # Strategy / thresholds (tuneable)
-MIN_HISTORY_ROWS = 200           # safe lower bound for 2y ≈ 480 days
+MIN_HISTORY_ROWS = 200           # safe lower bound for 2y ≈ 480 trading days
 MIN_INDICATOR_ROWS = 120         # minimum rows with computed indicators to accept a ticker
 BATCH_SIZE = 40
 BATCH_RETRIES = 2
@@ -409,8 +409,15 @@ class BacktestEngine:
                     new_port.append(trade)
             self.portfolio = new_port
 
-            # entries
+            # entries (INSTRUMENTED & slightly relaxed)
             if len(self.portfolio) < 5:
+                # filter counters for diagnostics
+                filter_counts = {
+                    "no_weekly": 0, "weekly_down": 0, "daily_basic": 0,
+                    "rsi": 0, "adx": 0, "vol": 0, "obv": 0, "recent_high": 0,
+                    "rr": 0, "qty": 0, "accepted": 0
+                }
+
                 for sym, df in processed.items():
                     if date not in df.index: continue
                     if len(self.portfolio) >= 5: break
@@ -418,38 +425,87 @@ class BacktestEngine:
 
                     # weekly quick checks
                     wdf = weekly_map.get(sym)
-                    if wdf is None or len(wdf) < 8: continue
-                    last_week = wdf.iloc[-1]
-                    if last_week['Close'] < last_week['EMA20'] or last_week['EMA20_SLOPE'] <= 0: continue
-
-                    # daily checks
-                    if not (row['Close'] > row['EMA20'] and row['EMA20_SLOPE'] > 0 and row['Close'] > row['SMA200']):
+                    if wdf is None or len(wdf) < 6:
+                        filter_counts["no_weekly"] += 1
                         continue
-                    if row['RSI'] < RSI_MIN or row['ADX'] < ADX_MIN: continue
-                    if pd.isna(row.get('VOL_SMA20', None)) or row['Volume'] < VOLUME_SPIKE * row['VOL_SMA20']: continue
 
+                    last_week = wdf.iloc[-1]
+                    # RELAX weekly EMA slope requirement: allow a small negative slope tolerance
+                    if last_week['Close'] < last_week['EMA20']:
+                        filter_counts["weekly_down"] += 1
+                        continue
+                    if last_week.get('EMA20_SLOPE', 0) <= -0.2:
+                        # only reject if slope strongly negative
+                        filter_counts["weekly_down"] += 1
+                        continue
+
+                    # daily basic checks (EMA/200)
+                    if not (row['Close'] > row['EMA20'] and row.get('EMA20_SLOPE', 0) > -0.5 and row['Close'] > row['SMA200']):
+                        filter_counts["daily_basic"] += 1
+                        continue
+
+                    # RSI / ADX / Volume checks
+                    if row['RSI'] < RSI_MIN:
+                        filter_counts["rsi"] += 1
+                        continue
+                    if row['ADX'] < ADX_MIN:
+                        filter_counts["adx"] += 1
+                        continue
+                    if pd.isna(row.get('VOL_SMA20', None)) or row['Volume'] < 0.9 * row['VOL_SMA20']:
+                        # allow slight dip in volume (0.9 tolerance) for debugging
+                        filter_counts["vol"] += 1
+                        continue
+
+                    # OBV confirmation (allow more leniency)
+                    if pd.isna(row.get('OBV', None)) or pd.isna(row.get('OBV_SMA', None)):
+                        filter_counts["obv"] += 1
+                        continue
+                    if row['OBV'] < row['OBV_SMA'] * 0.9:
+                        filter_counts["obv"] += 1
+                        continue
+
+                    # recent high breakout: RELAX threshold from 0.995 -> 0.99 (1% below)
                     recent_high = self.calc_recent_high(df, date)
-                    if recent_high is None: continue
-                    if not (row['Close'] >= recent_high * 0.995): continue
+                    if recent_high is None:
+                        filter_counts["recent_high"] += 1
+                        continue
+                    if not (row['Close'] >= recent_high * 0.99):
+                        filter_counts["recent_high"] += 1
+                        continue
 
-                    if pd.isna(row.get('OBV', None)) or pd.isna(row.get('OBV_SMA', None)): continue
-                    if row['OBV'] < row['OBV_SMA'] * 0.95: continue
-
+                    # risk/reward
                     sl = row['Close'] - row['ATR']
                     target = row['Close'] + 2.5 * row['ATR']
-                    if sl >= row['Close']: continue
-                    rr = (target - row['Close']) / (row['Close'] - sl) if (row['Close'] - sl)!=0 else 0
-                    if rr < RR_MIN: continue
+                    if sl >= row['Close']:
+                        filter_counts["rr"] += 1
+                        continue
+                    rr = (target - row['Close']) / (row['Close'] - sl) if (row['Close'] - sl) != 0 else 0
+                    if rr < RR_MIN:
+                        filter_counts["rr"] += 1
+                        continue
 
                     qty = self.calc_qty(row['Close'], sl, self.equity_curve[-1])
-                    if qty <= 0 or qty * row['Close'] > self.equity_curve[-1]: continue
+                    if qty <= 0 or qty * row['Close'] > self.equity_curve[-1]:
+                        filter_counts["qty"] += 1
+                        continue
 
+                    # Accept the trade
                     entry_cost = row['Close'] * qty * BROKERAGE_PCT
                     self.cash -= (row['Close'] * qty + entry_cost)
                     self.portfolio.append({
                         "symbol": sym, "entry": row['Close'], "sl": sl, "target": target,
                         "qty": qty, "entry_date": date
                     })
+                    filter_counts["accepted"] += 1
+
+                # LOG diagnostics for this date (only if we saw candidates)
+                total_checked = sum(v for k,v in filter_counts.items() if k != "accepted")
+                if total_checked > 0:
+                    logger.debug(f"Entry diagnostics {date.strftime('%Y-%m-%d')}: accepted={filter_counts['accepted']} | filters={ {k:v for k,v in filter_counts.items() if k!='accepted'} }")
+                    # also aggregate to top-level counters (optional)
+                    if not hasattr(self, "_entry_diag"):
+                        self._entry_diag = Counter()
+                    self._entry_diag.update(filter_counts)
 
             # mark-to-market equity
             m2m = self.cash
@@ -547,6 +603,10 @@ def run_backtest_main():
     # run engine
     engine = BacktestEngine(bulk, list(prepared_map.keys()))
     report = engine.run()
+
+    # print cumulative diagnostics if available
+    if hasattr(engine, "_entry_diag"):
+        logger.info(f"Cumulative entry filter breakdown: {engine._entry_diag}")
 
     out = {
         "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
