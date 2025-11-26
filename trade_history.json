@@ -1,5 +1,21 @@
 [
   {
+    "id": "SUNPHARMA-2025-11-26",
+    "date": "2025-11-26",
+    "symbol": "SUNPHARMA",
+    "entry": 1801.6,
+    "qty": 13,
+    "target": 1875.47,
+    "stop_loss": 1776.98,
+    "status": "LOSS",
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "note": "SL Gap Down",
+    "exit_price": 1775.5,
+    "exit_date": "2025-11-26",
+    "net_pnl": -468.61
+  },
+  {
     "id": "TATASTEEL-2025-11-26",
     "date": "2025-11-26",
     "symbol": "TATASTEEL",
@@ -8,8 +24,8 @@
     "target": 180.28,
     "stop_loss": 166.13,
     "status": "OPEN",
-    "pnl": -0.0,
-    "pnl_pct": -0.0,
+    "pnl": -16.17,
+    "pnl_pct": -0.06,
     "note": ""
   },
   {
@@ -21,8 +37,8 @@
     "target": 1025.38,
     "stop_loss": 974.14,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": -98.75,
+    "pnl_pct": -0.4,
     "note": ""
   },
   {
@@ -34,8 +50,8 @@
     "target": 441.38,
     "stop_loss": 407.27,
     "status": "OPEN",
-    "pnl": -0.0,
-    "pnl_pct": -0.0,
+    "pnl": -69.0,
+    "pnl_pct": -0.28,
     "note": ""
   },
   {
@@ -47,8 +63,8 @@
     "target": 1638.22,
     "stop_loss": 1523.79,
     "status": "OPEN",
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "pnl": 4.8,
+    "pnl_pct": 0.02,
     "note": ""
   },
   {
@@ -92,8 +108,8 @@
     "target": 2517.96,
     "stop_loss": 2392.68,
     "status": "OPEN",
-    "pnl": 18.0,
-    "pnl_pct": 0.07,
+    "pnl": 20.0,
+    "pnl_pct": 0.08,
     "note": ""
   },
   {
