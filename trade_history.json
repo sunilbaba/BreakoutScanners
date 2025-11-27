@@ -1,5 +1,27 @@
 [
   {
+    "id": "GESHIP-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "GESHIP",
+    "entry": 1089.0,
+    "qty": 22,
+    "target": 1185.98,
+    "stop_loss": 1056.67,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "CHOLAFIN-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "CHOLAFIN",
+    "entry": 1719.0,
+    "qty": 14,
+    "target": 1841.02,
+    "stop_loss": 1678.33,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "GODIGIT-2025-11-27",
     "date": "2025-11-27",
     "symbol": "GODIGIT",
@@ -317,8 +339,10 @@
     "qty": 1,
     "target": 16901.08,
     "stop_loss": 15907.64,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -280.67,
+    "exit_price": 15907.64,
+    "exit_date": "2025-11-27"
   },
   {
     "id": "YESBANK-2025-11-26",
