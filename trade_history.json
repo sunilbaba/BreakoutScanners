@@ -1,5 +1,27 @@
 [
   {
+    "id": "HINDPETRO-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "HINDPETRO",
+    "entry": 459.6,
+    "qty": 54,
+    "target": 491.39,
+    "stop_loss": 449.0,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "HDFCBANK-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "HDFCBANK",
+    "entry": 1009.75,
+    "qty": 24,
+    "target": 1053.71,
+    "stop_loss": 995.1,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "GESHIP-2025-11-27",
     "date": "2025-11-27",
     "symbol": "GESHIP",
