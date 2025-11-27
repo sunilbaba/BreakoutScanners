@@ -1,5 +1,27 @@
 [
   {
+    "id": "ICICIGI-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "ICICIGI",
+    "entry": 1980.4,
+    "qty": 12,
+    "target": 2101.49,
+    "stop_loss": 1940.04,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "AGARWALEYE-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "AGARWALEYE",
+    "entry": 520.15,
+    "qty": 48,
+    "target": 576.26,
+    "stop_loss": 501.45,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "INOXINDIA-2025-11-27",
     "date": "2025-11-27",
     "symbol": "INOXINDIA",
