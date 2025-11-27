@@ -1,5 +1,27 @@
 [
   {
+    "id": "GODIGIT-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "GODIGIT",
+    "entry": 355.7,
+    "qty": 70,
+    "target": 381.33,
+    "stop_loss": 347.16,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "FORCEMOT-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "FORCEMOT",
+    "entry": 17302.0,
+    "qty": 1,
+    "target": 19045.36,
+    "stop_loss": 16720.88,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "HEG-2025-11-27",
     "date": "2025-11-27",
     "symbol": "HEG",
