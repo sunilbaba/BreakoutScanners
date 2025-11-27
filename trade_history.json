@@ -1,5 +1,38 @@
 [
   {
+    "id": "EICHERMOT-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "EICHERMOT",
+    "entry": 7067.0,
+    "qty": 3,
+    "target": 7471.13,
+    "stop_loss": 6932.29,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "DIVISLAB-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "DIVISLAB",
+    "entry": 6481.0,
+    "qty": 3,
+    "target": 6824.58,
+    "stop_loss": 6366.47,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "ENGINERSIN-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "ENGINERSIN",
+    "entry": 200.89,
+    "qty": 124,
+    "target": 216.68,
+    "stop_loss": 195.63,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "DCMSHRIRAM-2025-11-27",
     "date": "2025-11-27",
     "symbol": "DCMSHRIRAM",
