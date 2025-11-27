@@ -1,5 +1,38 @@
 [
   {
+    "id": "MAHABANK-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "MAHABANK",
+    "entry": 59.65,
+    "qty": 419,
+    "target": 64.49,
+    "stop_loss": 58.04,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "BAJAJ-AUTO-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "BAJAJ-AUTO",
+    "entry": 9201.0,
+    "qty": 2,
+    "target": 9604.21,
+    "stop_loss": 9066.6,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "AKZOINDIA-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "AKZOINDIA",
+    "entry": 3373.2,
+    "qty": 7,
+    "target": 3586.08,
+    "stop_loss": 3302.24,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "GLENMARK-2025-11-26",
     "date": "2025-11-26",
     "symbol": "GLENMARK",
@@ -51,8 +84,10 @@
     "qty": 7,
     "target": 3617.82,
     "stop_loss": 3352.46,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -512.24,
+    "exit_price": 3352.46,
+    "exit_date": "2025-11-27"
   },
   {
     "id": "ACC-2025-11-26",
