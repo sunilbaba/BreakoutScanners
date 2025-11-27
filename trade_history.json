@@ -1,5 +1,38 @@
 [
   {
+    "id": "GICRE-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "GICRE",
+    "entry": 386.7,
+    "qty": 64,
+    "target": 411.08,
+    "stop_loss": 378.57,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "ELGIEQUIP-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "ELGIEQUIP",
+    "entry": 503.8,
+    "qty": 49,
+    "target": 549.29,
+    "stop_loss": 488.64,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "EMCURE-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "EMCURE",
+    "entry": 1397.6,
+    "qty": 17,
+    "target": 1554.32,
+    "stop_loss": 1345.36,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "EICHERMOT-2025-11-27",
     "date": "2025-11-27",
     "symbol": "EICHERMOT",
