@@ -1,5 +1,38 @@
 [
   {
+    "id": "CENTRALBK-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "CENTRALBK",
+    "entry": 38.69,
+    "qty": 646,
+    "target": 41.57,
+    "stop_loss": 37.73,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "CEATLTD-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "CEATLTD",
+    "entry": 3895.0,
+    "qty": 6,
+    "target": 4225.0,
+    "stop_loss": 3785.0,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "ALKEM-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "ALKEM",
+    "entry": 5738.0,
+    "qty": 4,
+    "target": 6054.86,
+    "stop_loss": 5632.38,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "CESC-2025-11-27",
     "date": "2025-11-27",
     "symbol": "CESC",
