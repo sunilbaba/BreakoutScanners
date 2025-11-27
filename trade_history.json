@@ -1,5 +1,38 @@
 [
   {
+    "id": "DCMSHRIRAM-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "DCMSHRIRAM",
+    "entry": 1225.9,
+    "qty": 20,
+    "target": 1363.74,
+    "stop_loss": 1179.95,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "CAMS-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "CAMS",
+    "entry": 3927.6,
+    "qty": 6,
+    "target": 4175.95,
+    "stop_loss": 3844.82,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "BHARTIHEXA-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "BHARTIHEXA",
+    "entry": 1770.4,
+    "qty": 14,
+    "target": 1933.15,
+    "stop_loss": 1716.15,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "DABUR-2025-11-27",
     "date": "2025-11-27",
     "symbol": "DABUR",
