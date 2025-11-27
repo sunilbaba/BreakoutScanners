@@ -1,5 +1,38 @@
 [
   {
+    "id": "DABUR-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "DABUR",
+    "entry": 517.1,
+    "qty": 48,
+    "target": 543.4,
+    "stop_loss": 508.33,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "CDSL-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "CDSL",
+    "entry": 1627.9,
+    "qty": 15,
+    "target": 1739.95,
+    "stop_loss": 1590.55,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "CHOICEIN-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "CHOICEIN",
+    "entry": 811.5,
+    "qty": 30,
+    "target": 859.19,
+    "stop_loss": 795.6,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "CENTRALBK-2025-11-27",
     "date": "2025-11-27",
     "symbol": "CENTRALBK",
