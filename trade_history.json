@@ -1,5 +1,27 @@
 [
   {
+    "id": "HEG-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "HEG",
+    "entry": 536.85,
+    "qty": 46,
+    "target": 597.72,
+    "stop_loss": 516.56,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "GRANULES-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "GRANULES",
+    "entry": 553.75,
+    "qty": 45,
+    "target": 594.89,
+    "stop_loss": 540.04,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "GAIL-2025-11-27",
     "date": "2025-11-27",
     "symbol": "GAIL",
@@ -404,10 +426,13 @@
     "qty": 25,
     "target": 1025.38,
     "stop_loss": 974.14,
-    "status": "OPEN",
+    "status": "LOSS",
     "pnl": -76.25,
     "pnl_pct": -0.31,
-    "note": ""
+    "note": "",
+    "exit_price": 974.14,
+    "exit_date": "2025-11-27",
+    "net_pnl": -369.6
   },
   {
     "id": "BEL-2025-11-26",
