@@ -1,5 +1,27 @@
 [
   {
+    "id": "KEI-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "KEI",
+    "entry": 4135.7,
+    "qty": 6,
+    "target": 4381.4,
+    "stop_loss": 4053.8,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "JSWSTEEL-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "JSWSTEEL",
+    "entry": 1160.6,
+    "qty": 21,
+    "target": 1235.45,
+    "stop_loss": 1135.65,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "KPRMILL-2025-11-27",
     "date": "2025-11-27",
     "symbol": "KPRMILL",
