@@ -1,5 +1,27 @@
 [
   {
+    "id": "HONASA-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "HONASA",
+    "entry": 292.45,
+    "qty": 85,
+    "target": 321.87,
+    "stop_loss": 282.64,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "HINDALCO-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "HINDALCO",
+    "entry": 806.45,
+    "qty": 31,
+    "target": 857.34,
+    "stop_loss": 789.49,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "HINDPETRO-2025-11-27",
     "date": "2025-11-27",
     "symbol": "HINDPETRO",
