@@ -1,5 +1,27 @@
 [
   {
+    "id": "J&KBANK-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "J&KBANK",
+    "entry": 108.17,
+    "qty": 231,
+    "target": 115.91,
+    "stop_loss": 105.59,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "JSL-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "JSL",
+    "entry": 772.45,
+    "qty": 32,
+    "target": 835.57,
+    "stop_loss": 751.41,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "KEI-2025-11-27",
     "date": "2025-11-27",
     "symbol": "KEI",
