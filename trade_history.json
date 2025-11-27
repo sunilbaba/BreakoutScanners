@@ -1,5 +1,27 @@
 [
   {
+    "id": "GAIL-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "GAIL",
+    "entry": 184.0,
+    "qty": 135,
+    "target": 193.88,
+    "stop_loss": 180.71,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "ERIS-2025-11-27",
+    "date": "2025-11-27",
+    "symbol": "ERIS",
+    "entry": 1614.6,
+    "qty": 15,
+    "target": 1750.61,
+    "stop_loss": 1569.26,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "GICRE-2025-11-27",
     "date": "2025-11-27",
     "symbol": "GICRE",
@@ -216,8 +238,10 @@
     "qty": 2,
     "target": 9604.21,
     "stop_loss": 9066.6,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -305.6,
+    "exit_price": 9066.6,
+    "exit_date": "2025-11-27"
   },
   {
     "id": "AKZOINDIA-2025-11-27",
@@ -319,10 +343,13 @@
     "qty": 100,
     "target": 259.67,
     "stop_loss": 243.98,
-    "status": "OPEN",
+    "status": "LOSS",
     "pnl": -20.0,
     "pnl_pct": -0.08,
-    "note": ""
+    "note": "",
+    "exit_price": 243.98,
+    "exit_date": "2025-11-27",
+    "net_pnl": -441.58
   },
   {
     "id": "KOTAKBANK-2025-11-26",
