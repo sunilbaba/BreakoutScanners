@@ -1,5 +1,27 @@
 [
   {
+    "id": "RBLBANK-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "RBLBANK",
+    "entry": 311.8,
+    "qty": 80,
+    "target": 334.53,
+    "stop_loss": 304.22,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "PRESTIGE-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "PRESTIGE",
+    "entry": 1671.6,
+    "qty": 14,
+    "target": 1809.44,
+    "stop_loss": 1625.65,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "ONGC-2025-11-28",
     "date": "2025-11-28",
     "symbol": "ONGC",
