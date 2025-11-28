@@ -1,5 +1,16 @@
 [
   {
+    "id": "SAILIFE-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "SAILIFE",
+    "entry": 884.4,
+    "qty": 28,
+    "target": 956.33,
+    "stop_loss": 860.42,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "TATACOMM-2025-11-28",
     "date": "2025-11-28",
     "symbol": "TATACOMM",
@@ -495,8 +506,10 @@
     "qty": 20,
     "target": 1300.21,
     "stop_loss": 1167.26,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -712.82,
+    "exit_price": 1167.26,
+    "exit_date": "2025-11-28"
   },
   {
     "id": "INDIACEM-2025-11-27",
