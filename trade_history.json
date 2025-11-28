@@ -1,5 +1,16 @@
 [
   {
+    "id": "TVSMOTOR-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "TVSMOTOR",
+    "entry": 3531.5,
+    "qty": 7,
+    "target": 3729.89,
+    "stop_loss": 3465.37,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "SAILIFE-2025-11-28",
     "date": "2025-11-28",
     "symbol": "SAILIFE",
