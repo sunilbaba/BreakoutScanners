@@ -1,5 +1,38 @@
 [
   {
+    "id": "KOTAKBANK-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "KOTAKBANK",
+    "entry": 2118.0,
+    "qty": 11,
+    "target": 2211.13,
+    "stop_loss": 2086.96,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "JBCHEPHARM-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "JBCHEPHARM",
+    "entry": 1770.6,
+    "qty": 14,
+    "target": 1864.86,
+    "stop_loss": 1739.18,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "CAMPUS-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "CAMPUS",
+    "entry": 277.25,
+    "qty": 90,
+    "target": 301.68,
+    "stop_loss": 269.11,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "JPPOWER-2025-11-28",
     "date": "2025-11-28",
     "symbol": "JPPOWER",
