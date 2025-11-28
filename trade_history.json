@@ -1,5 +1,27 @@
 [
   {
+    "id": "MPHASIS-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "MPHASIS",
+    "entry": 2788.8,
+    "qty": 8,
+    "target": 2977.65,
+    "stop_loss": 2725.85,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "MANAPPURAM-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "MANAPPURAM",
+    "entry": 285.35,
+    "qty": 87,
+    "target": 305.22,
+    "stop_loss": 278.73,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "MARUTI-2025-11-28",
     "date": "2025-11-28",
     "symbol": "MARUTI",
