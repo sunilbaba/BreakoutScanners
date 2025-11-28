@@ -1,5 +1,27 @@
 [
   {
+    "id": "DRREDDY-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "DRREDDY",
+    "entry": 1248.6,
+    "qty": 20,
+    "target": 1307.61,
+    "stop_loss": 1228.93,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "APOLLOTYRE-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "APOLLOTYRE",
+    "entry": 515.5,
+    "qty": 48,
+    "target": 555.4,
+    "stop_loss": 502.2,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "POLICYBZR-2025-11-28",
     "date": "2025-11-28",
     "symbol": "POLICYBZR",
