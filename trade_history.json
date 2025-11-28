@@ -1,5 +1,16 @@
 [
   {
+    "id": "TORNTPHARM-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "TORNTPHARM",
+    "entry": 3720.6,
+    "qty": 6,
+    "target": 3913.86,
+    "stop_loss": 3656.18,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "TVSMOTOR-2025-11-28",
     "date": "2025-11-28",
     "symbol": "TVSMOTOR",
