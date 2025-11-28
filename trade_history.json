@@ -1,5 +1,27 @@
 [
   {
+    "id": "RAMCOCEM-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "RAMCOCEM",
+    "entry": 1034.1,
+    "qty": 24,
+    "target": 1103.67,
+    "stop_loss": 1010.91,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "RADICO-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "RADICO",
+    "entry": 3210.8,
+    "qty": 7,
+    "target": 3513.2,
+    "stop_loss": 3110.0,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "STARHEALTH-2025-11-28",
     "date": "2025-11-28",
     "symbol": "STARHEALTH",
