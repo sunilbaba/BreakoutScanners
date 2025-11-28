@@ -1,5 +1,27 @@
 [
   {
+    "id": "REDINGTON-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "REDINGTON",
+    "entry": 280.75,
+    "qty": 89,
+    "target": 310.01,
+    "stop_loss": 271.0,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "BERGEPAINT-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "BERGEPAINT",
+    "entry": 563.05,
+    "qty": 44,
+    "target": 605.6,
+    "stop_loss": 548.87,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "RBLBANK-2025-11-28",
     "date": "2025-11-28",
     "symbol": "RBLBANK",
@@ -796,8 +818,10 @@
     "qty": 7,
     "target": 3586.08,
     "stop_loss": 3302.24,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -543.94,
+    "exit_price": 3302.24,
+    "exit_date": "2025-11-28"
   },
   {
     "id": "GLENMARK-2025-11-26",
