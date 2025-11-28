@@ -1,5 +1,38 @@
 [
   {
+    "id": "TATACOMM-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "TATACOMM",
+    "entry": 1814.4,
+    "qty": 13,
+    "target": 1977.46,
+    "stop_loss": 1760.05,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "TATACONSUM-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "TATACONSUM",
+    "entry": 1173.8,
+    "qty": 21,
+    "target": 1246.19,
+    "stop_loss": 1149.67,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "SYRMA-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "SYRMA",
+    "entry": 821.75,
+    "qty": 30,
+    "target": 926.33,
+    "stop_loss": 786.89,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "RAMCOCEM-2025-11-28",
     "date": "2025-11-28",
     "symbol": "RAMCOCEM",
@@ -7,8 +40,10 @@
     "qty": 24,
     "target": 1103.67,
     "stop_loss": 1010.91,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -606.2,
+    "exit_price": 1010.91,
+    "exit_date": "2025-11-28"
   },
   {
     "id": "RADICO-2025-11-28",
