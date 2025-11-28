@@ -1,5 +1,27 @@
 [
   {
+    "id": "MRPL-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "MRPL",
+    "entry": 158.52,
+    "qty": 157,
+    "target": 179.0,
+    "stop_loss": 151.69,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "HDFCLIFE-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "HDFCLIFE",
+    "entry": 763.5,
+    "qty": 32,
+    "target": 803.84,
+    "stop_loss": 750.05,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "JINDALSTEL-2025-11-28",
     "date": "2025-11-28",
     "symbol": "JINDALSTEL",
@@ -339,8 +361,10 @@
     "qty": 32,
     "target": 817.09,
     "stop_loss": 764.37,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -471.52,
+    "exit_price": 764.37,
+    "exit_date": "2025-11-28"
   },
   {
     "id": "HONASA-2025-11-27",
