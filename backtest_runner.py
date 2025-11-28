@@ -1,470 +1,313 @@
 #!/usr/bin/env python3
 """
-backtest_runner.py
+backtest_ath_pullback.py
 
-Very-strict pullback backtest (High win-rate: aimed 60%+, few trades).
-Updated fixes:
-- Tighter SL selection (max instead of min)
-- ADX and OBV confirmation added
-- Tighter volume dry-up and pullback pct
-- Diagnostics retained
+Strategy: Enter after new ALL-TIME HIGH (ATH). Entry at next day's OPEN.
+Protective stop = previous ATH level (breakout level) — used only if hit intraday.
+Exit rule (your choice E): exit when any pullback occurs:
+    Close < previous day's Close  -> exit at that day's Close
+
+Backtest period: 2 years (DATA_PERIOD)
+Saves results JSON to: ath_backtest_stats.json
+
+Requirements:
+    pip install yfinance pandas numpy
 """
+
 import os
-import time
 import json
+import math
 import logging
 from datetime import datetime
-from collections import Counter
+from collections import defaultdict
 
 import yfinance as yf
 import pandas as pd
 import numpy as np
 
 # -------------------------
-# CONFIG (Strict C) - UPDATED
+# CONFIG
 # -------------------------
 DATA_PERIOD = "2y"
 CAPITAL = 100_000.0
-RISK_PER_TRADE = 0.015   # 1.5% risk per trade
-BROKERAGE_PCT = 0.001
+RISK_PER_TRADE = 0.02      # fraction of equity risked per trade
+BROKERAGE_PCT = 0.001      # round-trip as fraction of value (applied simply)
+MIN_ROWS = 200             # skip tickers with too little history
+CACHE_FILE = "ath_backtest_stats.json"
+CSV_FILE = "ind_nifty500list.csv"
 
-VOL_MULT = 0.65          # tightened: volume must be < 65% of vol_sma20 (dry-up)
-PULLBACK_PCT = 0.005     # tightened: within ±0.5% of EMA20
-RSI_LOW = 45
-RSI_HIGH = 56
-ADX_MIN = 18             # require ADX >= 18 for trend strength
-BREAKOUT_LOOKBACK = 1    # follow-through: today > yesterday high
-ATR_SMA_PERIOD = 20
-MIN_HISTORY_ROWS = 250
-MIN_INDICATOR_ROWS = 180
-
-CONCURRENT_POSITIONS = 4
-BATCH_SIZE = 40
-BATCH_RETRIES = 2
-CACHE_FILE = "backtest_stats.json"
-DEFAULT_TICKERS = ["RELIANCE.NS","HDFCBANK.NS","INFY.NS","TCS.NS","SBIN.NS"]
-
-# TSL params
-TSL_BE_ATR = 0.9
-TSL_EMA10_ATR = 1.6
-TSL_SWING_ATR = 2.4
+DEFAULT_TICKERS = ["RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "SBIN.NS"]
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("BacktestC_fixed")
+logger = logging.getLogger("BacktestATH")
 
 # -------------------------
-# INDICATORS
+# HELPERS
 # -------------------------
-def true_range(df):
-    pc = df['Close'].shift(1)
-    tr1 = df['High'] - df['Low']
-    tr2 = (df['High'] - pc).abs()
-    tr3 = (df['Low'] - pc).abs()
-    return pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+def load_tickers():
+    if os.path.exists(CSV_FILE):
+        try:
+            df = pd.read_csv(CSV_FILE)
+            if 'Symbol' in df.columns:
+                syms = [s.strip().upper() + ("" if s.strip().upper().endswith('.NS') else ".NS") for s in df['Symbol'].dropna().astype(str)]
+                syms = [s for s in syms if s]
+                logger.info("Loaded %d tickers from %s", len(syms), CSV_FILE)
+                return sorted(list(dict.fromkeys(syms)))  # unique preserve order
+        except Exception as e:
+            logger.warning("Failed to read %s: %s", CSV_FILE, e)
+    logger.info("Using default tickers (%d)", len(DEFAULT_TICKERS))
+    return DEFAULT_TICKERS.copy()
 
-def atr(df, period=14):
-    return true_range(df).ewm(alpha=1/period, adjust=False).mean()
-
-def wilder_rsi(series, period=14):
-    delta = series.diff()
-    gain = (delta.where(delta > 0, 0)).ewm(alpha=1/period, adjust=False).mean()
-    loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/period, adjust=False).mean()
-    return 100 - (100 / (1 + gain / loss)).fillna(50)
-
-def compute_adx(df, period=14):
-    plus_dm = df['High'].diff()
-    minus_dm = df['Low'].diff()
-    plus_dm = np.where((plus_dm > minus_dm) & (plus_dm > 0), plus_dm, 0.0)
-    minus_dm = np.where((minus_dm > plus_dm) & (minus_dm > 0), -minus_dm, 0.0)
-    tr = true_range(df).ewm(alpha=1/period, adjust=False).mean()
-    plus_di = 100 * (pd.Series(plus_dm).ewm(alpha=1/period, adjust=False).mean() / tr)
-    minus_di = 100 * (pd.Series(minus_dm).ewm(alpha=1/period, adjust=False).mean() / tr)
-    adx = (abs(plus_di - minus_di) / (plus_di + minus_di) * 100).ewm(alpha=1/period, adjust=False).mean().fillna(0)
-    return adx
-
-def compute_obv(df):
-    obv = [0]
-    for i in range(1, len(df)):
-        if df['Close'].iat[i] > df['Close'].iat[i-1]:
-            obv.append(obv[-1] + int(df['Volume'].iat[i]))
-        elif df['Close'].iat[i] < df['Close'].iat[i-1]:
-            obv.append(obv[-1] - int(df['Volume'].iat[i]))
-        else:
-            obv.append(obv[-1])
-    return pd.Series(obv, index=df.index)
-
-# -------------------------
-# PREPARE DF
-# -------------------------
-def prepare_df(df):
+def safe_download(ticker, period=DATA_PERIOD):
+    """
+    Download daily data for a single ticker and return prepared DataFrame or None.
+    Use auto_adjust=True (yfinance changes).
+    """
+    try:
+        df = yf.download(ticker, period=period, interval='1d', progress=False, auto_adjust=True, threads=False, ignore_tz=True)
+    except Exception as e:
+        logger.warning("Download failed for %s: %s", ticker, e)
+        return None
     if df is None or df.empty:
-        return pd.DataFrame()
-    df = df.copy()
-    # normalize col names if needed
-    cols_map = {}
-    for c in df.columns:
-        lc = c.lower()
-        if lc == 'adj close': cols_map[c] = 'Close'
-        elif lc in ('open','high','low','close','volume'): cols_map[c] = lc.capitalize()
-    if cols_map:
-        df = df.rename(columns=cols_map)
-    if not set(['Open','High','Low','Close','Volume']).issubset(df.columns):
-        return pd.DataFrame()
-    df['SMA50'] = df['Close'].rolling(50).mean()
-    df['SMA200'] = df['Close'].rolling(200).mean()
-    df['EMA20'] = df['Close'].ewm(span=20, adjust=False).mean()
-    df['EMA10'] = df['Close'].ewm(span=10, adjust=False).mean()
-    df['ATR'] = atr(df)
-    df['ATR_SMA'] = df['ATR'].rolling(ATR_SMA_PERIOD).mean()
-    df['RSI'] = wilder_rsi(df['Close'])
-    df['ADX'] = compute_adx(df)
-    df['VOL_SMA20'] = df['Volume'].rolling(20).mean()
-    df['OBV'] = compute_obv(df)
-    df['OBV_SMA20'] = df['OBV'].rolling(20).mean()
+        return None
+    # Ensure required columns in expected names
+    # yfinance with auto_adjust returns columns: Open, High, Low, Close, Volume
+    needed = {'Open','High','Low','Close','Volume'}
+    if not needed.issubset(df.columns):
+        return None
+    # drop rows with NaN in Close
+    df = df.dropna(subset=['Close'])
+    if len(df) < MIN_ROWS:
+        logger.info("%s: too few rows (%d) — skipping", ticker, len(df))
+        return None
     return df
 
+def calc_max_drawdown(equity_curve):
+    arr = np.array(equity_curve, dtype=float)
+    if arr.size == 0:
+        return 0.0
+    peak = np.maximum.accumulate(arr)
+    dd = (arr - peak) / peak
+    max_dd = float(dd.min()) if dd.size>0 else 0.0
+    return round(max_dd * 100, 2)  # percent negative
+
+def risk_qty(equity, entry_price, stop_price):
+    """
+    Returns integer qty for risk-based sizing.
+    If stop_price >= entry_price -> returns 0 (can't compute)
+    """
+    if stop_price >= entry_price:
+        return 0
+    risk_amount = equity * RISK_PER_TRADE
+    per_share_risk = entry_price - stop_price
+    if per_share_risk <= 0:
+        return 0
+    raw_qty = int(risk_amount / per_share_risk)
+    if raw_qty <= 0:
+        return 0
+    # Prevent oversized positions: max 25% of equity exposure
+    max_shares = int((equity * 0.25) / entry_price)
+    if max_shares <= 0:
+        return 0
+    qty = min(raw_qty, max_shares)
+    return max(qty, 0)
+
 # -------------------------
-# DOWNLOAD HELPERS
+# BACKTEST IMPLEMENTATION
 # -------------------------
-def normalize_ticker(sym):
-    s = str(sym).strip().upper()
-    if s.startswith('^'): return s
-    if not s.endswith('.NS'):
-        s = s + '.NS'
-    return s
+def run_backtest(tickers):
+    equity = CAPITAL
+    equity_curve = [equity]
+    trades = []
+    per_ticker_summary = defaultdict(lambda: {'trades':0, 'wins':0, 'pnl':0.0})
 
-def try_single_download_and_prepare(ticker, period=DATA_PERIOD):
-    try:
-        df = yf.download(ticker, period=period, interval='1d', progress=False, threads=True, ignore_tz=True, auto_adjust=True)
-    except Exception as e:
-        return None, f"exception:{e}"
-    if df is None or df.empty:
-        return None, "no_data"
-    pdf = prepare_df(df)
-    if pdf.empty:
-        return None, "prepare_empty"
-    raw_rows = len(df)
-    valid_rows = int(pdf.dropna(subset=['SMA50','SMA200','EMA20','ATR','RSI']).shape[0])
-    if raw_rows < MIN_HISTORY_ROWS:
-        return None, f"too_few_rows:{raw_rows}"
-    if valid_rows < MIN_INDICATOR_ROWS:
-        return None, f"not_enough_indicator_rows:{valid_rows}"
-    logger.info(f"{ticker}: raw_rows={raw_rows}, indicator_rows={valid_rows}")
-    return pdf, None
-
-def prepare_candidate_from_raw(raw, ticker):
-    if raw is None or raw.empty:
-        return None, "no_data"
-    pdf = prepare_df(raw)
-    if pdf.empty:
-        return None, "prepare_empty"
-    raw_rows = len(raw)
-    valid_rows = int(pdf.dropna(subset=['SMA50','SMA200','EMA20','ATR','RSI']).shape[0])
-    if raw_rows < MIN_HISTORY_ROWS:
-        return None, f"too_few_rows:{raw_rows}"
-    if valid_rows < MIN_INDICATOR_ROWS:
-        return None, f"not_enough_indicator_rows:{valid_rows}"
-    logger.info(f"{ticker}: raw_rows={raw_rows}, indicator_rows={valid_rows}")
-    return pdf, None
-
-def download_and_prepare_tickers(tickers, period=DATA_PERIOD, batch_size=BATCH_SIZE, batch_retries=BATCH_RETRIES):
-    prepared = {}
-    skipped = []
-    logger.info(f"Downloading {len(tickers)} tickers for {period}...")
-    for start in range(0, len(tickers), batch_size):
-        batch = tickers[start:start+batch_size]
-        raw = None
-        for attempt in range(batch_retries + 1):
-            try:
-                raw = yf.download(batch, period=period, interval='1d', group_by='ticker', progress=False, threads=True, ignore_tz=True, auto_adjust=True)
-                break
-            except Exception as e:
-                logger.warning(f"Batch download failed (attempt {attempt+1}): {e}")
-                time.sleep(1.2 * (attempt+1))
-                raw = None
-        if raw is None or raw.empty:
-            # fallback to per-symbol
-            for t in batch:
-                pdf, reason = try_single_download_and_prepare(t, period)
-                if pdf is not None:
-                    prepared[t] = pdf
-                else:
-                    skipped.append((t, reason))
+    for t_i, ticker in enumerate(tickers, start=1):
+        logger.info("Downloading %s (%d/%d)", ticker, t_i, len(tickers))
+        df = safe_download(ticker)
+        if df is None:
             continue
 
-        if isinstance(raw, pd.DataFrame) and isinstance(raw.columns, pd.MultiIndex):
-            cols0 = raw.columns.get_level_values(0).unique()
-            for t in cols0:
-                try:
-                    sub = raw[t].dropna(how='all')
-                except Exception:
-                    sub = None
-                pdf, reason = prepare_candidate_from_raw(sub, t)
-                if pdf is not None:
-                    prepared[t] = pdf
-                else:
-                    skipped.append((t, reason))
-        else:
-            for t in batch:
-                pdf, reason = try_single_download_and_prepare(t, period)
-                if pdf is not None:
-                    prepared[t] = pdf
-                else:
-                    skipped.append((t, reason))
+        # compute running historical ATH (highest close prior to current day)
+        # For day i (index i), the ATH up to previous day is max Close of df.iloc[:i]
+        closes = df['Close']
+        dates = df.index
 
-    if not prepared:
-        logger.error("No tickers prepared successfully. Aborting.")
-        return None, {}, skipped
-    skip_counter = Counter([r for (_, r) in skipped])
-    logger.info(f"Prepared {len(prepared)} tickers; skipped {len(skipped)} tickers.")
-    logger.info(f"Top skip reasons: {skip_counter.most_common(8)}")
-    return prepared, prepared, skipped
+        position = None  # dict with keys: entry_price, entry_date, sl, qty
+        # sweep rows
+        for i in range(1, len(df)):  # start at 1 because we may enter on day i using previous days info
+            # compute historical ATH up to previous day (0..i-1)
+            hist_max = float(closes.iloc[:i].max())  # ATH prior to day i
+            prev_close = float(closes.iloc[i-1])
+            today_open = float(df['Open'].iloc[i])
+            today_low = float(df['Low'].iloc[i])
+            today_close = float(closes.iloc[i])
 
-# -------------------------
-# BACKTEST ENGINE (Fixed Strict)
-# -------------------------
-class BacktestEngine:
-    def __init__(self, prepared_map):
-        self.map = prepared_map
-        self.tickers = [t for t in prepared_map.keys() if not str(t).startswith('^')]
-        self.cash = CAPITAL
-        self.equity_curve = [CAPITAL]
-        self.portfolio = []
-        self.history = []
-        self.entry_diag = Counter()
-
-    def calc_qty(self, entry, sl, equity):
-        risk_amt = equity * RISK_PER_TRADE
-        risk_share = abs(entry - sl)
-        if risk_share <= 0: return 0
-        qty = int(risk_amt / risk_share)
-        max_qty = int((equity * 0.20) / entry) if entry > 0 else 0
-        if qty * entry > equity * 0.20:
-            qty = max_qty
-        return max(qty, 0)
-
-    def apply_tsl(self, trade, row, df, idx):
-        atr_v = row['ATR']
-        entry = trade['entry']
-        if row['High'] >= entry + (TSL_BE_ATR * atr_v):
-            trade['sl'] = max(trade['sl'], entry)
-        if row['High'] >= entry + (TSL_EMA10_ATR * atr_v):
-            if not pd.isna(row.get('EMA10', np.nan)):
-                trade['sl'] = max(trade['sl'], row['EMA10'])
-        if row['High'] >= entry + (TSL_SWING_ATR * atr_v):
-            if idx >= 5:
-                swing_low = df['Low'].iloc[max(0, idx-5):idx].min()
-                trade['sl'] = max(trade['sl'], swing_low)
-
-    def process_exit(self, trade, row, date):
-        exit_price = None
-        if row['Open'] < trade['sl']:
-            exit_price = row['Open']
-        elif row['Low'] <= trade['sl']:
-            exit_price = trade['sl']
-        if row['Open'] > trade['target']:
-            exit_price = row['Open']
-        elif row['High'] >= trade['target']:
-            exit_price = trade['target']
-        if exit_price is None:
-            return False
-        qty = trade['qty']
-        revenue = exit_price * qty
-        cost = revenue * BROKERAGE_PCT
-        entry_cost = trade['entry'] * qty * BROKERAGE_PCT
-        pnl = revenue - cost - (trade['entry'] * qty + entry_cost)
-        self.history.append({
-            "symbol": trade['symbol'],
-            "entry": round(trade['entry'], 2),
-            "exit": round(exit_price, 2),
-            "qty": qty,
-            "entry_date": trade['entry_date'].strftime("%Y-%m-%d"),
-            "exit_date": date.strftime("%Y-%m-%d"),
-            "sl": round(trade['sl'], 2),
-            "target": round(trade['target'], 2),
-            "rr": round((trade['target'] - trade['entry']) / (trade['entry'] - trade['sl']) if (trade['entry'] - trade['sl'])!=0 else 0, 2),
-            "pnl": round(pnl, 2)
-        })
-        self.cash += (revenue - cost)
-        return True
-
-    def run(self):
-        logger.info("Running very-strict pullback backtest (fixed)...")
-        processed = self.map
-        dates = sorted(list(set().union(*[df.index for df in processed.values()])))
-        for date in dates:
-            # EXITS
-            active = []
-            for trade in self.portfolio:
-                sym = trade['symbol']
-                df = processed.get(sym)
-                if df is None or date not in df.index:
-                    active.append(trade); continue
-                row = df.loc[date]
-                idx = df.index.get_loc(date)
-                self.apply_tsl(trade, row, df, idx)
-                if not self.process_exit(trade, row, date):
-                    active.append(trade)
-            self.portfolio = active
-
-            # ENTRIES
-            if len(self.portfolio) < CONCURRENT_POSITIONS:
-                for sym, df in processed.items():
-                    if date not in df.index: continue
-                    if len(self.portfolio) >= CONCURRENT_POSITIONS: break
-                    row = df.loc[date]
-                    # basic checks
-                    if pd.isna(row.get('SMA50')) or pd.isna(row.get('SMA200')) or pd.isna(row.get('EMA20')):
-                        self.entry_diag['no_ind'] += 1; continue
-                    # Trend: SMA50 > SMA200 and EMA20 above SMA50 roughly
-                    if not (row['SMA50'] > row['SMA200'] and row['EMA20'] > row['SMA50'] * 0.98):
-                        self.entry_diag['trend_fail'] += 1; continue
-                    # ADX trend strength
-                    if pd.isna(row.get('ADX')) or row['ADX'] < ADX_MIN:
-                        self.entry_diag['adx_fail'] += 1; continue
-                    # Pullback tight to EMA20
-                    if abs(row['Close'] - row['EMA20'])/row['EMA20'] > PULLBACK_PCT:
-                        self.entry_diag['pullback_fail'] += 1; continue
-                    # Volume dry-up
-                    if pd.isna(row.get('VOL_SMA20')) or row['Volume'] >= VOL_MULT * row['VOL_SMA20']:
-                        self.entry_diag['vol_fail'] += 1; continue
-                    # OBV confirmation
-                    if pd.isna(row.get('OBV')) or pd.isna(row.get('OBV_SMA20')) or row['OBV'] <= row['OBV_SMA20']:
-                        self.entry_diag['obv_fail'] += 1; continue
-                    # RSI band
-                    if pd.isna(row.get('RSI')) or row['RSI'] < RSI_LOW or row['RSI'] > RSI_HIGH:
-                        self.entry_diag['rsi_fail'] += 1; continue
-                    # Follow-through: must be > yesterday high
-                    i = df.index.get_loc(date)
-                    if i == 0:
-                        self.entry_diag['no_prev'] += 1; continue
-                    prev_high = df['High'].iat[i-1]
-                    if row['Close'] <= prev_high:
-                        self.entry_diag['no_follow'] += 1; continue
-                    # SL and TP: FIXED - use MAX(swing_low, close - 0.6*ATR) to make SL tighter
-                    swing_low = df['Low'].iloc[max(0, i-5):i].min() if i>0 else row['Low']
-                    if pd.isna(row.get('ATR')): 
-                        self.entry_diag['no_atr'] += 1; continue
-                    sl_candidate = max(swing_low, row['Close'] - 0.6 * row['ATR'])
-                    if sl_candidate >= row['Close']:
-                        self.entry_diag['bad_sl'] += 1; continue
-                    target = row['Close'] + 1.6 * row['ATR']
-                    rr = (target - row['Close']) / (row['Close'] - sl_candidate) if (row['Close'] - sl_candidate)!=0 else 0
-                    if rr < 1.05:
-                        self.entry_diag['rr_fail'] += 1; continue
-                    qty = self.calc_qty(row['Close'], sl_candidate, self.equity_curve[-1])
-                    if qty <= 0 or qty * row['Close'] > self.cash:
-                        self.entry_diag['qty_fail'] += 1; continue
-                    fees = row['Close'] * qty * BROKERAGE_PCT
-                    self.cash -= (row['Close'] * qty + fees)
-                    self.portfolio.append({
-                        "symbol": sym,
-                        "entry": row['Close'],
-                        "qty": qty,
-                        "sl": sl_candidate,
-                        "target": target,
-                        "entry_cost": fees,
-                        "entry_date": date
+            # If we have a position, check exits first (we evaluate market open -> intraday -> close)
+            if position:
+                # 1) intraday stop (protective stop = breakout level). If today's low <= SL -> exit at SL
+                if today_low <= position['sl']:
+                    exit_price = position['sl']
+                    pnl = (exit_price - position['entry']) * position['qty']
+                    fees = (position['entry'] * position['qty'] + exit_price * position['qty']) * BROKERAGE_PCT
+                    net_pnl = pnl - fees
+                    trades.append({
+                        'symbol': ticker,
+                        'entry_date': position['entry_date'].strftime("%Y-%m-%d"),
+                        'entry': round(position['entry'],2),
+                        'exit_date': dates[i].strftime("%Y-%m-%d"),
+                        'exit': round(exit_price,2),
+                        'qty': position['qty'],
+                        'pnl': round(net_pnl,2),
+                        'reason': 'stop_hit'
                     })
-                    self.entry_diag['accepted'] += 1
+                    per_ticker_summary[ticker]['trades'] += 1
+                    per_ticker_summary[ticker]['pnl'] += net_pnl
+                    if net_pnl > 0: per_ticker_summary[ticker]['wins'] += 1
+                    # release cash (simulated): equity increases by exit proceeds
+                    equity += (exit_price * position['qty'] - fees)
+                    equity_curve.append(round(equity,2))
+                    position = None
+                    # continue to next day after exit
+                    continue
 
-            # EQUITY update
-            m2m = self.cash
-            for t in self.portfolio:
-                sym = t['symbol']
-                df = processed.get(sym)
-                if df is None:
-                    m2m += t['entry'] * t['qty']
-                else:
-                    if date in df.index:
-                        m2m += df.loc[date]['Close'] * t['qty']
-                    else:
-                        m2m += t['entry'] * t['qty']
-            self.equity_curve.append(round(m2m, 2))
+                # 2) exit at close if today's close is a pullback: Close < previous day's Close
+                if today_close < prev_close:
+                    exit_price = today_close
+                    pnl = (exit_price - position['entry']) * position['qty']
+                    fees = (position['entry'] * position['qty'] + exit_price * position['qty']) * BROKERAGE_PCT
+                    net_pnl = pnl - fees
+                    trades.append({
+                        'symbol': ticker,
+                        'entry_date': position['entry_date'].strftime("%Y-%m-%d"),
+                        'entry': round(position['entry'],2),
+                        'exit_date': dates[i].strftime("%Y-%m-%d"),
+                        'exit': round(exit_price,2),
+                        'qty': position['qty'],
+                        'pnl': round(net_pnl,2),
+                        'reason': 'pullback_close'
+                    })
+                    per_ticker_summary[ticker]['trades'] += 1
+                    per_ticker_summary[ticker]['pnl'] += net_pnl
+                    if net_pnl > 0: per_ticker_summary[ticker]['wins'] += 1
+                    equity += (exit_price * position['qty'] - fees)
+                    equity_curve.append(round(equity,2))
+                    position = None
+                    continue
 
-        # results
-        if not self.history:
-            report = {
-                "curve": [round(x,2) for x in self.equity_curve],
-                "profit": round(self.equity_curve[-1] - CAPITAL, 2),
-                "total_trades": 0,
-                "win_rate": 0,
-                "history": [],
-                "entry_diag": dict(self.entry_diag),
-                "last_run": datetime.utcnow().strftime("%Y-%m-%d")
-            }
-            return report
+                # else, keep holding (no exit today); equity not updated for this ticker until exit (we'll compute m2m later)
+                # Continue scanning subsequent days
+            else:
+                # No position — check entry condition: was yesterday a NEW ATH? (i-1 day close > previous ATH)
+                # Yesterday's close is closes.iloc[i-1] and hist_max (computed above) was max up to i-1 (which includes day 0..i-1)
+                # We need to check if there was a NEW ATH formed at day i-1 -> close at day i-1 was greater than all prior closes
+                prev_hist_max = float(closes.iloc[:i-1].max()) if i-1 > 0 else float(closes.iloc[:0].max()) if i-1==0 else -math.inf
+                # Simpler: check if closes.iloc[i-1] > max of closes[:i-1]
+                previous_ath_before_yesterday = float(closes.iloc[:i-1].max()) if i-1>0 else -math.inf
+                yesterday_close = float(closes.iloc[i-1])
+                # new ATH at yesterday if yesterday_close > previous_ath_before_yesterday
+                if yesterday_close > previous_ath_before_yesterday:
+                    # entry on today's OPEN (we already have today_open)
+                    entry_price = today_open
+                    breakout_level = yesterday_close  # previous ATH as SL
+                    sl = breakout_level
+                    qty = risk_qty(equity, entry_price, sl)
+                    if qty <= 0:
+                        # skip sizing-zero trades
+                        continue
+                    fees = (entry_price * qty) * BROKERAGE_PCT
+                    # reduce equity by cost (simulate cash outflow)
+                    equity -= (entry_price * qty + fees)
+                    position = {
+                        'symbol': ticker,
+                        'entry': entry_price,
+                        'entry_date': dates[i],
+                        'sl': sl,
+                        'qty': qty
+                    }
+                    # note: we don't immediately record a trade until exit
+                    # add a small snapshot to equity curve to reflect position mark to market (we'll add actual m2m below at day's end)
+                    # but for simplicity, append current equity
+                    equity_curve.append(round(equity,2))
+                    continue
+                # else: no entry
+                continue
 
-        wins = [h for h in self.history if h['pnl'] > 0]
-        win_rate = round(100 * len(wins) / len(self.history), 2) if self.history else 0
-        report = {
-            "curve": [round(x,2) for x in self.equity_curve],
-            "profit": round(self.equity_curve[-1] - CAPITAL, 2),
-            "total_trades": len(self.history),
+        # End of ticker scanning: if position still open at end of data, close at last Close
+        if position:
+            last_close = float(closes.iloc[-1])
+            exit_price = last_close
+            pnl = (exit_price - position['entry']) * position['qty']
+            fees = (position['entry'] * position['qty'] + exit_price * position['qty']) * BROKERAGE_PCT
+            net_pnl = pnl - fees
+            trades.append({
+                'symbol': ticker,
+                'entry_date': position['entry_date'].strftime("%Y-%m-%d"),
+                'entry': round(position['entry'],2),
+                'exit_date': dates[-1].strftime("%Y-%m-%d"),
+                'exit': round(exit_price,2),
+                'qty': position['qty'],
+                'pnl': round(net_pnl,2),
+                'reason': 'eod_close'
+            })
+            per_ticker_summary[ticker]['trades'] += 1
+            per_ticker_summary[ticker]['pnl'] += net_pnl
+            if net_pnl > 0: per_ticker_summary[ticker]['wins'] += 1
+            equity += (exit_price * position['qty'] - fees)
+            equity_curve.append(round(equity,2))
+            position = None
+
+    # End all tickers
+    total_trades = len(trades)
+    wins = len([t for t in trades if t['pnl'] > 0])
+    losses = total_trades - wins
+    total_pnl = round(sum(t['pnl'] for t in trades), 2)
+    avg_pnl = round((total_pnl / total_trades), 2) if total_trades else 0.0
+    win_rate = round(100.0 * wins / total_trades, 2) if total_trades else 0.0
+    max_dd = calc_max_drawdown(equity_curve)
+
+    stats = {
+        "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+        "portfolio": {
+            "start_capital": CAPITAL,
+            "end_capital": round(equity,2),
+            "curve": equity_curve,
+            "total_trades": total_trades,
+            "wins": wins,
+            "losses": losses,
             "win_rate": win_rate,
-            "history": self.history,
-            "entry_diag": dict(self.entry_diag),
-            "last_run": datetime.utcnow().strftime("%Y-%m-%d")
-        }
-        return report
+            "total_pnl": total_pnl,
+            "avg_pnl_per_trade": avg_pnl,
+            "max_drawdown_pct": max_dd
+        },
+        "trades": trades,
+        "per_ticker": {k: v for k, v in per_ticker_summary.items()}
+    }
+
+    # Save JSON
+    with open(CACHE_FILE, 'w') as f:
+        json.dump(stats, f, indent=2)
+
+    logger.info("Backtest complete.")
+    logger.info("Trades: %d | Wins: %d | Win rate: %s%% | Total PnL: %s | MaxDD: %s%%",
+                total_trades, wins, win_rate, total_pnl, max_dd)
+    return stats
 
 # -------------------------
 # MAIN
 # -------------------------
-def get_tickers_from_csv_or_default():
-    if os.path.exists("ind_nifty500list.csv"):
-        try:
-            df = pd.read_csv("ind_nifty500list.csv")
-            if 'Symbol' in df.columns:
-                syms = [normalize_ticker(x) for x in df['Symbol'].dropna().unique()]
-                return syms
-        except Exception as e:
-            logger.warning(f"Failed to read CSV: {e}")
-    return DEFAULT_TICKERS.copy()
-
-def normalize_ticker(sym):
-    s = str(sym).strip().upper()
-    if s.startswith('^'): return s
-    if not s.endswith('.NS'):
-        s = s + '.NS'
-    return s
-
-def main():
-    tickers = get_tickers_from_csv_or_default()
-    tickers = [normalize_ticker(t) for t in tickers]
-    tickers = [t for t in tickers if not any(p in t for p in ('DUMMY','TMP','ZZ'))]
-    logger.info(f"Tickers count to download: {len(tickers)}")
-    prepared_map, _, skipped = download_and_prepare_tickers(tickers, period=DATA_PERIOD)
-    if not prepared_map:
-        logger.error("No data prepared. Exiting.")
-        with open(CACHE_FILE, 'w') as f:
-            json.dump({"updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
-                       "prepared": 0, "skipped": skipped, "last_run": datetime.utcnow().strftime("%Y-%m-%d")}, f, indent=2)
-        return
-
-    engine = BacktestEngine(prepared_map)
-    report = engine.run()
-    out = {
-        "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
-        "portfolio": {
-            "curve": report.get("curve", [CAPITAL]),
-            "ledger": report.get("history", [])[-50:],
-            "win_rate": report.get("win_rate", 0),
-            "total_trades": report.get("total_trades", 0),
-            "profit": report.get("profit", 0)
-        },
-        "tickers": {k.replace('.NS',''): 0 for k in prepared_map.keys()},
-        "skipped": skipped,
-        "entry_diag": report.get("entry_diag", {}),
-        "last_run": report.get("last_run", datetime.utcnow().strftime("%Y-%m-%d"))
-    }
-    with open(CACHE_FILE, 'w') as f:
-        json.dump(out, f, indent=2)
-    logger.info("Backtest finished.")
-    logger.info(f"Prepared tickers: {len(prepared_map)} | Skipped: {len(skipped)}")
-    logger.info(f"Trades: {out['portfolio']['total_trades']} | Win Rate: {out['portfolio']['win_rate']}% | Profit: {out['portfolio']['profit']}")
-    logger.info(f"Entry diag: {out['entry_diag']}")
-    logger.info(f"Saved results to {CACHE_FILE}")
-
 if __name__ == "__main__":
-    main()
+    tickers = load_tickers()
+    logger.info("Starting ATH backtest on %d tickers (period=%s)", len(tickers), DATA_PERIOD)
+    stats = run_backtest(tickers)
+    # Print summary
+    p = stats['portfolio']
+    print("=== BACKTEST SUMMARY ===")
+    print(f"Start capital : ₹{p['start_capital']}")
+    print(f"End capital   : ₹{p['end_capital']}")
+    print(f"Trades        : {p['total_trades']}")
+    print(f"Wins          : {p['wins']}")
+    print(f"Win rate      : {p['win_rate']}%")
+    print(f"Total PnL     : ₹{p['total_pnl']}")
+    print(f"Avg PnL/trade : ₹{p['avg_pnl_per_trade']}")
+    print(f"Max Drawdown  : {p['max_drawdown_pct']}%")
+    print(f"Saved results to {CACHE_FILE}")
