@@ -1,5 +1,27 @@
 [
   {
+    "id": "JINDALSTEL-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "JINDALSTEL",
+    "entry": 1049.5,
+    "qty": 23,
+    "target": 1119.11,
+    "stop_loss": 1026.3,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "CENTURYPLY-2025-11-28",
+    "date": "2025-11-28",
+    "symbol": "CENTURYPLY",
+    "entry": 800.05,
+    "qty": 31,
+    "target": 867.36,
+    "stop_loss": 777.61,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "DRREDDY-2025-11-28",
     "date": "2025-11-28",
     "symbol": "DRREDDY",
