@@ -1,5 +1,38 @@
 [
   {
+    "id": "SAIL-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "SAIL",
+    "entry": 135.73,
+    "qty": 184,
+    "target": 146.61,
+    "stop_loss": 132.1,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "SBILIFE-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "SBILIFE",
+    "entry": 1960.4,
+    "qty": 12,
+    "target": 2062.6,
+    "stop_loss": 1926.33,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "KFINTECH-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "KFINTECH",
+    "entry": 1107.9,
+    "qty": 22,
+    "target": 1195.2,
+    "stop_loss": 1078.8,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "POONAWALLA-2025-12-01",
     "date": "2025-12-01",
     "symbol": "POONAWALLA",
