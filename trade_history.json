@@ -1,5 +1,38 @@
 [
   {
+    "id": "VIJAYA-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "VIJAYA",
+    "entry": 1013.2,
+    "qty": 24,
+    "target": 1095.96,
+    "stop_loss": 985.61,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "NEULANDLAB-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "NEULANDLAB",
+    "entry": 16716.0,
+    "qty": 1,
+    "target": 18571.2,
+    "stop_loss": 16097.6,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "COALINDIA-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "COALINDIA",
+    "entry": 378.8,
+    "qty": 65,
+    "target": 393.13,
+    "stop_loss": 374.02,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "UNOMINDA-2025-12-01",
     "date": "2025-12-01",
     "symbol": "UNOMINDA",
