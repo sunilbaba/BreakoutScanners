@@ -554,8 +554,10 @@
     "qty": 21,
     "target": 1243.49,
     "stop_loss": 1135.9,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -613.74,
+    "exit_price": 1135.9,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "MPHASIS-2025-11-28",
@@ -723,8 +725,10 @@
     "qty": 32,
     "target": 835.57,
     "stop_loss": 751.41,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -722.72,
+    "exit_price": 751.41,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "KEI-2025-11-27",
@@ -817,8 +821,10 @@
     "qty": 62,
     "target": 435.49,
     "stop_loss": 388.44,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -778.74,
+    "exit_price": 388.44,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "ICICIBANK-2025-11-27",
