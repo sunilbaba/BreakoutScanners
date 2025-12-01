@@ -1,5 +1,16 @@
 [
   {
+    "id": "RAMCOCEM-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "RAMCOCEM",
+    "entry": 1030.0,
+    "qty": 24,
+    "target": 1099.44,
+    "stop_loss": 1006.85,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "SAIL-2025-12-01",
     "date": "2025-12-01",
     "symbol": "SAIL",
@@ -29,8 +40,10 @@
     "qty": 22,
     "target": 1195.2,
     "stop_loss": 1078.8,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -904.55,
+    "exit_price": 1069.0,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "POONAWALLA-2025-12-01",
