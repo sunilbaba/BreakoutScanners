@@ -1,5 +1,38 @@
 [
   {
+    "id": "JUBLINGREA-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "JUBLINGREA",
+    "entry": 704.25,
+    "qty": 35,
+    "target": 768.55,
+    "stop_loss": 682.82,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "CHOLAHLDNG-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "CHOLAHLDNG",
+    "entry": 1909.7,
+    "qty": 13,
+    "target": 2095.7,
+    "stop_loss": 1847.7,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "ALKEM-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "ALKEM",
+    "entry": 5627.0,
+    "qty": 4,
+    "target": 5945.78,
+    "stop_loss": 5520.74,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "RAMCOCEM-2025-12-01",
     "date": "2025-12-01",
     "symbol": "RAMCOCEM",
@@ -565,8 +598,10 @@
     "qty": 23,
     "target": 1189.16,
     "stop_loss": 1045.48,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -875.9,
+    "exit_price": 1045.48,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "INDIGO-2025-11-27",
@@ -945,8 +980,10 @@
     "qty": 4,
     "target": 6054.86,
     "stop_loss": 5632.38,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -468.38,
+    "exit_price": 5632.38,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "CESC-2025-11-27",
