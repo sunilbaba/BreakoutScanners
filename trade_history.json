@@ -1,5 +1,38 @@
 [
   {
+    "id": "UNOMINDA-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "UNOMINDA",
+    "entry": 1310.8,
+    "qty": 19,
+    "target": 1412.92,
+    "stop_loss": 1276.76,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "TIMKEN-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "TIMKEN",
+    "entry": 3084.5,
+    "qty": 8,
+    "target": 3353.86,
+    "stop_loss": 2994.71,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "RBLBANK-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "RBLBANK",
+    "entry": 306.6,
+    "qty": 81,
+    "target": 329.94,
+    "stop_loss": 298.82,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "LTFOODS-2025-12-01",
     "date": "2025-12-01",
     "symbol": "LTFOODS",
@@ -343,8 +376,10 @@
     "qty": 80,
     "target": 334.53,
     "stop_loss": 304.22,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -656.29,
+    "exit_price": 304.22,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "PRESTIGE-2025-11-28",
@@ -1181,8 +1216,10 @@
     "qty": 1090,
     "target": 24.29,
     "stop_loss": 22.48,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -540.49,
+    "exit_price": 22.48,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "ASTRAL-2025-11-26",
