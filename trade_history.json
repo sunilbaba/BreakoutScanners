@@ -1,5 +1,27 @@
 [
   {
+    "id": "NYKAA-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "NYKAA",
+    "entry": 262.7,
+    "qty": 95,
+    "target": 282.88,
+    "stop_loss": 255.97,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "APARINDS-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "APARINDS",
+    "entry": 8968.0,
+    "qty": 2,
+    "target": 9792.08,
+    "stop_loss": 8693.31,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "JUBLINGREA-2025-12-01",
     "date": "2025-12-01",
     "symbol": "JUBLINGREA",
@@ -18,8 +40,10 @@
     "qty": 13,
     "target": 2095.7,
     "stop_loss": 1847.7,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -903.75,
+    "exit_price": 1844.0,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "ALKEM-2025-12-01",
@@ -611,8 +635,10 @@
     "qty": 4,
     "target": 6246.56,
     "stop_loss": 5809.81,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -484.11,
+    "exit_price": 5809.81,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "ICICIGI-2025-11-27",
@@ -1026,8 +1052,10 @@
     "qty": 419,
     "target": 64.49,
     "stop_loss": 58.04,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -724.58,
+    "exit_price": 58.04,
+    "exit_date": "2025-12-01"
   },
   {
     "id": "BAJAJ-AUTO-2025-11-27",
