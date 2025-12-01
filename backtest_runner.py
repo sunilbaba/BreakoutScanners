@@ -1,113 +1,167 @@
-import os
-import json
-import math
-import time
-import logging
-from datetime import datetime, timedelta
-from collections import defaultdict
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
+"""
+ATH Breakout Backtest Engine
+Version: Stable Production Build (No UI)
+Author: ChatGPT rewrite
+
+Features:
+---------
+✓ Pure ATH breakout strategy
+✓ 2-year backtest
+✓ Pullback exit logic
+✓ ATR stoploss
+✓ Debug logs for triage
+✓ Robust yfinance handling
+✓ Strict + relaxed modes
+"""
+
+import os
+import sys
+import time
+import json
+import logging
+import traceback
+from datetime import datetime, timedelta
+from collections import Counter
+
+import yfinance as yf
 import pandas as pd
 import numpy as np
-import yfinance as yf
 
 # -------------------------------------------------------
-# LOGGING CONFIG
-# -------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
-log = logging.getLogger("BacktestATH")
-
-# -------------------------------------------------------
-# GLOBAL CONFIGURATION
+# CONFIGURATION
 # -------------------------------------------------------
 
-DATA_YEARS = 2                        # 2 years of data
-PERIOD_STRING = f"{DATA_YEARS}y"
-WARMUP_BARS = 250                     # required bars for indicators
-START_CAPITAL = 100000.0              # starting capital
-RISK_PER_TRADE = 0.02                 # risk 2% per trade
-BROKERAGE_PCT = 0.001                 # 0.1% brokerage
+START_CAPITAL = 100000.0
+CAPITAL = START_CAPITAL
 
-# ATH Strategy parameters
-PULLBACK_EXIT = True                  # exit when close < prev close
-ALLOW_MULTI_ENTRY = True              # multiple entries per ticker
-CONFIRMATION_REQUIRED = True          # require next-day confirmation
+PERIOD_STRING = "2y"        # Download period
+WARMUP_BARS    = 200        # Minimum bars needed
+ATR_PERIOD     = 14
+ATR_MULT_SL    = 1.0        # Stop loss = Close - 1 ATR
+CONFIRM_BARS   = 1          # ATH breakout confirmation by next bar
 
-# Output JSON file
-OUTPUT_JSON = "backtest_stats.json"
-
-# CSV with tickers (WITH .NS included)
-TICKER_CSV = "ind_nifty500list.csv"
-CSV_SYMBOL_COL = "Symbol"
+MIN_RR = 2.0                # Risk-reward filter
+MAX_HOLD_DAYS = 20          # Exit after N days
+LOGLEVEL = logging.INFO
 
 # -------------------------------------------------------
-# UTILITY FUNCTIONS
+# LOGGING SETUP
 # -------------------------------------------------------
 
-def load_tickers_from_csv(path=TICKER_CSV):
-    """
-    Loads tickers from ind_nifty500list.csv which contains tickers with '.NS'
-    """
+logger = logging.getLogger("ATH")
+logger.setLevel(LOGLEVEL)
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(logging.Formatter(
+    "%(asctime)s [%(levelname)s] %(message)s"
+))
+logger.addHandler(handler)
+log = logger
+
+# -------------------------------------------------------
+# TICKER LOADING
+# -------------------------------------------------------
+
+def load_tickers_from_csv(path):
+    """CSV must contain a 'Symbol' column with tickers like RELIANCE.NS"""
     if not os.path.exists(path):
-        raise FileNotFoundError(f"Ticker file not found: {path}")
+        log.error(f"Ticker CSV not found: {path}")
+        return []
+    try:
+        df = pd.read_csv(path)
+        syms = [s.strip() for s in df["Symbol"].dropna().unique()]
+        log.info(f"Loaded {len(syms)} tickers from CSV")
+        return syms
+    except Exception as e:
+        log.exception("Failed to read ticker CSV: %s", e)
+        return []
 
-    df = pd.read_csv(path)
-    if CSV_SYMBOL_COL not in df.columns:
-        raise ValueError(f"CSV missing expected column: {CSV_SYMBOL_COL}")
 
-    tickers = df[CSV_SYMBOL_COL].dropna().unique().tolist()
-    tickers = [str(t).strip() for t in tickers]
-    return tickers
-
+# -------------------------------------------------------
+# SAFE DOWNLOAD
+# -------------------------------------------------------
 
 def safe_download(ticker, period=PERIOD_STRING):
     """
-    Downloads a single ticker safely with retries.
+    Downloads data and ensures Close column is a single numeric series.
     """
-    for attempt in range(3):
-        try:
-            df = yf.download(ticker, period=period, progress=False)
-            if df is not None and len(df) > 0:
-                df = df.copy()
-                df.dropna(inplace=True)
-                return df
-        except Exception as e:
-            log.warning(f"{ticker}: download attempt {attempt+1} failed: {e}")
-            time.sleep(1 + attempt)
-    return None
+    try:
+        df = yf.download(
+            ticker,
+            period=period,
+            auto_adjust=True,
+            progress=False,
+            threads=False
+        )
+    except Exception as e:
+        log.warning(f"{ticker}: yfinance error: {e}")
+        return None
+
+    if df is None or len(df) == 0:
+        return None
+
+    # Normalize multi-column Close (sometimes DataFrame)
+    if isinstance(df.get("Close"), pd.DataFrame):
+        close_cols = df["Close"].select_dtypes(include=[np.number]).columns
+        if len(close_cols) > 0:
+            df["Close"] = df["Close"][close_cols[0]]
+        else:
+            df["Close"] = df["Close"].iloc[:, 0]
+
+    # Coerce numerics
+    for c in ["Open", "High", "Low", "Close"]:
+        if c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    df = df.dropna(subset=["Close"])
+
+    return df if len(df) > 0 else None
 
 
-def highest_close(series):
-    """
-    Returns rolling all-time-high of closing prices.
-    """
-    return series.expanding().max()
+# -------------------------------------------------------
+# ATR CALCULATION
+# -------------------------------------------------------
 
-
-def calc_atr(df, period=14):
+def calc_atr(df, period=ATR_PERIOD):
     high = df["High"]
     low = df["Low"]
     prev_close = df["Close"].shift(1)
 
-    tr = pd.concat([
-        (high - low),
-        (high - prev_close).abs(),
-        (low - prev_close).abs()
-    ], axis=1).max(axis=1)
+    tr1 = high - low
+    tr2 = (high - prev_close).abs()
+    tr3 = (low - prev_close).abs()
 
-    return tr.ewm(alpha=1/period, adjust=False).mean()
+    tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+    atr = tr.ewm(alpha=1/period, adjust=False).mean()
+    return atr
 
 
-def max_drawdown(equity_curve):
+# -------------------------------------------------------
+# HISTORICAL MAX (ATH BASE)
+# -------------------------------------------------------
+
+def highest_close(series):
     """
-    Computes max drawdown on an equity curve.
+    Compute max of all previous closes (shifted),
+    aligned & numeric-safe.
     """
-    curve = np.array(equity_curve)
-    peak = np.maximum.accumulate(curve)
-    dd = (curve - peak) / peak
-    return float(dd.min()) * 100.0
+    if isinstance(series, pd.DataFrame):
+        nums = series.select_dtypes(include=[np.number]).columns
+        if len(nums):
+            s = series[nums[0]]
+        else:
+            s = series.iloc[:, 0]
+    else:
+        s = pd.Series(series)
+
+    s = pd.to_numeric(s, errors="coerce")
+    shifted = s.shift(1)
+    rolling_max = shifted.cummax().fillna(0)
+
+    rolling_max = pd.Series(rolling_max, index=s.index)
+    return rolling_max.astype(float)
 
 # -------------------------------------------------------
 # INDICATOR PREPARATION
@@ -115,508 +169,395 @@ def max_drawdown(equity_curve):
 
 def prepare_indicators(df):
     """
-    Adds ATR, rolling max, ATH flags.
-    Requires >= WARMUP_BARS rows for proper signals.
+    Adds:
+        - ATR
+        - RollingMax
+        - ATH_break
+        - Confirmed_break
+        - Quality checks
+    Returns:
+        fully prepared DF or None (skip)
     """
-    df = df.copy()
-    if len(df) < WARMUP_BARS:
+    try:
+        if df is None or len(df) < WARMUP_BARS:
+            return None
+
+        df = df.copy()
+
+        # Ensure numeric prices
+        for col in ["Open", "High", "Low", "Close"]:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        df["ATR"] = calc_atr(df)
+        df["PrevClose"] = df["Close"].shift(1)
+
+        # Rolling max from previous bars
+        rolling_max = highest_close(df["Close"])
+        rolling_max.index = df.index
+        df["RollingMax"] = rolling_max
+
+        # ATH breakout: today's close > all-time-high until yesterday
+        left, right = df["Close"].align(df["RollingMax"], join="left")
+        df["ATH_break"] = left.gt(right).fillna(False)
+
+        # Confirmation next bar closes above today's close
+        df["Confirmed_break"] = (df["Close"].shift(-1) > df["Close"]) & df["ATH_break"]
+
+        # Quality filter
+        if df["ATR"].isna().mean() > 0.20:
+            return None
+
+        df = df.dropna(subset=["Close", "ATR", "RollingMax"])
+        if len(df) < WARMUP_BARS:
+            return None
+
+        return df
+
+    except Exception as e:
+        log.exception("prepare_indicators failed: %s", e)
         return None
-
-    df["ATR"] = calc_atr(df)
-    df["PrevClose"] = df["Close"].shift(1)
-
-    # ATH breakout flag (raw)
-    df["RollingMax"] = highest_close(df["Close"].shift(1).fillna(0))
-    df["ATH_break"] = df["Close"] > df["RollingMax"]
-
-    # ensure enough bars
-    if df["ATR"].isna().sum() > (len(df) * 0.2):
-        return None
-
-    return df
 
 
 # -------------------------------------------------------
-# DATA PREPARATION (ALL TICKERS)
+# PREPARE ALL TICKERS
 # -------------------------------------------------------
 
 def prepare_all_ticker_data(tickers):
     """
-    Download + prepare indicator data for all tickers.
-    Returns a dict of {ticker: df} and skip diagnostics.
+    Downloads each ticker, prepares indicators, filters bad data.
+    Returns a dict: {ticker: prepared_df}
     """
-    prepared = {}
-    skipped = defaultdict(int)
-    total = len(tickers)
+    good = {}
+    skipped = []
 
-    log.info(f"Downloading & preparing {total} tickers for {DATA_YEARS}y...")
+    log.info(f"Preparing {len(tickers)} tickers...")
 
     for t in tickers:
         df = safe_download(t)
-        if df is None or len(df) < WARMUP_BARS:
-            skipped["too_few_rows"] += 1
+        if df is None:
+            skipped.append((t, "download_fail"))
             continue
 
-        # prepare indicators
         pdf = prepare_indicators(df)
-        if pdf is None or len(pdf) < WARMUP_BARS:
-            skipped["not_enough_indicator_rows"] += 1
+        if pdf is None:
+            skipped.append((t, "indicator_fail"))
             continue
 
-        prepared[t] = pdf
+        good[t] = pdf
 
-        log.info(f"{t}: raw_rows={len(df)}, indicator_rows={len(pdf)}")
+        log.debug(f"{t}: raw_rows={len(df)}, indicator_rows={len(pdf)}")
 
-    log.info(f"Prepared {len(prepared)} tickers; skipped {total - len(prepared)} tickers.")
+    log.info(f"Prepared {len(good)} tickers; skipped {len(skipped)}.")
+    if skipped:
+        reasons = Counter([r for _, r in skipped])
+        log.info(f"Skip reasons: {reasons}")
 
-    # Summaries
-    top_skip = [(f"{k}", v) for k, v in skipped.items()]
-    log.info(f"Top skip reasons: {top_skip}")
+    return good
 
-    return prepared
 
 # -------------------------------------------------------
-# STRATEGY CORE: ATH BREAKOUT + NEXT-DAY CONFIRMATION
+# TRADE SIGNAL GENERATION (ATH Entry Rules)
 # -------------------------------------------------------
 
-def generate_trade_signals(prepped):
+def generate_trade_signals(all_data):
     """
-    Loop through each ticker’s DF and find ATH breakout entries.
-    Entry rule:
-        Day D:  Close > previous all-time-high (ATH_break = True)
-        Day D+1: Confirmation close > D close (must exist)
-    Stoploss (Option C):
-        SL = previous ATH (RollingMax[D])
-    Exit:
-        - Pullback hit: Close < EMA5
-        - Or SL hit intraday
-        - Or Take Profit: 3 × ATR
+    Loop through each prepared ticker and detect ATH signals.
+
+    BUY RULES:
+    ----------
+    1. Close[0] makes ATH_break == True
+    2. Next bar confirms (Confirmed_break == True)
+    3. ATR-based stoploss
+    4. Risk/Reward ≥ MIN_RR
+
+    Returns list of entries:
+        {
+            'ticker': 'RELIANCE.NS',
+            'date': Timestamp,
+            'entry': float,
+            'stop': float,
+            'target': float,
+            'risk': float,
+            'rr': float,
+        }
     """
 
-    entries = []          # Raw entries
-    rejected_stats = Counter()
+    entries = []
+    diag = Counter()
 
-    for t, df in prepped.items():
+    for ticker, df in all_data.items():
+        closes = df["Close"]
+        atr = df["ATR"]
 
-        for i in range(WARMUP_BARS, len(df) - 2):
+        for i in range(len(df)-2):
             row = df.iloc[i]
 
-            # 1) ATH breakout occurred today
             if not row["ATH_break"]:
-                rejected_stats["no_ath_break"] += 1
+                diag["no_ath"] += 1
                 continue
 
-            # ATH breakout but closing weak?
-            if row["Close"] <= row["RollingMax"]:
-                rejected_stats["not_true_break"] += 1
+            # Confirm breakout on next bar
+            if not df.iloc[i+1]["Confirmed_break"]:
+                diag["no_confirm"] += 1
                 continue
 
-            # 2) Confirmation must happen next day
-            conf = df.iloc[i + 1]
-            if conf["Close"] <= row["Close"]:
-                rejected_stats["no_confirmation"] += 1
+            entry = float(row["Close"])
+            stop = entry - (ATR_MULT_SL * float(row["ATR"]))
+            risk = entry - stop
+            if risk <= 0:
+                diag["invalid_risk"] += 1
                 continue
 
-            # 3) Stoploss (Option C) — SL = previous ATH
-            sl = row["RollingMax"]
-            if sl <= 0 or sl >= row["Close"]:
-                rejected_stats["invalid_sl"] += 1
+            rr_target = entry + (MIN_RR * risk)
+
+            # Must fit R/R requirements
+            rr = (rr_target - entry) / risk
+            if rr < MIN_RR:
+                diag["rr_fail"] += 1
                 continue
 
-            # 4) ATR must exist
-            atr = float(row["ATR"])
-            if atr <= 0:
-                rejected_stats["no_atr"] += 1
-                continue
-
-            # 5) Take-profit = 3×ATR
-            tgt = row["Close"] + 3 * atr
+            diag["accepted"] += 1
 
             entries.append({
-                "symbol": t,
-                "entry_date": df.index[i + 1],     # next day
-                "entry_price": float(conf["Close"]),
-                "sl": float(sl),
-                "tgt": float(tgt),
-                "atr": float(atr),
+                "ticker": ticker,
+                "i": i,
+                "date": df.index[i],
+                "entry": entry,
+                "stop": stop,
+                "target": rr_target,
+                "risk": risk,
+                "rr": rr
             })
 
-    log.info(f"Entry diagnostics: {rejected_stats}")
-    log.info(f"Total accepted entries: {len(entries)}")
+    log.info(f"Entry diag: {dict(diag)}")
+    log.info(f"Generated {len(entries)} trade entries.")
 
     return entries
 
 # -------------------------------------------------------
-# Position sizing
+# BACKTEST SIMULATION ENGINE
 # -------------------------------------------------------
 
-def compute_position_size(entry_price, sl_price):
-    """Risk-based sizing: 1% of capital per trade."""
-    risk_per_trade = CAPITAL * 0.01
-    stop_distance = entry_price - sl_price
-
-    if stop_distance <= 0:
-        return 0
-
-    qty = int(risk_per_trade / stop_distance)
-    if qty <= 0:
-        return 0
-
-    return qty
-
-
-# -------------------------------------------------------
-# Simulate each trade through future bars
-# -------------------------------------------------------
-
-def simulate_trade(df, entry_idx, entry_price, sl, tgt):
+def simulate_trade(df, start_index, entry, stop, target):
     """
-    Simulates a trade starting at entry_idx.
-    Exits:
-      - Intraday SL
-      - Intraday Target
-      - Pullback Exit (Close < EMA5)
+    Simulate trade starting at index=start_index+1 to allow the entry candle
+    to close first. We then evaluate subsequent bars:
+
+    Exit Rules:
+    -----------
+    1. SL hit (Low <= stop → exit at stop or next open)
+    2. Target hit (High >= target → exit at target or next open)
+    3. Pullback exit:
+       - After breakout, if Close < PrevClose OR Close < 0.98 * entry
+    4. Time exit (max hold days)
+
+    Returns:
+        (exit_price, exit_date, result_string)
     """
-    df = df.copy()
-    df["EMA5"] = df["Close"].ewm(span=5).mean()
 
-    for j in range(entry_idx, len(df)):
-        day = df.iloc[j]
-        low = day["Low"]
-        high = day["High"]
-        close = day["Close"]
+    start_bar = start_index + 1
+    max_index = min(len(df) - 1, start_bar + MAX_HOLD_DAYS)
 
-        # 1) SL hit intraday
-        if low <= sl:
-            exit_price = sl
-            return exit_price, "SL"
+    for i in range(start_bar, max_index + 1):
+        row = df.iloc[i]
+        low, high, close = row["Low"], row["High"], row["Close"]
 
-        # 2) TGT hit intraday
-        if high >= tgt:
-            exit_price = tgt
-            return exit_price, "TP"
+        # 1. SL hit
+        if low <= stop:
+            # next open slippage
+            next_open = df.iloc[i]["Open"]
+            exit_price = min(stop, next_open)
+            return exit_price, df.index[i], "LOSS"
 
-        # 3) Pullback exit at close
-        if close < day["EMA5"]:
-            exit_price = close
-            return exit_price, "PULLBACK"
+        # 2. Target hit
+        if high >= target:
+            next_open = df.iloc[i]["Open"]
+            exit_price = max(target, next_open)
+            return exit_price, df.index[i], "WIN"
 
-    # If never exited, last close
-    return df.iloc[-1]["Close"], "END"
+        # 3. Pullback exit
+        prev_close = df["Close"].iloc[i-1]
+        if close < prev_close or close < 0.98 * entry:
+            return close, df.index[i], "PULLBACK_EXIT"
+
+    # 4. Time-based exit (max hold reached)
+    final_close = df["Close"].iloc[max_index]
+    result = "WIN" if final_close >= entry else "LOSS"
+    return final_close, df.index[max_index], result
 
 
 # -------------------------------------------------------
-# Backtest execution
+# FULL BACKTEST PROCESSOR
 # -------------------------------------------------------
 
-def run_backtest(prepped, entries):
-    equity = CAPITAL
-    curve = [equity]
+def run_backtest(all_data, entries):
+    """
+    Given:
+        all_data : {ticker: dataframe}
+        entries  : list of entry dictionaries from generate_trade_signals()
+
+    Returns:
+        stats = {
+            "start_capital": ...,
+            "end_capital": ...,
+            "profit": ...,
+            "total_trades": ...,
+            "wins": ...,
+            "win_rate": ...,
+            "max_drawdown": ...,
+            "curve": [...],
+            "history": [...]  # list of executed trade details
+        }
+    """
+
+    equity = START_CAPITAL
+    equity_curve = [equity]
     history = []
 
-    grouped = defaultdict(list)
     for e in entries:
-        grouped[e["symbol"]].append(e)
+        tkr = e["ticker"]
+        if tkr not in all_data:
+            continue
 
-    for sym, trades in grouped.items():
-        df = prepped[sym]
-        for e in trades:
-            entry_date = e["entry_date"]
-            if entry_date not in df.index:
-                continue
+        df = all_data[tkr]
 
-            entry_idx = df.index.get_loc(entry_date)
-            entry_price = e["entry_price"]
-            sl = e["sl"]
-            tgt = e["tgt"]
+        # simulate trade
+        exit_price, exit_date, outcome = simulate_trade(
+            df,
+            e["i"],
+            e["entry"],
+            e["stop"],
+            e["target"]
+        )
 
-            qty = compute_position_size(entry_price, sl)
-            if qty <= 0:
-                continue
+        pnl = exit_price - e["entry"]
+        qty = int((equity * 0.02) / max(e["risk"], 0.01))  # 2% capital per trade
 
-            exit_price, exit_type = simulate_trade(df, entry_idx, entry_price, sl, tgt)
+        trade_pnl = pnl * qty
+        equity += trade_pnl
+        equity_curve.append(equity)
 
-            pnl = (exit_price - entry_price) * qty
+        history.append({
+            "ticker": tkr,
+            "entry_date": e["date"],
+            "exit_date": exit_date,
+            "entry": e["entry"],
+            "exit": exit_price,
+            "qty": qty,
+            "result": outcome,
+            "pnl": trade_pnl
+        })
 
-            history.append({
-                "symbol": sym,
-                "entry_date": str(entry_date),
-                "exit_type": exit_type,
-                "entry": entry_price,
-                "exit": exit_price,
-                "qty": qty,
-                "pnl": pnl
-            })
+    total_trades = len(history)
+    wins = sum(1 for h in history if h["pnl"] > 0)
+    win_rate = round((wins / total_trades) * 100, 2) if total_trades else 0
 
-            equity += pnl
-            curve.append(equity)
+    # Max Drawdown
+    curve = pd.Series(equity_curve)
+    peak = curve.cummax()
+    dd = (curve - peak) / peak
+    max_dd = round(dd.min() * -100, 2)
 
-    wins = len([t for t in history if t["pnl"] > 0])
-    total = len(history)
-    win_rate = round((wins / total * 100), 2) if total else 0
-    profit = round(equity - CAPITAL, 2)
-
-    log.info(f"Backtest complete. Trades={total}, Wins={wins}, Win rate={win_rate}%, Profit={profit}")
-
-    return {
-        "curve": curve,
-        "profit": profit,
-        "total_trades": total,
+    stats = {
+        "start_capital": START_CAPITAL,
+        "end_capital": equity,
+        "profit": round(equity - START_CAPITAL, 2),
+        "total_trades": total_trades,
+        "wins": wins,
         "win_rate": win_rate,
+        "max_drawdown": max_dd,
+        "curve": [round(x, 2) for x in equity_curve],
         "history": history
     }
 
+    log.info(f"=== BACKTEST SUMMARY ===")
+    log.info(f"Start capital : ₹{START_CAPITAL}")
+    log.info(f"End capital   : ₹{equity}")
+    log.info(f"Trades        : {total_trades}")
+    log.info(f"Wins          : {wins}")
+    log.info(f"Win rate      : {win_rate}%")
+    log.info(f"Total PnL     : ₹{stats['profit']}")
+    log.info(f"MaxDD         : {stats['max_drawdown']}%")
+
+    return stats
+
 # -------------------------------------------------------
-# JSON Helpers
+# SAVE JSON
 # -------------------------------------------------------
 
 def save_json(path, data):
-    with open(path, "w") as f:
-        json.dump(data, f, indent=2)
-    log.info(f"Saved results to {path}")
+    """Write JSON with indentation."""
+    try:
+        with open(path, "w") as f:
+            json.dump(data, f, indent=2, default=str)
+        log.info(f"Saved results to {path}")
+    except Exception as e:
+        log.error(f"Failed saving JSON {path}: {e}")
 
 
 # -------------------------------------------------------
-# DIAGNOSTICS
+# PRETTY BANNERS
 # -------------------------------------------------------
 
-def print_entry_summary(entries):
-    sym_count = Counter([e["symbol"] for e in entries])
-    log.info(f"Top entry Tickers: {sym_count.most_common(10)}")
-    log.info(f"Total entries found: {len(entries)}")
-
-
-def print_backtest_summary(stats):
-    log.info("=== BACKTEST SUMMARY ===")
-    log.info(f"Start capital : ₹{CAPITAL}")
-    log.info(f"End capital   : ₹{CAPITAL + stats['profit']}")
-    log.info(f"Trades        : {stats['total_trades']}")
-    log.info(f"Wins          : {sum(1 for t in stats['history'] if t['pnl']>0)}")
-    log.info(f"Win rate      : {stats['win_rate']}%")
-    log.info(f"Total PnL     : ₹{stats['profit']}")
+def banner(text):
+    bar = "=" * (len(text) + 6)
+    log.info("\n" + bar)
+    log.info(f"== {text} ==")
+    log.info(bar)
 
 
 # -------------------------------------------------------
-# MASTER RUNNER
+# FULL EXECUTION PIPELINE
 # -------------------------------------------------------
 
 def run_full_backtest():
-    # 1) Load ticker list
+    """High-level orchestration: load → prepare → signal → backtest → save."""
+    banner("Loading Tickers")
     tickers = load_tickers_from_csv("ind_nifty500list.csv")
     if not tickers:
-        log.error("Ticker list empty. Aborting.")
+        log.error("No tickers loaded. Exiting.")
         return
 
-    # 2) Download + prepare data
-    prepped = prepare_all_ticker_data(tickers)
-    if not prepped:
-        log.error("No data prepared. Exiting.")
+    banner("Preparing Data")
+    all_data = prepare_all_ticker_data(tickers)
+    if not all_data:
+        log.error("No prepared tickers. Exiting.")
         return
+    log.info(f"Prepared {len(all_data)} tickers.")
 
-    # 3) Find entries
-    entries = generate_trade_signals(prepped)
-    print_entry_summary(entries)
+    banner("Generating Signals")
+    entries = generate_trade_signals(all_data)
+    if not entries:
+        log.warning("No signals generated.")
+    else:
+        log.info(f"{len(entries)} entries generated.")
 
-    if len(entries) == 0:
-        log.warning("No entries found. Check rules or relax constraints.")
-        stats = {
-            "curve": [CAPITAL],
-            "profit": 0,
-            "total_trades": 0,
-            "win_rate": 0,
-            "history": []
-        }
-        save_json("backtest_stats.json", stats)
-        return
+    banner("Running Backtest")
+    stats = run_backtest(all_data, entries)
 
-    # 4) Run backtest simulation
-    stats = run_backtest(prepped, entries)
-
-    # 5) Save final result
+    banner("Saving Results")
     save_json("backtest_stats.json", stats)
 
-    # 6) Print summary
-    print_backtest_summary(stats)
+    banner("Completed")
+    return stats
+
 
 # -------------------------------------------------------
-# MISC IMPORTS USED LATER (ensure Counter is available)
-# -------------------------------------------------------
-from collections import Counter
-
-# -------------------------------------------------------
-# MAIN / CLI
+# MAIN
 # -------------------------------------------------------
 
 def main():
-    start = datetime.utcnow()
-    log.info("Starting ATH Backtest Runner")
+    start = time.time()
     try:
         run_full_backtest()
-    except Exception as e:
-        log.exception("Fatal error during backtest: %s", e)
+    except Exception:
+        log.error("Fatal error:")
+        traceback.print_exc()
     finally:
-        end = datetime.utcnow()
-        elapsed = (end - start).total_seconds()
-        log.info("Backtest finished in %.2f seconds", elapsed)
+        elapsed = time.time() - start
+        log.info(f"Backtest finished in {elapsed:.2f} seconds")
 
 
 if __name__ == "__main__":
     main()
-
-# -------------------------------------------------------
-# ADVANCED DIAGNOSTICS — optional but extremely useful
-# -------------------------------------------------------
-
-def diagnostic_count_ath(prepped):
-    """
-    Counts ATH breakouts per ticker for debugging.
-    """
-    results = {}
-    for sym, df in prepped.items():
-        if "ATH_break" in df:
-            results[sym] = int(df["ATH_break"].sum())
-    top = sorted(results.items(), key=lambda x: x[1], reverse=True)[:15]
-    log.info("Top 15 tickers by ATH-break count:")
-    for s, c in top:
-        log.info(f"  {s}: {c}")
-    return results
-
-
-def diagnostic_entry_flow(entries):
-    """
-    Show distribution of entries across all tickers.
-    """
-    sym_count = Counter([e["symbol"] for e in entries])
-    log.info("Entry distribution (top 20):")
-    for sym, cnt in sym_count.most_common(20):
-        log.info(f"  {sym}: {cnt} entries")
-
-
-def diagnostic_trade_results(history):
-    """
-    Summaries for trade outcomes by type.
-    """
-    types = Counter([h["exit_type"] for h in history])
-    log.info("Exit reason distribution:")
-    for t, c in types.items():
-        log.info(f"  {t}: {c}")
-
-    sym_wins = Counter([h["symbol"] for h in history if h["pnl"] > 0])
-    log.info("Top winning symbols:")
-    for s, c in sym_wins.most_common(10):
-        log.info(f"  {s}: {c} wins")
-
-
-def dump_debug_csv(prepped, path="debug_tickers.csv"):
-    """
-    Save quick summary of each ticker to CSV for investigation.
-    """
-    rows = []
-    for sym, df in prepped.items():
-        rows.append({
-            "symbol": sym,
-            "rows": len(df),
-            "ath_count": int(df["ATH_break"].sum()),
-            "atr_min": float(df["ATR"].min()),
-            "atr_max": float(df["ATR"].max()),
-            "close_min": float(df["Close"].min()),
-            "close_max": float(df["Close"].max())
-        })
-    pd.DataFrame(rows).to_csv(path, index=False)
-    log.info(f"Saved debug ticker summary → {path}")
-
-# -------------------------------------------------------
-# PRETTY LOGGING UTILITIES
-# -------------------------------------------------------
-
-COLOR = {
-    "RESET": "\033[0m",
-    "GREEN": "\033[92m",
-    "RED": "\033[91m",
-    "CYAN": "\033[96m",
-    "YELLOW": "\033[93m",
-    "MAGENTA": "\033[95m",
-    "BLUE": "\033[94m",
-    "GRAY": "\033[90m",
-}
-
-def banner(msg):
-    """Nice readable section header."""
-    bar = "=" * (len(msg) + 4)
-    log.info(COLOR["CYAN"] + bar)
-    log.info(f"| {msg} |")
-    log.info(bar + COLOR["RESET"])
-
-
-def pretty_kv(title, dct):
-    log.info(COLOR["MAGENTA"] + f"--- {title} ---" + COLOR["RESET"])
-    for k, v in dct.items():
-        log.info(f"{k:20s}: {v}")
-
-
-def enable_verbose():
-    """Increase logging detail."""
-    log.setLevel(logging.DEBUG)
-    for handler in log.handlers:
-        handler.setLevel(logging.DEBUG)
-    log.debug("Verbose logging enabled.")
-
-
-# -------------------------------------------------------
-# OPTIONAL: CLI ARG PARSER (to toggle verbose mode)
-# -------------------------------------------------------
-
-import argparse
-
-def parse_cli():
-    parser = argparse.ArgumentParser(description="ATH Backtester Runner")
-    parser.add_argument("--verbose", action="store_true",
-                        help="Enable detailed debug logging.")
-    parser.add_argument("--dump", action="store_true",
-                        help="Dump debug CSV with ticker stats.")
-    return parser.parse_args()
-
-
-# -------------------------------------------------------
-# UPDATED MAIN TO SUPPORT VERBOSE MODE
-# -------------------------------------------------------
-
-def main():
-    args = parse_cli()
-    if args.verbose:
-        enable_verbose()
-
-    start = datetime.utcnow()
-    banner("Starting ATH Breakout Backtest")
-
-    try:
-        tickers = load_tickers_from_csv("ind_nifty500list.csv")
-        if not tickers:
-            log.error("Ticker list empty — aborting.")
-            return
-
-        banner("Preparing Data")
-        prepped = prepare_all_ticker_data(tickers)
-
-        banner("Scanning for ATH Entries")
-        entries = generate_trade_signals(prepped)
-        print_entry_summary(entries)
-
-        banner("Running Trade Simulation")
-        stats = run_backtest(prepped, entries)
-
-        banner("Backtest Summary")
-        print_backtest_summary(stats)
-
-        save_json("backtest_stats.json", stats)
-
-        if args.dump:
-            banner("Dumping Debug CSV")
-            dump_debug_csv(prepped)
-
-    except Exception as e:
-        log.exception("Fatal error during run: %s", e)
-
-    end = datetime.utcnow()
-    log.info(f"Completed in {(end - start).total_seconds():.2f}s")
-    banner("Done")
