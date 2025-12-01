@@ -1,5 +1,27 @@
 [
   {
+    "id": "LTFOODS-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "LTFOODS",
+    "entry": 415.9,
+    "qty": 60,
+    "target": 446.07,
+    "stop_loss": 405.84,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "INDIGO-2025-12-01",
+    "date": "2025-12-01",
+    "symbol": "INDIGO",
+    "entry": 5799.0,
+    "qty": 4,
+    "target": 6119.86,
+    "stop_loss": 5692.05,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "HUDCO-2025-12-01",
     "date": "2025-12-01",
     "symbol": "HUDCO",
