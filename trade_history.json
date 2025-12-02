@@ -1,5 +1,27 @@
 [
   {
+    "id": "PHOENIXLTD-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "PHOENIXLTD",
+    "entry": 1720.6,
+    "qty": 14,
+    "target": 1830.49,
+    "stop_loss": 1683.97,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "CDSL-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "CDSL",
+    "entry": 1594.5,
+    "qty": 15,
+    "target": 1701.4,
+    "stop_loss": 1558.87,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "NEULANDLAB-2025-12-02",
     "date": "2025-12-02",
     "symbol": "NEULANDLAB",
@@ -1277,8 +1299,10 @@
     "qty": 6,
     "target": 4175.95,
     "stop_loss": 3844.82,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -543.81,
+    "exit_price": 3844.82,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "BHARTIHEXA-2025-11-27",
@@ -1310,8 +1334,10 @@
     "qty": 15,
     "target": 1739.95,
     "stop_loss": 1590.55,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -609.09,
+    "exit_price": 1590.55,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "CHOICEIN-2025-11-27",
