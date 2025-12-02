@@ -65,19 +65,31 @@ log = logger
 # -------------------------------------------------------
 
 def load_tickers_from_csv(path):
-    """CSV must contain a 'Symbol' column with tickers like RELIANCE.NS"""
+    """CSV must contain a 'Symbol' column with tickers like RELIANCE or RELIANCE.NS.
+    This function normalizes and appends .NS if missing (so Yahoo symbols are correct).
+    """
     if not os.path.exists(path):
         log.error(f"Ticker CSV not found: {path}")
         return []
     try:
         df = pd.read_csv(path)
-        syms = [s.strip() for s in df["Symbol"].dropna().unique()]
+        syms = []
+        for s in df.get("Symbol", []):
+            if pd.isna(s):
+                continue
+            s = str(s).strip()
+            if not s:
+                continue
+            # normalize: add .NS if not present
+            if not s.upper().endswith(".NS"):
+                s = s + ".NS"
+            syms.append(s.upper())
+        syms = list(dict.fromkeys(syms))  # preserve order, unique
         log.info(f"Loaded {len(syms)} tickers from CSV")
         return syms
     except Exception as e:
         log.exception("Failed to read ticker CSV: %s", e)
         return []
-
 
 # -------------------------------------------------------
 # SAFE DOWNLOAD
@@ -85,7 +97,8 @@ def load_tickers_from_csv(path):
 
 def safe_download(ticker, period=PERIOD_STRING):
     """
-    Downloads data and ensures Close column is a single numeric series.
+    Downloads data and ensures Open/High/Low/Close are pandas Series.
+    Returns None on failure.
     """
     try:
         df = yf.download(
@@ -99,26 +112,75 @@ def safe_download(ticker, period=PERIOD_STRING):
         log.warning(f"{ticker}: yfinance error: {e}")
         return None
 
-    if df is None or len(df) == 0:
+    # Empty / no data
+    if df is None or (hasattr(df, 'empty') and df.empty) or len(df) == 0:
+        log.debug(f"{ticker}: no data returned by yfinance")
         return None
 
-    # Normalize multi-column Close (sometimes DataFrame)
-    if isinstance(df.get("Close"), pd.DataFrame):
-        close_cols = df["Close"].select_dtypes(include=[np.number]).columns
-        if len(close_cols) > 0:
-            df["Close"] = df["Close"][close_cols[0]]
-        else:
-            df["Close"] = df["Close"].iloc[:, 0]
+    # If df has multi-level columns (happens rarely), try to collapse if single ticker returned
+    try:
+        # If 'Close' is a DataFrame (multi-columns), pick numeric column if possible
+        close_obj = df.get("Close")
+        if isinstance(close_obj, pd.DataFrame):
+            # choose first numeric subcolumn
+            numcols = close_obj.select_dtypes(include=[np.number]).columns
+            if len(numcols) > 0:
+                df["Close"] = close_obj[numcols[0]]
+            else:
+                # fallback to first column
+                df["Close"] = close_obj.iloc[:, 0]
+    except Exception:
+        # continue — we'll attempt to coerce below
+        pass
 
-    # Coerce numerics
+    # Ensure index is a DatetimeIndex
+    try:
+        if not isinstance(df.index, pd.DatetimeIndex):
+            df.index = pd.to_datetime(df.index, errors="coerce")
+    except Exception:
+        pass
+
+    # Now coerce Open/High/Low/Close into 1-d Series robustly
     for c in ["Open", "High", "Low", "Close"]:
-        if c in df.columns:
-            df[c] = pd.to_numeric(df[c], errors="coerce")
+        if c not in df.columns:
+            continue
+        col = df[c]
+        # if scalar (weird), convert to Series with same index
+        if not isinstance(col, (pd.Series, np.ndarray, list)):
+            try:
+                df[c] = pd.Series([col] * len(df), index=df.index)
+            except Exception:
+                # last resort: drop this ticker
+                log.debug(f"{ticker}: column {c} not array-like, skipping ticker")
+                return None
+        else:
+            # if it's a DataFrame-like object (2D), pick numeric column or flatten
+            if isinstance(col, pd.DataFrame):
+                numcols = col.select_dtypes(include=[np.number]).columns
+                if len(numcols) > 0:
+                    df[c] = col[numcols[0]].astype(float)
+                else:
+                    # fallback: first column
+                    df[c] = col.iloc[:, 0].astype(float)
+            else:
+                # safe coercion for Series / ndarray
+                try:
+                    df[c] = pd.to_numeric(pd.Series(col, index=df.index), errors="coerce")
+                except Exception:
+                    try:
+                        # try converting element-wise
+                        df[c] = pd.Series(list(col), index=df.index).astype(float)
+                    except Exception:
+                        log.debug(f"{ticker}: failed to coerce column {c}")
+                        return None
 
+    # Drop rows where Close is NA
     df = df.dropna(subset=["Close"])
+    if df is None or len(df) == 0:
+        log.debug(f"{ticker}: no numeric close data after coercion")
+        return None
 
-    return df if len(df) > 0 else None
-
+    return df
 
 # -------------------------------------------------------
 # ATR CALCULATION
@@ -136,7 +198,6 @@ def calc_atr(df, period=ATR_PERIOD):
     tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
     atr = tr.ewm(alpha=1/period, adjust=False).mean()
     return atr
-
 
 # -------------------------------------------------------
 # HISTORICAL MAX (ATH BASE)
@@ -218,7 +279,6 @@ def prepare_indicators(df):
         log.exception("prepare_indicators failed: %s", e)
         return None
 
-
 # -------------------------------------------------------
 # PREPARE ALL TICKERS
 # -------------------------------------------------------
@@ -254,7 +314,6 @@ def prepare_all_ticker_data(tickers):
         log.info(f"Skip reasons: {reasons}")
 
     return good
-
 
 # -------------------------------------------------------
 # TRADE SIGNAL GENERATION (ATH Entry Rules)
@@ -386,7 +445,6 @@ def simulate_trade(df, start_index, entry, stop, target):
     result = "WIN" if final_close >= entry else "LOSS"
     return final_close, df.index[max_index], result
 
-
 # -------------------------------------------------------
 # FULL BACKTEST PROCESSOR
 # -------------------------------------------------------
@@ -495,7 +553,6 @@ def save_json(path, data):
     except Exception as e:
         log.error(f"Failed saving JSON {path}: {e}")
 
-
 # -------------------------------------------------------
 # PRETTY BANNERS
 # -------------------------------------------------------
@@ -505,7 +562,6 @@ def banner(text):
     log.info("\n" + bar)
     log.info(f"== {text} ==")
     log.info(bar)
-
 
 # -------------------------------------------------------
 # FULL EXECUTION PIPELINE
@@ -541,7 +597,6 @@ def run_full_backtest():
 
     banner("Completed")
     return stats
-
 
 # -------------------------------------------------------
 # MAIN
