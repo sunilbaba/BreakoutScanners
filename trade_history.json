@@ -1,5 +1,38 @@
 [
   {
+    "id": "LEMONTREE-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "LEMONTREE",
+    "entry": 163.39,
+    "qty": 153,
+    "target": 175.74,
+    "stop_loss": 159.27,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "HDFCBANK-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "HDFCBANK",
+    "entry": 989.4,
+    "qty": 25,
+    "target": 1033.33,
+    "stop_loss": 974.76,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "ESCORTS-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "ESCORTS",
+    "entry": 3773.0,
+    "qty": 6,
+    "target": 4057.73,
+    "stop_loss": 3678.09,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "GSPL-2025-12-02",
     "date": "2025-12-02",
     "symbol": "GSPL",
@@ -7,8 +40,10 @@
     "qty": 80,
     "target": 329.77,
     "stop_loss": 301.81,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -1465.41,
+    "exit_price": 291.1000061035156,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "DATAPATTNS-2025-12-02",
@@ -154,8 +189,10 @@
     "qty": 4,
     "target": 6119.86,
     "stop_loss": 5692.05,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -474.19,
+    "exit_price": 5692.05,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "HUDCO-2025-12-01",
@@ -656,8 +693,10 @@
     "qty": 87,
     "target": 305.22,
     "stop_loss": 278.73,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -625.59,
+    "exit_price": 278.73,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "MARUTI-2025-11-28",
