@@ -1,9 +1,9 @@
 """
-strategy_optimizer.py (Fixed Loop & Deep Scan)
-----------------------------------------------
-1. FIX: Used 'while' loop to correctly handle trade duration skipping.
-2. FIX: Increased sample size from 20 to 50 stocks per strategy.
-3. LOGIC: Injects a "Baseline" strategy to ensure the engine works.
+strategy_optimizer.py (Debug Edition)
+-------------------------------------
+1. Added verbose logging for Data Shape & Indicator values.
+2. Added 'Rejection Counters' to see why trades are skipped.
+3. Fixed potential index out-of-bounds issues.
 """
 
 import yfinance as yf
@@ -13,13 +13,14 @@ import random
 import json
 import logging
 import os
+from collections import Counter
 from datetime import datetime
 
 # --- CONFIG ---
 ITERATIONS = 500          
-MIN_TRADES = 5            # Lowered to 5 to catch rare but good setups
+MIN_TRADES = 5            
 DATA_PERIOD = "2y"
-SAMPLE_SIZE = 50          # Test on 50 stocks (10% of Nifty 500)
+SAMPLE_SIZE = 50          
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger("Optimizer")
@@ -43,23 +44,36 @@ def robust_download(tickers):
         batch = tickers[i:i+batch_size]
         try:
             data = yf.download(batch, period=DATA_PERIOD, group_by='ticker', threads=True, progress=False, ignore_tz=True)
-            frames.append(data)
-        except: pass
-    return pd.concat(frames, axis=1) if frames else pd.DataFrame()
+            if not data.empty:
+                frames.append(data)
+        except Exception as e: 
+            logger.warning(f"Batch download error: {e}")
+            pass
+            
+    if not frames: return pd.DataFrame()
+    bulk = pd.concat(frames, axis=1)
+    logger.info(f"✅ Downloaded Bulk Data Shape: {bulk.shape}")
+    return bulk
 
 def extract_df(bulk, ticker):
     try:
         if isinstance(bulk.columns, pd.MultiIndex):
             if ticker in bulk.columns.get_level_values(0):
-                return bulk[ticker].copy().dropna()
+                return bulk[ticker].copy() # Don't dropna here yet
     except: pass
     return None
 
 # -------------------------
 # 2. MATH & INDICATORS
 # -------------------------
-def prepare_features(df):
+def prepare_features(df, ticker_name="Unknown"):
     df = df.copy()
+    
+    # Check raw data
+    if len(df) < 200:
+        # logger.debug(f"Skipping {ticker_name}: Too short ({len(df)} rows)")
+        return None
+        
     # Trend
     df['SMA50'] = df['Close'].rolling(50).mean()
     df['SMA200'] = df['Close'].rolling(200).mean()
@@ -87,7 +101,14 @@ def prepare_features(df):
     minus_di = 100 * (pd.Series(minus_dm).ewm(alpha=1/14).mean() / tr)
     df['ADX'] = (abs(plus_di - minus_di) / (plus_di + minus_di) * 100).ewm(alpha=1/14).mean().fillna(0)
     
-    return df.dropna()
+    df = df.dropna()
+    
+    # DEBUG: Check if indicators are valid
+    if len(df) > 0 and ticker_name == "RELIANCE.NS":
+        last = df.iloc[-1]
+        logger.info(f"🔍 {ticker_name} Check: Close={last['Close']:.2f}, RSI={last['RSI']:.2f}, ADX={last['ADX']:.2f}, SMA200={last['SMA200']:.2f}")
+    
+    return df
 
 # -------------------------
 # 3. STRATEGY GENERATOR
@@ -95,8 +116,8 @@ def prepare_features(df):
 def generate_random_strategy():
     return {
         "name": f"AI-{random.randint(100,999)}",
-        "trend_filter": random.choice(["SMA200", "NONE"]), # Simplified
-        "rsi_logic": random.choice(["OVERSOLD", "MOMENTUM"]), # Removed NEUTRAL to force direction
+        "trend_filter": random.choice(["SMA200", "NONE"]), 
+        "rsi_logic": random.choice(["OVERSOLD", "MOMENTUM"]), 
         "rsi_threshold": random.choice([30, 35, 40, 60, 65, 70]),
         "adx_min": random.choice([0, 15, 20]),
         "sl_atr_mult": random.choice([1.0, 2.0]),
@@ -104,12 +125,12 @@ def generate_random_strategy():
     }
 
 # -------------------------
-# 4. EVALUATION ENGINE (WHILE LOOP FIX)
+# 4. EVALUATION ENGINE
 # -------------------------
-def evaluate_strategy(df, genome):
+def evaluate_strategy(df, genome, debug=False):
     wins, losses = 0, 0
     
-    # Vector Access
+    # Pre-fetch columns
     close = df['Close'].values
     low = df['Low'].values
     high = df['High'].values
@@ -118,10 +139,15 @@ def evaluate_strategy(df, genome):
     adx = df['ADX'].values
     atr = df['ATR'].values
     
-    if len(close) < 250: return 0, 0
+    # Diagnostics
+    reasons = Counter()
+    
+    if len(close) < 50: 
+        if debug: logger.warning("  -> DF too short for sim.")
+        return 0, 0
 
     # Loop Logic
-    i = 200 # Start after warmup
+    i = 0 
     end_idx = len(df) - 20
     
     while i < end_idx:
@@ -131,25 +157,28 @@ def evaluate_strategy(df, genome):
         # 1. Trend
         if genome["trend_filter"] == "SMA200":
             if close[i] < sma200[i]: 
+                reasons['Trend'] += 1
                 i += 1; continue
         
         # 2. ADX
         if adx[i] <= genome["adx_min"]:
+            reasons['ADX'] += 1
             i += 1; continue
 
         # 3. RSI
         rsi_val = rsi[i]
         if genome["rsi_logic"] == "OVERSOLD":
             if rsi_val < genome["rsi_threshold"]: is_entry = True
+            else: reasons['RSI_Over'] += 1
         elif genome["rsi_logic"] == "MOMENTUM":
             if rsi_val > genome["rsi_threshold"]: is_entry = True
+            else: reasons['RSI_Mom'] += 1
             
         if is_entry:
             entry_price = close[i]
             sl = entry_price - (genome["sl_atr_mult"] * atr[i])
             tgt = entry_price + (genome["tgt_atr_mult"] * atr[i])
             
-            # Simulate Forward
             outcome = "OPEN"
             days_held = 0
             
@@ -158,7 +187,6 @@ def evaluate_strategy(df, genome):
                 curr_idx = i + j
                 if curr_idx >= len(close): break
                 
-                # Check Low first (Conservative)
                 if low[curr_idx] <= sl:
                     outcome = "LOSS"
                     break
@@ -168,12 +196,15 @@ def evaluate_strategy(df, genome):
             
             if outcome == "WIN": wins += 1
             elif outcome == "LOSS": losses += 1
+            # If OPEN, we just ignore it for win rate stats (or mark as loss if you prefer strict)
             
-            # Skip forward by holding period
             i += days_held
         else:
             i += 1
-
+            
+    if debug and (wins+losses) == 0:
+        logger.info(f"  -> 0 Trades. Rejections: {dict(reasons)}")
+        
     return wins, losses
 
 # -------------------------
@@ -204,16 +235,17 @@ def run_optimization():
     logger.info("📊 Preparing Data...")
     for t in tickers:
         raw = extract_df(bulk, t)
-        if raw is not None and len(raw) > 250:
-            processed_data.append(prepare_features(raw))
+        if raw is not None:
+            clean = prepare_features(raw, t)
+            if clean is not None: processed_data.append(clean)
     
     if not processed_data:
-        logger.error("❌ No valid data.")
+        logger.error("❌ No valid data prepared.")
         return
 
     logger.info(f"🧬 Testing {ITERATIONS} Strategies on sample of {SAMPLE_SIZE} stocks...")
     
-    # INJECT BASELINE (Known Good Strategy)
+    # INJECT BASELINE
     baseline = {
         "name": "BASELINE-DIP", "trend_filter": "SMA200", "rsi_logic": "OVERSOLD",
         "rsi_threshold": 40, "adx_min": 15, "sl_atr_mult": 1.5, "tgt_atr_mult": 3.0
@@ -221,18 +253,22 @@ def run_optimization():
     
     results = []
     
-    # Evolution Loop
     for idx in range(ITERATIONS + 1):
         if idx == 0: genome = baseline
         else: genome = generate_random_strategy()
         
         total_wins, total_losses = 0, 0
         
-        # Test on random sample
+        # Debug the first run to see why it fails (if it does)
+        debug_flag = (idx == 0) 
+        if debug_flag: logger.info(f"🧐 Debugging Baseline Strategy: {genome}")
+
+        # Sample data
         sample = random.sample(processed_data, min(len(processed_data), SAMPLE_SIZE))
         
-        for df in sample:
-            w, l = evaluate_strategy(df, genome)
+        for i, df in enumerate(sample):
+            # Only debug the first stock of the first strategy
+            w, l = evaluate_strategy(df, genome, debug=(debug_flag and i==0))
             total_wins += w
             total_losses += l
             
@@ -242,8 +278,7 @@ def run_optimization():
         if total >= MIN_TRADES:
             results.append({ "genome": genome, "win_rate": round(win_rate, 1), "trades": total })
             
-        # Verbose log for first 5 to prove it works
-        if idx < 5:
+        if idx < 3: # Print first 3 attempts
             logger.info(f"Test {idx}: WR {win_rate:.1f}% | Trades {total}")
 
     results.sort(key=lambda x: x['win_rate'], reverse=True)
@@ -254,7 +289,6 @@ def run_optimization():
         g = top['genome']
         logger.info(f"🏆 WINNER: {top['win_rate']}% Win Rate ({top['trades']} Trades)")
         logger.info(f"   • Signal: RSI {g['rsi_logic']} < {g['rsi_threshold']} (Trend: {g['trend_filter']})")
-        logger.info(f"   • Risk: Stop {g['sl_atr_mult']} ATR | Target {g['tgt_atr_mult']} ATR")
         save_best_strategy(g)
     else:
         logger.warning("⚠️ Still no viable strategy. Using Baseline.")
