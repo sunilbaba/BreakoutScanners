@@ -1,8 +1,9 @@
 """
-backtest_runner.py (Diagnostic)
-- Runs Nightly.
-- Tracks rejection reasons to debug "0 Trades" issue.
-- Saves 'backtest_stats.json'.
+backtest_runner.py (Tuned Edition)
+- Relaxed constraints to find more trades.
+- ADX > 15 (was 20).
+- RSI > 50 (was 55).
+- Fixed hardcoded values in Win Rate calculator.
 """
 
 import yfinance as yf
@@ -15,15 +16,15 @@ from collections import Counter
 from datetime import datetime
 
 # --- CONFIG ---
-DATA_PERIOD = "2y" # Needed for SMA200
+DATA_PERIOD = "2y" 
 CACHE_FILE = "backtest_stats.json"
 CAPITAL = 100_000.0
 RISK_PER_TRADE = 0.02
 BROKERAGE_PCT = 0.001
 
-# Relaxed constraints for testing
-ADX_THRESHOLD = 20.0
-RSI_THRESHOLD = 55.0
+# --- RELAXED SETTINGS FOR MORE TRADES ---
+ADX_THRESHOLD = 15.0  # Lowered from 20 to catch earlier trends
+RSI_THRESHOLD = 50.0  # Lowered from 55 to catch standard momentum
 
 SECTOR_INDICES = {
     "NIFTY 50": "^NSEI", "BANK": "^NSEBANK", "AUTO": "^CNXAUTO", "IT": "^CNXIT",
@@ -41,7 +42,6 @@ def get_tickers():
             df = pd.read_csv("ind_nifty500list.csv")
             return [f"{x}.NS" for x in df['Symbol'].dropna().unique()]
         except: pass
-    # Fallback to liquid stocks if CSV missing
     return ["RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "ICICIBANK.NS", 
             "SBIN.NS", "TATAMOTORS.NS", "ITC.NS", "SUNPHARMA.NS", "MARUTI.NS"]
 
@@ -105,6 +105,7 @@ def calc_single_wr(df):
         row = df.iloc[i]
         sma200 = row['SMA200'] if not pd.isna(row['SMA200']) else row['Close']
         
+        # Use GLOBAL thresholds to match simulation
         if row['Close'] > row['EMA20'] and row['RSI'] > RSI_THRESHOLD and row['ADX'] > ADX_THRESHOLD and row['Close'] > sma200:
             stop = row['Close'] - row['ATR']
             target = row['Close'] + (3 * row['ATR'])
@@ -171,7 +172,7 @@ def run_simulation(bulk_data, tickers):
                 if date not in df.index: continue
                 row = df.loc[date]
                 
-                # DIAGNOSTIC CHECKS
+                # RULES
                 sma200 = row['SMA200'] if not pd.isna(row['SMA200']) else row['Close']
                 
                 passed_trend = row['Close'] > sma200
@@ -184,7 +185,6 @@ def run_simulation(bulk_data, tickers):
                 elif not passed_rsi: reject_reasons['Low RSI'] += 1
                 elif not passed_adx: reject_reasons['Low ADX'] += 1
                 else:
-                    # SIGNAL FOUND
                     potential_signals += 1
                     if any(t['symbol'] == sym for t in portfolio): 
                         reject_reasons['Already Owned'] += 1
@@ -196,8 +196,8 @@ def run_simulation(bulk_data, tickers):
                     qty = int((curve[-1] * RISK_PER_TRADE) / risk)
                     cost = qty * row['Close']
                     
+                    # Affordable sizing
                     if cost > cash: 
-                        # Affordable sizing check
                         qty = int(cash / row['Close'])
                         cost = qty * row['Close']
                     
