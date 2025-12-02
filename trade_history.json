@@ -1,5 +1,16 @@
 [
   {
+    "id": "AXISBANK-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "AXISBANK",
+    "entry": 1256.8,
+    "qty": 19,
+    "target": 1316.16,
+    "stop_loss": 1237.01,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "MAPMYINDIA-2025-12-02",
     "date": "2025-12-02",
     "symbol": "MAPMYINDIA",
@@ -7,8 +18,10 @@
     "qty": 14,
     "target": 1897.03,
     "stop_loss": 1714.72,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -1244.89,
+    "exit_price": 1674.9000244140625,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "ADANIENSOL-2025-12-02",
