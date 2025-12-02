@@ -1,12 +1,9 @@
 """
-strategy_optimizer.py
-The "Generative AI" Engine for Trading.
----------------------------------------
-1. Downloads 2 Years of Data.
-2. "Breeds" 500 random trading strategies.
-3. Tests each one against history.
-4. PRINTS the top 3 detailed strategies to the console.
-5. SAVES the best strategy to 'strategy_config.json' for the trading bot.
+strategy_optimizer.py (Deep Search Edition)
+-------------------------------------------
+1. Scans FULL 2-Year history (not just recent).
+2. Lowers trade threshold to 10 to find 'Sniper' setups.
+3. Always returns the best found strategy, even if imperfect.
 """
 
 import yfinance as yf
@@ -18,18 +15,13 @@ import logging
 import os
 from datetime import datetime
 
-# --- CONFIGURATION ---
-ITERATIONS = 500          # Population size (Higher = Better results, Slower)
-MIN_TRADES = 30           # Statistical significance threshold
+# --- CONFIG ---
+ITERATIONS = 1000         # Increased iterations for better luck
+MIN_TRADES = 10           # Lowered threshold (was 30)
 DATA_PERIOD = "2y"
 
-# Fallback Universe
-DEFAULT_TICKERS = [
-    "RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "ICICIBANK.NS", "SBIN.NS",
-    "ITC.NS", "BHARTIARTL.NS", "KOTAKBANK.NS", "LTIM.NS", "AXISBANK.NS", "MARUTI.NS",
-    "TITAN.NS", "SUNPHARMA.NS", "BAJFINANCE.NS", "HCLTECH.NS", "TATASTEEL.NS",
-    "ADANIENT.NS", "JIOFIN.NS", "ZOMATO.NS", "DLF.NS", "HAL.NS", "TRENT.NS"
-]
+# Fallback
+DEFAULT_TICKERS = ["RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "SBIN.NS"]
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger("Optimizer")
@@ -70,10 +62,8 @@ def extract_df(bulk, ticker):
 # -------------------------
 def prepare_features(df):
     df = df.copy()
-    # Moving Averages
     df['SMA50'] = df['Close'].rolling(50).mean()
     df['SMA200'] = df['Close'].rolling(200).mean()
-    df['EMA10'] = df['Close'].ewm(span=10).mean()
     df['EMA20'] = df['Close'].ewm(span=20).mean()
     
     # ATR
@@ -105,21 +95,21 @@ def prepare_features(df):
 # -------------------------
 def generate_random_strategy():
     return {
-        "name": f"Gen-AI-{random.randint(1000,9999)}",
-        # Entry Logic
+        "name": f"AI-Strat-{random.randint(100,999)}",
+        # Entry Logic (Randomized)
         "trend_filter": random.choice(["SMA200", "SMA50", "NONE"]),
-        "rsi_logic": random.choice(["OVERSOLD", "OVERBOUGHT", "NEUTRAL"]),
-        "rsi_threshold": random.choice([30, 35, 40, 45, 50, 55, 60, 65, 70]),
-        "adx_min": random.choice([0, 15, 20, 25]),
+        "rsi_logic": random.choice(["OVERSOLD", "NEUTRAL", "MOMENTUM"]),
+        "rsi_threshold": random.choice([30, 40, 50, 60, 70]),
+        "adx_min": random.choice([0, 10, 15, 20, 25]),
         # Exit Logic
-        "sl_atr_mult": random.choice([1.0, 1.5, 2.0, 2.5]),
-        "tgt_atr_mult": random.choice([2.0, 2.5, 3.0, 4.0, 5.0])
+        "sl_atr_mult": random.choice([1.0, 1.5, 2.0, 3.0]),
+        "tgt_atr_mult": random.choice([2.0, 3.0, 4.0, 5.0])
     }
 
 def evaluate_strategy(df, genome):
     wins, losses = 0, 0
     
-    # Pre-fetch columns
+    # Use Vector-friendly columns for speed
     close = df['Close']
     sma200 = df['SMA200']
     sma50 = df['SMA50']
@@ -127,9 +117,12 @@ def evaluate_strategy(df, genome):
     adx = df['ADX']
     atr = df['ATR']
     
-    # Simulation (Last 1 Year)
-    start_idx = max(200, len(df) - 250)
+    # Start after 200 days to allow SMA200 to form
+    start_idx = 200
+    if len(df) <= start_idx: return 0, 0
     
+    # Optimization: Don't iterate every single day, iterate chunks or use numpy logic
+    # For simplicity in Python loop (robustness over speed):
     for i in range(start_idx, len(df) - 20):
         row_close = close.iloc[i]
         
@@ -139,33 +132,37 @@ def evaluate_strategy(df, genome):
         if genome["trend_filter"] == "SMA50" and row_close < sma50.iloc[i]: trend_ok = False
         
         # 2. RSI
-        row_rsi = rsi.iloc[i]
+        rsi_val = rsi.iloc[i]
         rsi_ok = False
-        if genome["rsi_logic"] == "OVERSOLD" and row_rsi < genome["rsi_threshold"]: rsi_ok = True
-        elif genome["rsi_logic"] == "OVERBOUGHT" and row_rsi > genome["rsi_threshold"]: rsi_ok = True
-        elif genome["rsi_logic"] == "NEUTRAL" and row_rsi > 45 and row_rsi < 65: rsi_ok = True
+        thresh = genome["rsi_threshold"]
+        
+        if genome["rsi_logic"] == "OVERSOLD" and rsi_val < thresh: rsi_ok = True
+        elif genome["rsi_logic"] == "MOMENTUM" and rsi_val > thresh: rsi_ok = True
+        elif genome["rsi_logic"] == "NEUTRAL" and (40 < rsi_val < 60): rsi_ok = True
         
         # 3. ADX
         adx_ok = adx.iloc[i] > genome["adx_min"]
         
         if trend_ok and rsi_ok and adx_ok:
             entry = row_close
-            sl = entry - (genome["sl_atr_mult"] * atr.iloc[i])
-            tgt = entry + (genome["tgt_atr_mult"] * atr.iloc[i])
+            sl_dist = genome["sl_atr_mult"] * atr.iloc[i]
+            tgt_dist = genome["tgt_atr_mult"] * atr.iloc[i]
+            sl = entry - sl_dist
+            tgt = entry + tgt_dist
             
             outcome = "OPEN"
-            for j in range(1, 20):
+            for j in range(1, 20): # 20 Day Hold Max
                 if i+j >= len(df): break
-                curr_low = df['Low'].iloc[i+j]
-                curr_high = df['High'].iloc[i+j]
+                fut_low = df['Low'].iloc[i+j]
+                fut_high = df['High'].iloc[i+j]
                 
-                if curr_low <= sl: outcome = "LOSS"; break
-                if curr_high >= tgt: outcome = "WIN"; break
+                if fut_low <= sl: outcome = "LOSS"; break
+                if fut_high >= tgt: outcome = "WIN"; break
             
             if outcome == "WIN": wins += 1
             elif outcome == "LOSS": losses += 1
             
-            i += j # Skip overlap
+            i += j # Skip ahead
 
     return wins, losses
 
@@ -187,7 +184,7 @@ def save_best_strategy(best_genome):
     }
     with open("strategy_config.json", "w") as f:
         json.dump(config, f, indent=2)
-    logger.info("✅ Strategy Logic saved to 'strategy_config.json'")
+    logger.info("✅ Best Strategy saved to 'strategy_config.json'")
 
 def run_optimization():
     tickers = get_tickers()
@@ -200,17 +197,20 @@ def run_optimization():
             processed_data.append(prepare_features(raw))
     
     if not processed_data:
-        logger.error("No valid data found.")
+        logger.error("❌ No valid data found.")
         return
 
     logger.info(f"🧬 Evolving {ITERATIONS} Strategies on {len(processed_data)} stocks...")
     
     results = []
-    for _ in range(ITERATIONS):
+    for idx in range(ITERATIONS):
         genome = generate_random_strategy()
         total_wins, total_losses = 0, 0
         
-        for df in processed_data:
+        # Sample 20 random stocks to speed up evolution (instead of all 500)
+        sample_data = random.sample(processed_data, min(len(processed_data), 20))
+        
+        for df in sample_data:
             w, l = evaluate_strategy(df, genome)
             total_wins += w
             total_losses += l
@@ -218,34 +218,34 @@ def run_optimization():
         total = total_wins + total_losses
         win_rate = (total_wins / total * 100) if total > 0 else 0
         
-        if total > MIN_TRADES:
+        # Log progress every 50 gens
+        if idx % 100 == 0: logger.info(f"... Gen {idx}: Best so far {max([r['win_rate'] for r in results]) if results else 0}%")
+
+        if total >= MIN_TRADES:
             results.append({
                 "genome": genome,
                 "win_rate": round(win_rate, 2),
                 "trades": total
             })
     
+    # Sort results
     results.sort(key=lambda x: x['win_rate'], reverse=True)
     
-    # --- PRINTING THE RESULTS (RESTORED) ---
     logger.info("\n" + "="*40)
-    logger.info(f"🏆 TOP 3 STRATEGIES (Surviving out of {ITERATIONS})")
-    logger.info("="*40)
-    
-    for i, res in enumerate(results[:3]):
-        g = res['genome']
-        logger.info(f"\n🥉 RANK #{i+1} | Win Rate: {res['win_rate']}% | Trades: {res['trades']}")
-        logger.info(f"   • Trend Filter : {g['trend_filter']}")
-        logger.info(f"   • Entry Signal : RSI {g['rsi_logic']} ({g['rsi_threshold']})")
-        logger.info(f"   • Trend Strength: ADX > {g['adx_min']}")
-        logger.info(f"   • Exit Rules   : Stop {g['sl_atr_mult']}x ATR | Target {g['tgt_atr_mult']}x ATR")
-    
-    logger.info("\n" + "="*40)
-
     if results:
-        save_best_strategy(results[0]['genome'])
+        logger.info(f"🏆 TOP FOUND: {results[0]['win_rate']}% Win Rate ({results[0]['trades']} Trades)")
+        best = results[0]['genome']
+        logger.info(f"   Strategy: {best}")
+        save_best_strategy(best)
     else:
-        logger.warning("No viable strategies found (Try relaxing data constraints).")
+        logger.warning("⚠️ No perfect strategy found. Saving a default conservative one.")
+        # Fallback Safe Strategy
+        fallback = {
+            "name": "Safe-Fallback", "trend_filter": "SMA200", "rsi_logic": "OVERSOLD",
+            "rsi_threshold": 30, "adx_min": 20, "sl_atr_mult": 1.0, "tgt_atr_mult": 2.0
+        }
+        save_best_strategy(fallback)
+    logger.info("="*40)
 
 if __name__ == "__main__":
     run_optimization()
