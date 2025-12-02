@@ -1,5 +1,38 @@
 [
   {
+    "id": "NBCC-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "NBCC",
+    "entry": 116.48,
+    "qty": 214,
+    "target": 126.03,
+    "stop_loss": 113.3,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "BDL-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "BDL",
+    "entry": 1544.5,
+    "qty": 16,
+    "target": 1659.12,
+    "stop_loss": 1506.29,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "AKZOINDIA-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "AKZOINDIA",
+    "entry": 3336.0,
+    "qty": 7,
+    "target": 3552.23,
+    "stop_loss": 3263.92,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "LEMONTREE-2025-12-02",
     "date": "2025-12-02",
     "symbol": "LEMONTREE",
