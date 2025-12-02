@@ -7,8 +7,10 @@
     "qty": 23,
     "target": 1115.74,
     "stop_loss": 1019.55,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -648.31,
+    "exit_price": 1017.5,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "AXISBANK-2025-12-02",
