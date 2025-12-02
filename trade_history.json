@@ -1,5 +1,27 @@
 [
   {
+    "id": "NMDC-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "NMDC",
+    "entry": 76.23,
+    "qty": 327,
+    "target": 80.63,
+    "stop_loss": 74.76,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "MAHABANK-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "MAHABANK",
+    "entry": 58.18,
+    "qty": 429,
+    "target": 63.42,
+    "stop_loss": 56.43,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "NBCC-2025-12-02",
     "date": "2025-12-02",
     "symbol": "NBCC",
@@ -257,8 +279,10 @@
     "qty": 9,
     "target": 3040.58,
     "stop_loss": 2660.07,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -905.76,
+    "exit_price": 2660.07,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "BHARTIARTL-2025-12-01",
