@@ -1,9 +1,9 @@
 """
-strategy_optimizer.py (Fixed ADX)
----------------------------------
-1. FIX: Corrected ADX Math (Index Alignment Bug).
-2. LOGIC: Now correctly calculates trend strength.
-3. RESULT: Will generate valid non-zero Win Rates.
+strategy_optimizer.py (Math Fixed)
+----------------------------------
+1. FIX: Corrected ADX Formula (PrevLow - CurrLow).
+2. LOGIC: Ensures ADX is always 0-100.
+3. RESULT: Optimizes strategies with valid Trend Strength data.
 """
 
 import yfinance as yf
@@ -18,7 +18,7 @@ from datetime import datetime
 
 # --- CONFIG ---
 ITERATIONS = 500          
-MIN_TRADES = 5            
+MIN_TRADES = 10           
 DATA_PERIOD = "2y"
 SAMPLE_SIZE = 50          
 
@@ -50,8 +50,7 @@ def robust_download(tickers):
             pass
             
     if not frames: return pd.DataFrame()
-    bulk = pd.concat(frames, axis=1)
-    return bulk
+    return pd.concat(frames, axis=1)
 
 def extract_df(bulk, ticker):
     try:
@@ -62,7 +61,7 @@ def extract_df(bulk, ticker):
     return None
 
 # -------------------------
-# 2. MATH & INDICATORS (FIXED)
+# 2. MATH & INDICATORS (CORRECTED)
 # -------------------------
 def prepare_features(df, ticker_name="Unknown"):
     df = df.copy()
@@ -86,31 +85,39 @@ def prepare_features(df, ticker_name="Unknown"):
     loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/14).mean()
     df['RSI'] = 100 - (100 / (1 + gain/loss)).fillna(50)
     
-    # ADX (FIXED LOGIC)
-    plus_dm = df['High'].diff()
-    minus_dm = df['Low'].diff()
+    # ADX (CORRECTED STANDARD FORMULA)
+    # UpMove = High - PrevHigh
+    up_move = df['High'] - df['High'].shift(1)
+    # DownMove = PrevLow - Low
+    down_move = df['Low'].shift(1) - df['Low']
     
-    # Use numpy for comparison but keep data separate
-    p_dm = np.where((plus_dm > minus_dm) & (plus_dm > 0), plus_dm, 0.0)
-    m_dm = np.where((minus_dm > plus_dm) & (minus_dm > 0), -minus_dm, 0.0)
+    # Initialize +DM and -DM with zeros
+    plus_dm = pd.Series(0.0, index=df.index)
+    minus_dm = pd.Series(0.0, index=df.index)
     
-    # CRITICAL FIX: Re-attach Index so pandas aligns them correctly
-    plus_dm_s = pd.Series(p_dm, index=df.index)
-    minus_dm_s = pd.Series(m_dm, index=df.index)
+    # Logic: If Up > Down and Up > 0, then +DM = Up
+    mask_plus = (up_move > down_move) & (up_move > 0)
+    plus_dm[mask_plus] = up_move[mask_plus]
     
-    tr = pd.concat([h_l, h_c, l_c], axis=1).max(axis=1).ewm(alpha=1/14).mean()
+    # Logic: If Down > Up and Down > 0, then -DM = Down
+    mask_minus = (down_move > up_move) & (down_move > 0)
+    minus_dm[mask_minus] = down_move[mask_minus]
     
-    plus_di = 100 * (plus_dm_s.ewm(alpha=1/14).mean() / tr)
-    minus_di = 100 * (minus_dm_s.ewm(alpha=1/14).mean() / tr)
+    # Smoothed True Range and DMs
+    atr_smooth = df['ATR'].ewm(alpha=1/14, adjust=False).mean()
+    plus_di = 100 * (plus_dm.ewm(alpha=1/14, adjust=False).mean() / atr_smooth)
+    minus_di = 100 * (minus_dm.ewm(alpha=1/14, adjust=False).mean() / atr_smooth)
     
-    df['ADX'] = (abs(plus_di - minus_di) / (plus_di + minus_di) * 100).ewm(alpha=1/14).mean().fillna(0)
+    # DX and ADX
+    dx = (abs(plus_di - minus_di) / (plus_di + minus_di)) * 100
+    df['ADX'] = dx.ewm(alpha=1/14, adjust=False).mean().fillna(0)
     
     df = df.dropna()
     
-    # DEBUG: Check if ADX is fixed
-    if ticker_name == "RELIANCE.NS":
+    # DEBUG CHECK
+    if ticker_name == "RELIANCE.NS" and len(df) > 0:
         last = df.iloc[-1]
-        logger.info(f"🔍 CHECK: {ticker_name} | ADX={last['ADX']:.2f} (Should not be 0)")
+        logger.info(f"🔍 CHECK: {ticker_name} | ADX={last['ADX']:.2f} (0-100 Valid)")
     
     return df
 
@@ -134,6 +141,7 @@ def generate_random_strategy():
 def evaluate_strategy(df, genome, debug=False):
     wins, losses = 0, 0
     
+    # Vector Access
     close = df['Close'].values
     low = df['Low'].values
     high = df['High'].values
@@ -144,6 +152,7 @@ def evaluate_strategy(df, genome, debug=False):
     
     if len(close) < 50: return 0, 0
 
+    # Loop Logic
     i = 0 
     end_idx = len(df) - 20
     
@@ -174,7 +183,7 @@ def evaluate_strategy(df, genome, debug=False):
             outcome = "OPEN"
             days_held = 0
             
-            for j in range(1, 15):
+            for j in range(1, 15): 
                 days_held = j
                 curr_idx = i + j
                 if curr_idx >= len(close): break
@@ -246,7 +255,6 @@ def run_optimization():
         else: genome = generate_random_strategy()
         
         total_wins, total_losses = 0, 0
-        
         sample = random.sample(processed_data, min(len(processed_data), SAMPLE_SIZE))
         
         for i, df in enumerate(sample):
@@ -260,7 +268,7 @@ def run_optimization():
         if total >= MIN_TRADES:
             results.append({ "genome": genome, "win_rate": round(win_rate, 1), "trades": total })
             
-        if idx < 3: # Print first 3 attempts
+        if idx < 3: 
             logger.info(f"Test {idx}: WR {win_rate:.1f}% | Trades {total}")
 
     results.sort(key=lambda x: x['win_rate'], reverse=True)
