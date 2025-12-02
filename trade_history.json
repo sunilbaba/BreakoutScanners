@@ -1,5 +1,16 @@
 [
   {
+    "id": "EIDPARRY-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "EIDPARRY",
+    "entry": 1043.6,
+    "qty": 23,
+    "target": 1115.74,
+    "stop_loss": 1019.55,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "AXISBANK-2025-12-02",
     "date": "2025-12-02",
     "symbol": "AXISBANK",
@@ -802,8 +813,10 @@
     "qty": 23,
     "target": 1119.11,
     "stop_loss": 1026.3,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -581.88,
+    "exit_price": 1026.3,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "CENTURYPLY-2025-11-28",
