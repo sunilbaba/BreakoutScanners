@@ -1,5 +1,27 @@
 [
   {
+    "id": "MAPMYINDIA-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "MAPMYINDIA",
+    "entry": 1760.3,
+    "qty": 14,
+    "target": 1897.03,
+    "stop_loss": 1714.72,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "ADANIENSOL-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "ADANIENSOL",
+    "entry": 979.45,
+    "qty": 25,
+    "target": 1055.47,
+    "stop_loss": 954.11,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "DABUR-2025-12-02",
     "date": "2025-12-02",
     "symbol": "DABUR",
@@ -1200,8 +1222,10 @@
     "qty": 70,
     "target": 381.33,
     "stop_loss": 347.16,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -647.6,
+    "exit_price": 347.16,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "FORCEMOT-2025-11-27",
