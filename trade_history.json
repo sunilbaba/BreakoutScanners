@@ -1,5 +1,38 @@
 [
   {
+    "id": "GSPL-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "GSPL",
+    "entry": 308.8,
+    "qty": 80,
+    "target": 329.77,
+    "stop_loss": 301.81,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "DATAPATTNS-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "DATAPATTNS",
+    "entry": 2894.1,
+    "qty": 8,
+    "target": 3202.6,
+    "stop_loss": 2791.27,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "BAJAJFINSV-2025-12-02",
+    "date": "2025-12-02",
+    "symbol": "BAJAJFINSV",
+    "entry": 2072.0,
+    "qty": 12,
+    "target": 2189.28,
+    "stop_loss": 2032.91,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "LEMONTREE-2025-12-01",
     "date": "2025-12-01",
     "symbol": "LEMONTREE",
@@ -53,8 +86,10 @@
     "qty": 1,
     "target": 18571.2,
     "stop_loss": 16097.6,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -651.83,
+    "exit_price": 16097.6,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "COALINDIA-2025-12-01",
@@ -277,8 +312,10 @@
     "qty": 50,
     "target": 537.05,
     "stop_loss": 478.52,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -780.81,
+    "exit_price": 478.52,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "MOTILALOFS-2025-12-01",
@@ -288,8 +325,10 @@
     "qty": 25,
     "target": 1066.45,
     "stop_loss": 950.12,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -778.96,
+    "exit_price": 950.0,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "HINDCOPPER-2025-12-01",
@@ -457,8 +496,10 @@
     "qty": 14,
     "target": 1809.44,
     "stop_loss": 1625.65,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -690.1,
+    "exit_price": 1625.65,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "ONGC-2025-11-28",
@@ -871,8 +912,10 @@
     "qty": 17,
     "target": 1443.35,
     "stop_loss": 1373.68,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -343.44,
+    "exit_price": 1373.68,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "HDFCLIFE-2025-11-27",
@@ -930,8 +973,10 @@
     "qty": 24,
     "target": 1053.71,
     "stop_loss": 995.1,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -570.47,
+    "exit_price": 988.0,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "GESHIP-2025-11-27",
@@ -1020,8 +1065,10 @@
     "qty": 15,
     "target": 1750.61,
     "stop_loss": 1569.26,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -757.94,
+    "exit_price": 1567.300048828125,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "GICRE-2025-11-27",
@@ -1086,8 +1133,10 @@
     "qty": 124,
     "target": 216.68,
     "stop_loss": 195.63,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -702.06,
+    "exit_price": 195.63,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "DCMSHRIRAM-2025-11-27",
@@ -1211,8 +1260,10 @@
     "qty": 11,
     "target": 2236.38,
     "stop_loss": 2066.27,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -514.22,
+    "exit_price": 2066.27,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "BAJFINANCE-2025-11-27",
@@ -1335,8 +1386,10 @@
     "qty": 13,
     "target": 1998.48,
     "stop_loss": 1846.51,
-    "status": "OPEN",
-    "net_pnl": 0
+    "status": "LOSS",
+    "net_pnl": -542.87,
+    "exit_price": 1846.51,
+    "exit_date": "2025-12-02"
   },
   {
     "id": "HCLTECH-2025-11-26",
