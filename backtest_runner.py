@@ -1,54 +1,61 @@
 """
-backtest_runner.py (Tuned Edition)
-- Relaxed constraints to find more trades.
-- ADX > 15 (was 20).
-- RSI > 50 (was 55).
-- Fixed hardcoded values in Win Rate calculator.
+strategy_optimizer.py
+The "Generative" Engine.
+------------------------
+1. Reads Tickers from 'ind_nifty500list.csv'.
+2. Downloads 2 Years of Data.
+3. Generates 500+ unique strategy variations (Genomes).
+4. Backtests each variation against the market.
+5. Returns the "fittest" strategy with the highest Win Rate.
 """
 
 import yfinance as yf
 import pandas as pd
 import numpy as np
-import json
-import os
+import random
 import logging
-from collections import Counter
+import os
 from datetime import datetime
 
-# --- CONFIG ---
-DATA_PERIOD = "2y" 
-CACHE_FILE = "backtest_stats.json"
-CAPITAL = 100_000.0
-RISK_PER_TRADE = 0.02
-BROKERAGE_PCT = 0.001
+# --- CONFIGURATION ---
+ITERATIONS = 500          # How many strategies to generate & test
+MIN_TRADES = 30           # Ignore strategies with too few trades
+DATA_PERIOD = "2y"
 
-# --- RELAXED SETTINGS FOR MORE TRADES ---
-ADX_THRESHOLD = 15.0  # Lowered from 20 to catch earlier trends
-RSI_THRESHOLD = 50.0  # Lowered from 55 to catch standard momentum
-
-SECTOR_INDICES = {
-    "NIFTY 50": "^NSEI", "BANK": "^NSEBANK", "AUTO": "^CNXAUTO", "IT": "^CNXIT",
-    "METAL": "^CNXMETAL", "PHARMA": "^CNXPHARMA", "FMCG": "^CNXFMCG",
-    "ENERGY": "^CNXENERGY", "REALTY": "^CNXREALTY", "PSU BANK": "^CNXPSUBANK"
-}
+# Fallback Universe (Liquid Nifty 50 Stocks) if CSV is missing
+DEFAULT_TICKERS = [
+    "RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "ICICIBANK.NS", "SBIN.NS",
+    "ITC.NS", "BHARTIARTL.NS", "KOTAKBANK.NS", "LTIM.NS", "AXISBANK.NS", "MARUTI.NS",
+    "TITAN.NS", "SUNPHARMA.NS", "BAJFINANCE.NS", "HCLTECH.NS", "TATASTEEL.NS",
+    "ADANIENT.NS", "JIOFIN.NS", "ZOMATO.NS", "DLF.NS", "HAL.NS", "TRENT.NS"
+]
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
-logger = logging.getLogger("Backtest")
+logger = logging.getLogger("Optimizer")
 
-# --- 1. DATA ---
+# -------------------------
+# 1. DATA ENGINE
+# -------------------------
 def get_tickers():
+    """Reads tickers from CSV or falls back to default list."""
     if os.path.exists("ind_nifty500list.csv"):
         try:
             df = pd.read_csv("ind_nifty500list.csv")
-            return [f"{x}.NS" for x in df['Symbol'].dropna().unique()]
-        except: pass
-    return ["RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "ICICIBANK.NS", 
-            "SBIN.NS", "TATAMOTORS.NS", "ITC.NS", "SUNPHARMA.NS", "MARUTI.NS"]
+            # Ensure .NS extension for Yahoo Finance
+            tickers = [f"{x}.NS" if not str(x).endswith(".NS") else x for x in df['Symbol'].dropna().unique()]
+            logger.info(f"✅ Loaded {len(tickers)} tickers from CSV.")
+            return tickers
+        except Exception as e:
+            logger.warning(f"⚠️ CSV Read Error: {e}")
+            pass
+    
+    logger.info("⚠️ CSV not found. Using default Nifty 50 list.")
+    return DEFAULT_TICKERS
 
 def robust_download(tickers):
-    logger.info(f"⬇️ Downloading {len(tickers)} symbols...")
+    logger.info(f"📥 Downloading {len(tickers)} stocks ({DATA_PERIOD})...")
     frames = []
-    batch_size = 20
+    batch_size = 50 # Increased batch size for efficiency
     for i in range(0, len(tickers), batch_size):
         batch = tickers[i:i+batch_size]
         try:
@@ -65,26 +72,30 @@ def extract_df(bulk, ticker):
     except: pass
     return None
 
-# --- 2. MATH ---
-def prepare_df(df):
+# -------------------------
+# 2. FEATURE ENGINEERING
+# -------------------------
+def prepare_features(df):
     df = df.copy()
+    # Moving Averages
     df['SMA50'] = df['Close'].rolling(50).mean()
     df['SMA200'] = df['Close'].rolling(200).mean()
+    df['EMA10'] = df['Close'].ewm(span=10).mean()
     df['EMA20'] = df['Close'].ewm(span=20).mean()
     
-    # Volatility
+    # ATR (Volatility)
     h_l = df['High'] - df['Low']
     h_c = (df['High'] - df['Close'].shift()).abs()
     l_c = (df['Low'] - df['Close'].shift()).abs()
     df['ATR'] = pd.concat([h_l, h_c, l_c], axis=1).max(axis=1).rolling(14).mean()
     
-    # Momentum
+    # RSI
     delta = df['Close'].diff()
     gain = (delta.where(delta > 0, 0)).ewm(alpha=1/14).mean()
     loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/14).mean()
-    df['RSI'] = 100 - (100 / (1 + gain / loss)).fillna(50)
+    df['RSI'] = 100 - (100 / (1 + gain/loss)).fillna(50)
     
-    # Trend Strength (ADX)
+    # ADX (Strength)
     plus_dm = df['High'].diff()
     minus_dm = df['Low'].diff()
     plus_dm = np.where((plus_dm > minus_dm) & (plus_dm > 0), plus_dm, 0.0)
@@ -94,165 +105,139 @@ def prepare_df(df):
     minus_di = 100 * (pd.Series(minus_dm).ewm(alpha=1/14).mean() / tr)
     df['ADX'] = (abs(plus_di - minus_di) / (plus_di + minus_di) * 100).ewm(alpha=1/14).mean().fillna(0)
     
-    return df
+    return df.dropna()
 
-# --- 3. WIN RATE CALC ---
-def calc_single_wr(df):
-    if len(df) < 250: return 0
-    wins, total = 0, 0
-    start = max(200, len(df) - 130)
-    for i in range(start, len(df)-10):
-        row = df.iloc[i]
-        sma200 = row['SMA200'] if not pd.isna(row['SMA200']) else row['Close']
-        
-        # Use GLOBAL thresholds to match simulation
-        if row['Close'] > row['EMA20'] and row['RSI'] > RSI_THRESHOLD and row['ADX'] > ADX_THRESHOLD and row['Close'] > sma200:
-            stop = row['Close'] - row['ATR']
-            target = row['Close'] + (3 * row['ATR'])
-            outcome = "OPEN"
-            for j in range(1, 15):
-                if i+j >= len(df): break
-                fut = df.iloc[i+j]
-                if fut['Low'] <= stop: outcome="LOSS"; break
-                if fut['High'] >= target: outcome="WIN"; break
-            if outcome != "OPEN":
-                total += 1
-                if outcome == "WIN": wins += 1
-    return round((wins/total*100), 0) if total > 0 else 0
-
-# --- 4. SIMULATION ---
-def run_simulation(bulk_data, tickers):
-    processed = {}
-    for t in tickers:
-        raw = extract_df(bulk_data, t)
-        if raw is not None and len(raw) > 250:
-            processed[t] = prepare_df(raw)
-            
-    if not processed: return [], [], 0, 0, 0
-    
-    dates = sorted(list(set().union(*[d.index for d in processed.values()])))
-    sim_dates = dates[200:] # Warmup
-    
-    cash = CAPITAL
-    curve = [CAPITAL]
-    portfolio = []
-    history = []
-    
-    # DIAGNOSTICS
-    reject_reasons = Counter()
-    potential_signals = 0
-    
-    logger.info(f"🚀 Simulating {len(sim_dates)} days across {len(processed)} stocks...")
-    
-    for date in sim_dates:
-        # A. Exits
-        active = []
-        for t in portfolio:
-            sym = t['symbol']
-            if date not in processed[sym].index:
-                active.append(t); continue
-            
-            row = processed[sym].loc[date]
-            exit_p = None
-            
-            if row['Open'] < t['sl']: exit_p = row['Open']
-            elif row['Low'] <= t['sl']: exit_p = t['sl']
-            elif row['High'] >= t['tgt']: exit_p = t['tgt']
-            
-            if exit_p:
-                pnl = (exit_p - t['entry']) * t['qty']
-                cash += (exit_p * t['qty'])
-                history.append({"date": date.strftime("%Y-%m-%d"), "symbol": sym, "pnl": round(pnl, 2), "result": "WIN" if pnl>0 else "LOSS"})
-            else: active.append(t)
-        portfolio = active
-        
-        # B. Entries
-        if len(portfolio) < 5:
-            for sym, df in processed.items():
-                if date not in df.index: continue
-                row = df.loc[date]
-                
-                # RULES
-                sma200 = row['SMA200'] if not pd.isna(row['SMA200']) else row['Close']
-                
-                passed_trend = row['Close'] > sma200
-                passed_mom = row['Close'] > row['EMA20']
-                passed_rsi = row['RSI'] > RSI_THRESHOLD
-                passed_adx = row['ADX'] > ADX_THRESHOLD
-                
-                if not passed_trend: reject_reasons['Downtrend'] += 1
-                elif not passed_mom: reject_reasons['Weak Momentum'] += 1
-                elif not passed_rsi: reject_reasons['Low RSI'] += 1
-                elif not passed_adx: reject_reasons['Low ADX'] += 1
-                else:
-                    potential_signals += 1
-                    if any(t['symbol'] == sym for t in portfolio): 
-                        reject_reasons['Already Owned'] += 1
-                        continue
-                        
-                    risk = row['ATR']
-                    if risk <= 0: continue
-                    
-                    qty = int((curve[-1] * RISK_PER_TRADE) / risk)
-                    cost = qty * row['Close']
-                    
-                    # Affordable sizing
-                    if cost > cash: 
-                        qty = int(cash / row['Close'])
-                        cost = qty * row['Close']
-                    
-                    if qty > 0 and cash > cost:
-                        cash -= cost
-                        portfolio.append({
-                            "symbol": sym, "entry": row['Close'], "qty": qty,
-                            "sl": row['Close'] - risk, "tgt": row['Close'] + (3*risk)
-                        })
-                        if len(portfolio) >= 5: break
-                    else:
-                        reject_reasons['Insufficient Cash'] += 1
-        
-        # C. Equity
-        m2m = 0
-        for t in portfolio:
-            sym = t['symbol']
-            price = processed[sym].loc[date]['Close'] if date in processed[sym].index else t['entry']
-            m2m += (price * t['qty'])
-        curve.append(round(cash + m2m, 2))
-
-    # REPORT DIAGNOSTICS
-    logger.info("\n--- DIAGNOSTIC REPORT ---")
-    logger.info(f"Total Potential Signals: {potential_signals}")
-    logger.info("Rejection Reasons:")
-    for reason, count in reject_reasons.most_common():
-        logger.info(f"  - {reason}: {count}")
-    logger.info(f"Actual Trades Taken: {len(history)}")
-    logger.info("-------------------------\n")
-
-    wins = len([h for h in history if h['pnl'] > 0])
-    win_rate = round(wins / len(history) * 100, 1) if history else 0
-    return curve, history, win_rate, len(history), round(curve[-1] - CAPITAL, 2)
-
-# --- MAIN ---
-if __name__ == "__main__":
-    tickers = get_tickers()
-    bulk = robust_download(tickers + list(SECTOR_INDICES.values()))
-    
-    ticker_stats = {}
-    for t in tickers:
-        df = extract_df(bulk, t)
-        if df is not None:
-            ticker_stats[t.replace('.NS','')] = calc_single_wr(prepare_df(df))
-            
-    curve, ledger, win_rate, trades, profit = run_simulation(bulk, tickers)
-    
-    output = {
-        "updated": datetime.now().strftime("%Y-%m-%d %H:%M UTC"),
-        "portfolio": {
-            "curve": curve, "ledger": ledger, 
-            "win_rate": win_rate, "total_trades": trades, "profit": profit
-        },
-        "tickers": ticker_stats
+# -------------------------
+# 3. STRATEGY GENERATOR (The "AI")
+# -------------------------
+def generate_random_strategy():
+    """Creates a random trading strategy genome."""
+    return {
+        "name": f"Strat-{random.randint(1000,9999)}",
+        # Entry Rules
+        "trend_filter": random.choice(["SMA200", "SMA50", "NONE"]),
+        "rsi_logic": random.choice(["OVERSOLD", "OVERBOUGHT", "NEUTRAL"]),
+        "rsi_threshold": random.randint(20, 80),
+        "adx_min": random.choice([0, 10, 15, 20, 25]),
+        # Exit Rules
+        "sl_atr_mult": random.choice([0.5, 1.0, 1.5, 2.0, 3.0]),
+        "tgt_atr_mult": random.choice([1.0, 1.5, 2.0, 3.0, 4.0, 5.0])
     }
+
+def evaluate_strategy(df, genome):
+    """Runs the specific genome on a stock's history."""
+    wins, losses = 0, 0
     
-    with open(CACHE_FILE, "w") as f: json.dump(output, f)
-    logger.info(f"✅ Saved stats. Profit: {profit} | Trades: {trades}")
+    # Pre-calc columns to speed up loop
+    close = df['Close']
+    sma200 = df['SMA200']
+    sma50 = df['SMA50']
+    rsi = df['RSI']
+    adx = df['ADX']
+    atr = df['ATR']
+    
+    # Simulation Loop (Last 1 Year approx)
+    start_idx = max(200, len(df) - 250)
+    for i in range(start_idx, len(df) - 10): 
+        row_close = close.iloc[i]
+        row_rsi = rsi.iloc[i]
+        row_adx = adx.iloc[i]
+        row_atr = atr.iloc[i]
+        
+        # 1. Trend Filter
+        trend_ok = True
+        if genome["trend_filter"] == "SMA200" and row_close < sma200.iloc[i]: trend_ok = False
+        if genome["trend_filter"] == "SMA50" and row_close < sma50.iloc[i]: trend_ok = False
+        
+        # 2. RSI Logic
+        rsi_ok = False
+        if genome["rsi_logic"] == "OVERSOLD" and row_rsi < genome["rsi_threshold"]: rsi_ok = True
+        if genome["rsi_logic"] == "OVERBOUGHT" and row_rsi > genome["rsi_threshold"]: rsi_ok = True
+        if genome["rsi_logic"] == "NEUTRAL" and row_rsi > 40 and row_rsi < 60: rsi_ok = True
+        
+        # 3. ADX Logic
+        adx_ok = row_adx > genome["adx_min"]
+        
+        if trend_ok and rsi_ok and adx_ok:
+            # ENTRY TRIGGERED
+            entry = row_close
+            sl = entry - (genome["sl_atr_mult"] * row_atr)
+            tgt = entry + (genome["tgt_atr_mult"] * row_atr)
+            
+            # Check Outcome (Look ahead 20 days)
+            outcome = "OPEN"
+            for j in range(1, 20):
+                if i+j >= len(df): break
+                fut_low = df['Low'].iloc[i+j]
+                fut_high = df['High'].iloc[i+j]
+                
+                if fut_low <= sl: outcome = "LOSS"; break
+                if fut_high >= tgt: outcome = "WIN"; break
+            
+            if outcome == "WIN": wins += 1
+            elif outcome == "LOSS": losses += 1
+            
+            # Skip ahead to avoid overlapping trades
+            i += j 
+
+    return wins, losses
+
+# -------------------------
+# 4. EVOLUTION LOOP
+# -------------------------
+def run_optimization():
+    tickers = get_tickers()
+    bulk = robust_download(tickers)
+    
+    # Prepare data once
+    processed_data = []
+    for t in tickers:
+        raw = extract_df(bulk, t)
+        if raw is not None and len(raw) > 250:
+            processed_data.append(prepare_features(raw))
+    
+    if not processed_data:
+        logger.error("No valid data available for optimization.")
+        return
+
+    logger.info(f"🧬 Evolving {ITERATIONS} Strategies on {len(processed_data)} stocks...")
+    
+    results = []
+    
+    for _ in range(ITERATIONS):
+        genome = generate_random_strategy()
+        total_wins, total_losses = 0, 0
+        
+        # Test genome on ALL stocks
+        for df in processed_data:
+            w, l = evaluate_strategy(df, genome)
+            total_wins += w
+            total_losses += l
+            
+        total_trades = total_wins + total_losses
+        win_rate = (total_wins / total_trades * 100) if total_trades > 0 else 0
+        
+        if total_trades > MIN_TRADES: # Only keep statistically significant ones
+            results.append({
+                "genome": genome,
+                "win_rate": round(win_rate, 2),
+                "trades": total_trades
+            })
+    
+    # Sort by Win Rate
+    results.sort(key=lambda x: x['win_rate'], reverse=True)
+    
+    # Print Top 3 Models
+    logger.info("\n🏆 TOP 3 PERFORMING MODELS FOUND:")
+    for i, res in enumerate(results[:3]):
+        g = res['genome']
+        logger.info(f"\n--- RANK #{i+1} (Win Rate: {res['win_rate']}%) ---")
+        logger.info(f"Trades Analyzed: {res['trades']}")
+        logger.info(f"Strategy Logic:")
+        logger.info(f"  1. Trend Filter: {g['trend_filter']}")
+        logger.info(f"  2. Signal: RSI {g['rsi_logic']} {g['rsi_threshold']}")
+        logger.info(f"  3. Strength: ADX > {g['adx_min']}")
+        logger.info(f"  4. Risk Management: Stop {g['sl_atr_mult']}x ATR | Target {g['tgt_atr_mult']}x ATR")
+
+if __name__ == "__main__":
+    run_optimization()
