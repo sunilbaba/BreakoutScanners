@@ -1,12 +1,11 @@
 {
   "updated": "2025-12-03",
   "parameters": {
-    "name": "AI-987",
-    "trend_filter": "NONE",
-    "rsi_logic": "OVERSOLD",
-    "rsi_threshold": 35,
-    "adx_min": 25,
-    "sl_mult": 2.0,
+    "trend_filter": "SMA50",
+    "rsi_logic": "MOMENTUM",
+    "rsi_threshold": 30,
+    "adx_min": 20,
+    "sl_mult": 2.5,
     "tgt_mult": 2.0
   }
 }
