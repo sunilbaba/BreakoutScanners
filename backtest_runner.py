@@ -198,7 +198,10 @@ def run_optimizer(processed_data):
             
         if idx < 3: logger.info(f"Test {idx}: WR {win_rate}% | Trades {total}")
 
-    results.sort(key=lambda x: x['win_rate'], reverse=True)
+    # Sort by Total Profit (Real money matters more than win %)
+    # But ensure minimum stability (at least 30% win rate)
+    results.sort(key=lambda x: (x['win_rate'] > 30, x['total_profit']), reverse=True)
+
     
     if results:
         best = results[0]
