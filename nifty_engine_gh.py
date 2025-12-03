@@ -1,605 +1,391 @@
 """
-nifty_engine_gh.py
-
-FINAL GOLD MASTER (Fixed & Verified)
-------------------------------------
-1. Fixes "TypeError: analyze_ticker takes 3 arguments".
-2. Fixes "Zomato/Delisted" errors gracefully.
-3. Restores "Institutional UI" (Dark Mode, Ledger, Strategy Graph).
-4. Auto-creates public folder.
-
-Requirements: pip install yfinance pandas numpy
+backtest_runner.py
+THE SELF-LEARNING NIGHTLY ENGINE (Verbose Logging)
+--------------------------------------------------
+1. Downloads 2 Years of Data (Batch 50).
+2. OPTIMIZER: Evolves 500 strategies on a 50-stock sample.
+3. SIMULATOR: Runs the WINNER on ALL stocks with full logging.
+4. REPORTS: Prints exact PnL, Trades, and Logic used.
 """
-
-import os
-import time
-import json
-import math
-import logging
-from datetime import datetime, date
-from functools import wraps
 
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import random
+import json
+import os
+import logging
+from datetime import datetime
 
-# -------------------------
-# 1. CONFIGURATION
-# -------------------------
-CAPITAL = 100_000.0               
-RISK_PER_TRADE = 0.02             
-MAX_POSITION_PERC = 0.25          
+# --- CONFIGURATION ---
+DATA_PERIOD = "2y"
+ITERATIONS = 500          # Strategies to breed
+MIN_TRADES = 10           # Min trades to accept a strategy
+SAMPLE_SIZE = 50          # Stocks to sample during evolution (Requested: 50)
 
-DATA_PERIOD = "1y"
-RETRY_ATTEMPTS = 3
-RETRY_BACKOFF = 2.0
+# Portfolio Config
+CAPITAL = 100_000.0
+RISK_PER_TRADE = 0.02
+MAX_POSITIONS = 5
+BROKERAGE_PCT = 0.001
 
-MIN_ADV_VALUE_RS = 2_000_000      
-
-# Costs
-BROKERAGE_PCT = 0.001 
-
-# Strategy
-ATR_MULTIPLIER_TARGET = 3.0
-ATR_MULTIPLIER_STOP = 1.0
-TSL_MOVE_TO_BE_AT = 0.5           
-ADX_THRESHOLD = 25.0              
-
-OUTPUT_DIR = "public"
-HTML_FILE = os.path.join(OUTPUT_DIR, "index.html")
-TRADE_HISTORY_FILE = "trade_history.json"
+# Output Files
 CACHE_FILE = "backtest_stats.json"
+STRATEGY_FILE = "strategy_config.json"
 
 SECTOR_INDICES = {
-    "NIFTY 50": "^NSEI",
-    "BANK": "^NSEBANK", "AUTO": "^CNXAUTO", "IT": "^CNXIT",
+    "NIFTY 50": "^NSEI", "BANK": "^NSEBANK", "AUTO": "^CNXAUTO", "IT": "^CNXIT",
     "METAL": "^CNXMETAL", "PHARMA": "^CNXPHARMA", "FMCG": "^CNXFMCG",
     "ENERGY": "^CNXENERGY", "REALTY": "^CNXREALTY", "PSU BANK": "^CNXPSUBANK"
 }
 
-DEFAULT_TICKERS = [
-    "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS",
-    "HINDUNILVR.NS", "ITC.NS", "SBIN.NS", "BHARTIARTL.NS", "KOTAKBANK.NS",
-    "LTIM.NS", "LT.NS", "AXISBANK.NS", "ASIANPAINT.NS", "MARUTI.NS",
-    "TITAN.NS", "ULTRACEMCO.NS", "SUNPHARMA.NS", "BAJFINANCE.NS", "HCLTECH.NS",
-    "ADANIENT.NS", "TATASTEEL.NS", "JIOFIN.NS", "ZOMATO.NS", "DLF.NS",
-    "HAL.NS", "TRENT.NS", "BEL.NS", "POWERGRID.NS", "ONGC.NS",
-    "NTPC.NS", "COALINDIA.NS", "BPCL.NS", "WIPRO.NS"
-]
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger("AI-Lab")
 
 # -------------------------
-# 2. LOGGING & UTILS
+# 1. DATA ENGINE
 # -------------------------
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("PrimeEngine")
-
-def retry_on_exception(max_tries=3, backoff=2.0):
-    def deco(func):
-        @wraps(func)
-        def inner(*a, **kw):
-            for i in range(max_tries):
-                try: return func(*a, **kw)
-                except Exception as e: time.sleep(backoff * (2 ** i))
-            raise Exception(f"Failed after {max_tries} tries")
-        return inner
-    return deco
-
-# -------------------------
-# 3. TECHNICAL INDICATORS
-# -------------------------
-def true_range(df):
-    prev_close = df['Close'].shift(1)
-    tr1 = df['High'] - df['Low']
-    tr2 = (df['High'] - prev_close).abs()
-    tr3 = (df['Low'] - prev_close).abs()
-    return pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
-
-def atr(df, period=14):
-    return true_range(df).ewm(alpha=1/period, adjust=False).mean()
-
-def wilder_rsi(series, period=14):
-    delta = series.diff()
-    gain = (delta.where(delta > 0, 0)).ewm(alpha=1/period, adjust=False).mean()
-    loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/period, adjust=False).mean()
-    return 100 - (100 / (1 + gain / loss)).fillna(50)
-
-def adx(df, period=14):
-    plus_dm = df['High'].diff()
-    minus_dm = df['Low'].diff()
-    plus_dm = np.where((plus_dm > minus_dm) & (plus_dm > 0), plus_dm, 0.0)
-    minus_dm = np.where((minus_dm > plus_dm) & (minus_dm > 0), -minus_dm, 0.0)
-    tr = true_range(df).ewm(alpha=1/period, adjust=False).mean()
-    plus_di = 100 * (pd.Series(plus_dm).ewm(alpha=1/period, adjust=False).mean() / tr)
-    minus_di = 100 * (pd.Series(minus_dm).ewm(alpha=1/period, adjust=False).mean() / tr)
-    return (abs(plus_di - minus_di) / (plus_di + minus_di) * 100).ewm(alpha=1/period, adjust=False).mean().fillna(0)
-
-def prepare_df(df):
-    df = df.copy()
-    df['SMA50'] = df['Close'].rolling(50).mean()
-    df['SMA200'] = df['Close'].rolling(200).mean()
-    df['EMA20'] = df['Close'].ewm(span=20).mean()
-    df['ATR'] = atr(df)
-    df['RSI'] = wilder_rsi(df['Close'])
-    df['ADX'] = adx(df)
-    return df
-
-# -------------------------
-# 4. DATA MANAGEMENT
-# -------------------------
-@retry_on_exception(max_tries=3)
-def robust_download(tickers, period=DATA_PERIOD):
-    logger.info(f"Downloading {len(tickers)} symbols...")
-    batch_size = 20
-    frames = []
-    for i in range(0, len(tickers), batch_size):
-        batch = tickers[i:i+batch_size]
-        try:
-            # ignore_tz=True prevents timezone errors
-            data = yf.download(batch, period=period, group_by='ticker', threads=True, progress=False, ignore_tz=True)
-            frames.append(data)
-        except: pass
-    if not frames: return pd.DataFrame() # Return empty DF instead of crashing
-    return pd.concat(frames, axis=1)
-
 def get_tickers():
     if os.path.exists("ind_nifty500list.csv"):
         try:
             df = pd.read_csv("ind_nifty500list.csv")
             return [f"{x}.NS" for x in df['Symbol'].dropna().unique()]
         except: pass
-    return DEFAULT_TICKERS.copy()
+    return ["RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "SBIN.NS", "ITC.NS", "TATAMOTORS.NS"]
 
-def extract_stock_df(bulk_data, ticker):
+def robust_download(tickers):
+    logger.info(f"⬇️ Downloading {len(tickers)} stocks ({DATA_PERIOD})...")
+    frames = []
+    batch_size = 50
+    for i in range(0, len(tickers), batch_size):
+        batch = tickers[i:i+batch_size]
+        try:
+            data = yf.download(batch, period=DATA_PERIOD, group_by='ticker', threads=True, progress=False, ignore_tz=True)
+            frames.append(data)
+        except: pass
+    return pd.concat(frames, axis=1) if frames else pd.DataFrame()
+
+def extract_df(bulk, ticker):
     try:
-        if isinstance(bulk_data.columns, pd.MultiIndex):
-            if ticker in bulk_data.columns.get_level_values(0):
-                return bulk_data[ticker].copy().dropna()
+        if isinstance(bulk.columns, pd.MultiIndex):
+            if ticker in bulk.columns.get_level_values(0):
+                return bulk[ticker].copy()
     except: pass
     return None
 
 # -------------------------
-# 5. HELPER FUNCTIONS
+# 2. MATH ENGINE
 # -------------------------
-def analyze_market_trend(bulk_data):
-    try:
-        nifty = extract_stock_df(bulk_data, "^NSEI")
-        if nifty is None or len(nifty) < 200: return "UNKNOWN"
-        curr = nifty['Close'].iloc[-1]
-        sma200 = nifty['Close'].rolling(200).mean().iloc[-1]
-        sma50 = nifty['Close'].rolling(50).mean().iloc[-1]
-        if curr > sma50 and sma50 > sma200: return "BULL MARKET 🟢"
-        if curr > sma200: return "UPTREND 🟡"
-        return "BEAR MARKET 🔴"
-    except: return "UNKNOWN"
-
-def get_stock_sector(symbol):
-    s = symbol.replace('.NS', '')
-    if s in ["HDFCBANK", "ICICIBANK", "SBIN", "AXISBANK", "KOTAKBANK"]: return "BANK"
-    if s in ["TCS", "INFY", "HCLTECH", "WIPRO", "LTIM"]: return "IT"
-    if s in ["MARUTI", "M&M", "TATAMOTORS", "BAJAJ-AUTO"]: return "AUTO"
-    if s in ["TATASTEEL", "JINDALSTEL", "HINDALCO", "VEDL"]: return "METAL"
-    if s in ["SUNPHARMA", "CIPLA", "DRREDDY", "DIVISLAB"]: return "PHARMA"
-    if s in ["ITC", "HINDUNILVR", "NESTLEIND"]: return "FMCG"
-    return "Other"
-
-def calculate_qty(entry, stop_loss):
-    risk_amt = CAPITAL * RISK_PER_TRADE
-    risk_share = abs(entry - stop_loss)
-    if risk_share <= 0: return 0
-    qty = int(risk_amt / risk_share)
-    if (qty * entry) > (CAPITAL * MAX_POSITION_PERC): 
-        qty = int((CAPITAL * MAX_POSITION_PERC) / entry)
-    return max(qty, 0)
+def prepare_features(df):
+    df = df.copy()
+    # Trend
+    df['SMA50'] = df['Close'].rolling(50).mean()
+    df['SMA200'] = df['Close'].rolling(200).mean()
+    df['EMA20'] = df['Close'].ewm(span=20).mean()
+    
+    # ATR
+    h_l = df['High'] - df['Low']
+    h_c = (df['High'] - df['Close'].shift()).abs()
+    l_c = (df['Low'] - df['Close'].shift()).abs()
+    df['ATR'] = pd.concat([h_l, h_c, l_c], axis=1).max(axis=1).rolling(14).mean()
+    
+    # RSI
+    delta = df['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).ewm(alpha=1/14).mean()
+    loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/14).mean()
+    df['RSI'] = 100 - (100 / (1 + gain/loss)).fillna(50)
+    
+    # ADX (Corrected)
+    plus_dm = df['High'].diff()
+    minus_dm = df['Low'].diff()
+    p_dm = np.where((plus_dm > minus_dm) & (plus_dm > 0), plus_dm, 0.0)
+    m_dm = np.where((minus_dm > plus_dm) & (minus_dm > 0), -minus_dm, 0.0)
+    plus_dm_s = pd.Series(p_dm, index=df.index)
+    minus_dm_s = pd.Series(m_dm, index=df.index)
+    
+    tr = pd.concat([h_l, h_c, l_c], axis=1).max(axis=1).ewm(alpha=1/14).mean()
+    plus_di = 100 * (plus_dm_s.ewm(alpha=1/14).mean() / tr)
+    minus_di = 100 * (minus_dm_s.ewm(alpha=1/14).mean() / tr)
+    df['ADX'] = (abs(plus_di - minus_di) / (plus_di + minus_di) * 100).ewm(alpha=1/14).mean().fillna(0)
+    
+    return df.dropna()
 
 # -------------------------
-# 6. BACKTEST ENGINE
+# 3. THE "AI" OPTIMIZER
 # -------------------------
-class BacktestEngine:
-    def __init__(self, bulk_data, tickers):
-        self.data = bulk_data
-        self.tickers = [t for t in tickers if not str(t).startswith('^')]
-        self.cash = CAPITAL
-        self.equity_curve = [CAPITAL]
-        self.portfolio = []
-        self.history = []
-        
-    def run(self):
-        logger.info("⏳ Running 1-Year Strategy Simulation...")
-        processed_data = {}
-        for t in self.tickers:
-            raw = extract_stock_df(self.data, t)
-            if raw is not None and len(raw) > 200:
-                processed_data[t] = prepare_df(raw)
-        
-        if not processed_data: return {}
-        dates = sorted(list(set().union(*[df.index for df in processed_data.values()])))
-        sim_dates = dates[150:] 
-        
-        for date in sim_dates:
-            self.process_day(date, processed_data)
-            m2m = 0
-            for trade in self.portfolio:
-                t = trade['symbol']
-                if date in processed_data[t].index:
-                    m2m += (processed_data[t].loc[date]['Close'] * trade['qty'])
-                else: m2m += (trade['entry'] * trade['qty'])
-            self.equity_curve.append(round(self.cash + m2m, 2))
+def generate_genome():
+    return {
+        "name": f"AI-{random.randint(100,999)}",
+        "trend_filter": random.choice(["SMA200", "NONE"]),
+        "rsi_logic": random.choice(["OVERSOLD", "MOMENTUM"]),
+        "rsi_threshold": random.choice([30, 35, 40, 55, 60, 70]),
+        "adx_min": random.choice([0, 15, 20, 25]),
+        "sl_mult": random.choice([1.0, 1.5, 2.0]),
+        "tgt_mult": random.choice([2.0, 3.0, 4.0])
+    }
 
-        wins = [t for t in self.history if t['pnl'] > 0]
-        win_rate = round(len(wins) / len(self.history) * 100, 1) if self.history else 0
+def fast_score(df, genome):
+    """Fast check to see if a strategy works on one stock."""
+    wins, losses = 0, 0
+    
+    # Vector Access
+    close = df['Close'].values
+    low = df['Low'].values
+    high = df['High'].values
+    sma200 = df['SMA200'].values
+    rsi = df['RSI'].values
+    adx = df['ADX'].values
+    atr = df['ATR'].values
+    
+    i = 0 
+    end_idx = len(df) - 20
+    
+    while i < end_idx:
+        is_entry = False
         
-        ticker_wins = {}
-        for t in self.tickers:
-            if t in processed_data:
-                ticker_wins[t.replace('.NS','')] = self.calc_single_stock_wr(processed_data[t])
+        # Trend
+        if genome["trend_filter"] == "SMA200":
+            if close[i] < sma200[i]: 
+                i += 1; continue
+        
+        # ADX
+        if adx[i] <= genome["adx_min"]:
+            i += 1; continue
 
+        # RSI
+        rsi_val = rsi[i]
+        if genome["rsi_logic"] == "OVERSOLD":
+            if rsi_val < genome["rsi_threshold"]: is_entry = True
+        elif genome["rsi_logic"] == "MOMENTUM":
+            if rsi_val > genome["rsi_threshold"]: is_entry = True
+            
+        if is_entry:
+            entry = close[i]
+            sl = entry - (genome["sl_mult"] * atr[i])
+            tgt = entry + (genome["tgt_mult"] * atr[i])
+            
+            outcome = "OPEN"
+            days_held = 0
+            
+            for j in range(1, 15):
+                days_held = j
+                idx = i + j
+                if idx >= len(close): break
+                if low[idx] <= sl: outcome = "LOSS"; break
+                if high[idx] >= tgt: outcome = "WIN"; break
+            
+            if outcome == "WIN": wins += 1
+            elif outcome == "LOSS": losses += 1
+            i += days_held
+        else:
+            i += 1
+            
+    return wins, losses
+
+def run_optimizer(processed_data):
+    logger.info(f"\n🧬 EVOLUTION STARTED: Testing {ITERATIONS} Strategies...")
+    logger.info(f"🧪 Sample Size: {SAMPLE_SIZE} random stocks per strategy")
+    
+    results = []
+    
+    for idx in range(ITERATIONS):
+        genome = generate_genome()
+        t_wins, t_losses = 0, 0
+        
+        # Test on random sample
+        sample = random.sample(processed_data, min(len(processed_data), SAMPLE_SIZE))
+        
+        for df in sample:
+            w, l = fast_score(df, genome)
+            t_wins += w
+            t_losses += l
+            
+        total = t_wins + t_losses
+        win_rate = (t_wins / total * 100) if total > 0 else 0
+        
+        if total >= MIN_TRADES:
+            results.append({ "genome": genome, "win_rate": round(win_rate, 1), "trades": total })
+        
+        if idx % 100 == 0:
+            best_so_far = max([r['win_rate'] for r in results]) if results else 0
+            logger.info(f"... Generation {idx}: Best Win Rate Found: {best_so_far}%")
+
+    results.sort(key=lambda x: x['win_rate'], reverse=True)
+    
+    if results:
+        best = results[0]
+        logger.info("\n🏆 WINNING STRATEGY FOUND:")
+        logger.info(f"   • Name: {best['genome']['name']}")
+        logger.info(f"   • Win Rate: {best['win_rate']}% (Over {best['trades']} Trades)")
+        logger.info(f"   • Logic: RSI {best['genome']['rsi_logic']} {best['genome']['rsi_threshold']} | ADX>{best['genome']['adx_min']}")
+        logger.info(f"   • Risk: Stop {best['genome']['sl_mult']}x | Target {best['genome']['tgt_mult']}x")
+        return best['genome']
+    else:
+        logger.warning("⚠️ No viable strategy found. Using fallback.")
         return {
-            "curve": self.equity_curve,
-            "win_rate": win_rate,
-            "total_trades": len(self.history),
-            "profit": round(self.equity_curve[-1] - CAPITAL, 2),
-            "tickers": ticker_wins,
-            "last_run": datetime.utcnow().strftime("%Y-%m-%d")
+            "name": "Fallback", "trend_filter": "SMA200", "rsi_logic": "OVERSOLD",
+            "rsi_threshold": 35, "adx_min": 15, "sl_mult": 1.0, "tgt_mult": 3.0
         }
 
-    def calc_single_stock_wr(self, df):
-        wins, total = 0, 0
-        start = len(df) - 130
-        if start < 0: return 0
-        for i in range(start, len(df)-10):
-            row = df.iloc[i]
-            if row['Close'] > row['EMA20'] and row['RSI'] > 60 and row['ADX'] > ADX_THRESHOLD:
-                sl = row['Close'] - row['ATR']
-                tgt = row['Close'] + (3 * row['ATR'])
-                outcome = "OPEN"
-                for j in range(1, 15):
-                    if i+j >= len(df): break
-                    fut = df.iloc[i+j]
-                    if fut['Low'] <= sl: outcome="LOSS"; break
-                    if fut['High'] >= tgt: outcome="WIN"; break
-                if outcome != "OPEN":
-                    total += 1
-                    if outcome == "WIN": wins += 1
-        return round((wins/total)*100, 0) if total > 0 else 0
+# -------------------------
+# 4. PORTFOLIO SIMULATION (The Validator)
+# -------------------------
+class PortfolioSimulator:
+    def __init__(self, processed_data, genome):
+        self.data_map = processed_data
+        self.genome = genome
+        self.cash = CAPITAL
+        self.curve = [CAPITAL]
+        self.history = []
+        self.portfolio = []
 
-    def process_day(self, date, data_map):
+    def run(self):
+        logger.info(f"\n📈 VALIDATION: Running 1-Year Backtest with '{self.genome['name']}'...")
+        logger.info(f"💰 Initial Capital: ₹{CAPITAL}")
+        
+        dates = sorted(list(set().union(*[d.index for d in self.data_map.values()])))
+        sim_dates = dates[200:] # Warmup
+        
+        for date in sim_dates:
+            self.process_day(date)
+            # Equity Calculation
+            m2m = 0
+            for t in self.portfolio:
+                sym = t['symbol']
+                price = self.data_map[sym].loc[date]['Close'] if date in self.data_map[sym].index else t['entry']
+                m2m += (price * t['qty'])
+            self.curve.append(round(self.cash + m2m, 2))
+            
+        # Stats
+        wins = len([t for t in self.history if t['pnl'] > 0])
+        total_trades = len(self.history)
+        win_rate = round(wins / total_trades * 100, 1) if total_trades > 0 else 0
+        final_profit = round(self.curve[-1] - CAPITAL, 2)
+        
+        logger.info("\n📊 FINAL RESULTS:")
+        logger.info(f"   • Final Balance: ₹{round(self.curve[-1], 2)}")
+        logger.info(f"   • Total Profit:  ₹{final_profit} {'(PROFIT)' if final_profit>0 else '(LOSS)'}")
+        logger.info(f"   • Total Trades:  {total_trades}")
+        logger.info(f"   • Win Rate:      {win_rate}%")
+        
+        return {
+            "curve": self.curve,
+            "win_rate": win_rate,
+            "total_trades": total_trades,
+            "profit": final_profit,
+            "ledger": self.history[-50:] 
+        }
+
+    def process_day(self, date):
+        # 1. Exits
         active = []
-        for trade in self.portfolio:
-            sym = trade['symbol']
-            if date not in data_map[sym].index:
-                active.append(trade)
-                continue
-            row = data_map[sym].loc[date]
-            exit_price = None
+        for t in self.portfolio:
+            sym = t['symbol']
+            if date not in self.data_map[sym].index:
+                active.append(t); continue
+            row = self.data_map[sym].loc[date]
             
-            if row['Open'] < trade['stop']: exit_price = row['Open']
-            elif row['Low'] <= trade['stop']: exit_price = trade['stop']
-            elif row['Open'] > trade['target']: exit_price = row['Open']
-            elif row['High'] >= trade['target']: exit_price = trade['target']
+            exit_p = None
+            if row['Open'] < t['sl']: exit_p = row['Open'] # Gap Down
+            elif row['Low'] <= t['sl']: exit_p = t['sl']
+            elif row['Open'] > t['tgt']: exit_p = row['Open'] # Gap Up
+            elif row['High'] >= t['tgt']: exit_p = t['tgt']
             
-            if exit_price:
-                revenue = exit_price * trade['qty']
-                cost = revenue * BROKERAGE_PCT
-                self.cash += (revenue - cost)
-                pnl = revenue - cost - (trade['entry'] * trade['qty'] + trade['entry_cost'])
-                self.history.append({"symbol": sym, "pnl": pnl, "result": "WIN" if pnl>0 else "LOSS"})
-            else: active.append(trade)
+            if exit_p:
+                pnl = (exit_p - t['entry']) * t['qty']
+                cost = exit_p * t['qty'] * BROKERAGE_PCT
+                self.cash += (exit_p * t['qty'] - cost)
+                self.history.append({
+                    "date": date.strftime("%Y-%m-%d"), "symbol": sym,
+                    "pnl": round(pnl - cost - t['entry_cost'], 2),
+                    "result": "WIN" if pnl > 0 else "LOSS"
+                })
+            else: active.append(t)
         self.portfolio = active
         
-        if len(self.portfolio) >= 5: return
-        for sym, df in data_map.items():
+        # 2. Entries
+        if len(self.portfolio) >= MAX_POSITIONS: return
+        
+        for sym, df in self.data_map.items():
             if date not in df.index: continue
             row = df.loc[date]
-            if row['Close'] > row['EMA20'] and row['RSI'] > 60 and row['ADX'] > ADX_THRESHOLD and row['Close'] > row['SMA200']:
+            
+            # Apply Winning Genome Logic
+            trend_ok = True
+            if self.genome["trend_filter"] == "SMA200" and row['Close'] < row['SMA200']: trend_ok = False
+            
+            rsi_ok = False
+            if self.genome["rsi_logic"] == "OVERSOLD" and row['RSI'] < self.genome["rsi_threshold"]: rsi_ok = True
+            elif self.genome["rsi_logic"] == "MOMENTUM" and row['RSI'] > self.genome["rsi_threshold"]: rsi_ok = True
+            
+            adx_ok = row['ADX'] > self.genome["adx_min"]
+            
+            if trend_ok and rsi_ok and adx_ok:
                 if any(t['symbol'] == sym for t in self.portfolio): continue
-                atr = row['ATR']
-                stop = row['Close'] - (1 * atr)
-                target = row['Close'] + (3 * atr)
-                risk = row['Close'] - stop
+                
+                risk = row['ATR'] * self.genome["sl_mult"]
                 if risk <= 0: continue
-                qty = int((self.equity_curve[-1] * RISK_PER_TRADE) / risk)
+                
+                qty = int((self.curve[-1] * RISK_PER_TRADE) / risk)
                 cost = qty * row['Close']
+                
+                # Affordable sizing
+                if cost > self.cash: qty = int(self.cash / row['Close']); cost = qty * row['Close']
+                
                 if qty > 0 and self.cash > cost:
                     fees = cost * BROKERAGE_PCT
                     self.cash -= (cost + fees)
                     self.portfolio.append({
                         "symbol": sym, "entry": row['Close'], "qty": qty,
-                        "stop": stop, "target": target, "entry_cost": fees
+                        "sl": row['Close'] - risk, 
+                        "tgt": row['Close'] + (row['ATR'] * self.genome["tgt_mult"]),
+                        "entry_cost": fees
                     })
-                    if len(self.portfolio) >= 5: break
+                    if len(self.portfolio) >= MAX_POSITIONS: break
 
 # -------------------------
-# 7. LIVE SCANNER
+# 6. MAIN EXECUTION
 # -------------------------
-def analyze_ticker(ticker, df, sector_changes, market_regime, win_rates):
-    # *** FIX: Added correct arguments (5 args) ***
-    if len(df) < 100: return None
-    df = prepare_df(df)
-    curr = df.iloc[-1]
-    prev = df.iloc[-2]
-    close = float(curr['Close'])
-    
-    trend = "UP" if close > float(curr['SMA200']) else "DOWN"
-    setups = []
-    if close > float(curr['EMA20']) and curr['RSI'] > 60 and curr['ADX'] > ADX_THRESHOLD: setups.append("Momentum Burst")
-    if trend == "UP" and close > float(curr['SMA50']) and abs(close - float(curr['SMA50']))/close < 0.03: setups.append("Pullback")
-    
-    clean_sym = ticker.replace(".NS", "")
-    has_sector = False
-    # Basic sector check
-    my_sector = get_stock_sector(clean_sym)
-    if sector_changes.get(my_sector, 0) > 0.5: has_sector = True
-            
-    atr_val = float(curr['ATR'])
-    stop = round(close - ATR_MULTIPLIER_STOP * atr_val, 2)
-    target = round(close + ATR_MULTIPLIER_TARGET * atr_val, 2)
-    rr = round((target - close) / (close - stop), 2)
-    
-    qty = calculate_qty(close, stop)
-
-    verdict = "WAIT"
-    v_color = "gray"
-    
-    if trend == "UP" and len(setups) > 0:
-        if rr >= 2.0:
-            verdict = "BUY"
-            v_color = "green"
-            # Only PRIME if History confirms it works
-            if win_rates.get(clean_sym, 0) >= 50 and has_sector: 
-                verdict = "PRIME BUY ⭐"
-                v_color = "purple"
-    
-    if verdict == "WAIT" and abs((close - float(prev['Close']))/float(prev['Close'])) < 0.01: return None
-
-    return {
-        "symbol": clean_sym,
-        "price": round(close, 2),
-        "change": round(((close - float(prev['Close']))/float(prev['Close']))*100, 2),
-        "sector": my_sector,
-        "verdict": verdict,
-        "v_color": v_color,
-        "rr": rr,
-        "qty": qty,
-        "adx": round(float(curr['ADX']), 1),
-        "win_rate": win_rates.get(clean_sym, 0),
-        "setups": setups,
-        "levels": {"TGT": target, "SL": stop},
-        "history": df['Close'].tail(30).tolist()
-    }
-
-# -------------------------
-# 8. LEDGER & HTML
-# -------------------------
-def load_json_file(path):
-    if os.path.exists(path):
-        try: return json.load(open(path))
-        except: pass
-    return []
-
-def save_json_file(path, data):
-    with open(path, 'w') as f: json.dump(data, f, indent=2)
-
-def update_trades(trades, bulk_data):
-    updated = False
-    today = date.today().isoformat()
-    for t in trades:
-        if t['status'] == 'OPEN':
-            df = extract_stock_df(bulk_data, t['symbol']+".NS")
-            if df is not None:
-                curr = df.iloc[-1]
-                low, high, open_p = curr['Low'], curr['High'], curr['Open']
-                
-                if low <= t['stop_loss']:
-                    t['status'] = 'LOSS'
-                    t['exit_price'] = open_p if open_p < t['stop_loss'] else t['stop_loss']
-                    t['exit_date'] = today
-                    pnl = (t['exit_price'] - t['entry']) * t['qty']
-                    costs = (t['entry'] * t['qty'] * BROKERAGE_PCT) * 2
-                    t['net_pnl'] = round(pnl - costs, 2)
-                    updated = True
-                elif high >= t['target']:
-                    t['status'] = 'WIN'
-                    t['exit_price'] = open_p if open_p > t['target'] else t['target']
-                    t['exit_date'] = today
-                    pnl = (t['exit_price'] - t['entry']) * t['qty']
-                    costs = (t['entry'] * t['qty'] * BROKERAGE_PCT) * 2
-                    t['net_pnl'] = round(pnl - costs, 2)
-                    updated = True
-    
-    if updated: save_json_file(TRADE_HISTORY_FILE, trades)
-    return trades
-
-def add_new_signals(signals, trades):
-    today = date.today().isoformat()
-    owned = {t['symbol'] for t in trades if t['status'] == 'OPEN'}
-    valid = [s for s in signals if "BUY" in s['verdict'] and s['symbol'] not in owned]
-    valid.sort(key=lambda x: x['win_rate'], reverse=True)
-    
-    for s in valid[:3]:
-        tid = f"{s['symbol']}-{today}"
-        if not any(t['id'] == tid for t in trades):
-            trades.insert(0, {
-                "id": tid, "date": today, "symbol": s['symbol'],
-                "entry": s['price'], "qty": s['qty'],
-                "target": s['levels']['TGT'], "stop_loss": s['levels']['SL'],
-                "status": "OPEN", "net_pnl": 0
-            })
-            save_json_file(TRADE_HISTORY_FILE, trades)
-
-def generate_html(signals, trades, bt_stats, timestamp):
-    closed = [t for t in trades if t['status'] != 'OPEN']
-    net_pnl = round(sum(t.get('net_pnl', 0) for t in closed), 2)
-    
-    owned = {t['symbol'] for t in trades if t['status'] == 'OPEN'}
-    display_signals = [s for s in signals if s['symbol'] not in owned]
-    display_signals.sort(key=lambda x: x['win_rate'], reverse=True)
-    
-    json_data = json.dumps({"signals": display_signals, "trades": trades, "backtest": bt_stats})
-    
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PrimeTrade PRO</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://unpkg.com/lucide@latest"></script>
-        <style>
-            body {{ background: #0f172a; color: #e2e8f0; font-family: sans-serif; }}
-            .card {{ background: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 12px; }}
-            .prime {{ border: 1px solid #a855f7; background: linear-gradient(to bottom right, #1e293b, #2e1065); }}
-            .tab-active {{ border-bottom: 2px solid #a855f7; color: white; }}
-            .tab-inactive {{ color: #64748b; }}
-            .win {{ color: #4ade80; }}
-            .loss {{ color: #f87171; }}
-        </style>
-    </head>
-    <body class="p-4 md:p-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-center mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <div><h1 class="text-2xl font-bold text-white flex items-center gap-2"><i data-lucide="layers" class="text-purple-500"></i> PrimeTrade</h1><div class="text-xs text-slate-500 mt-1">{timestamp}</div></div>
-                <div class="text-right"><div class="text-[10px] text-slate-500 uppercase">Realized PnL</div><div class="text-xl font-bold {{'win' if net_pnl>=0 else 'loss'}}">₹{net_pnl}</div></div>
-            </div>
-
-            <div class="flex gap-6 mb-6 border-b border-slate-800">
-                <button onclick="setTab('dash')" id="btn-dash" class="pb-2 text-sm font-bold tab-active">Dashboard</button>
-                <button onclick="setTab('ledger')" id="btn-ledger" class="pb-2 text-sm font-bold tab-inactive">Ledger</button>
-                <button onclick="setTab('strat')" id="btn-strat" class="pb-2 text-sm font-bold tab-inactive">Strategy</button>
-            </div>
-
-            <div id="view-dash">
-                <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase">Active Portfolio</h2>
-                <div id="portfolio" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
-                <h2 class="text-xs font-bold text-slate-500 mb-3 uppercase">New Signals</h2>
-                <div id="scanner" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
-            </div>
-
-            <div id="view-ledger" class="hidden">
-                <div class="bg-slate-900 rounded-lg border border-slate-800 overflow-hidden">
-                    <table class="w-full text-sm text-left text-slate-400">
-                        <thead class="bg-slate-800 text-xs uppercase text-slate-500"><tr><th class="p-3">Date</th><th class="p-3">Symbol</th><th class="p-3">Result</th><th class="p-3">PnL</th></tr></thead>
-                        <tbody id="ledger-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="view-strat" class="hidden">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div class="card text-center"><div class="text-xs text-slate-500">1Y Profit</div><div class="text-2xl font-bold text-green-400">₹{bt_stats.get('profit', 0)}</div></div>
-                    <div class="card text-center"><div class="text-xs text-slate-500">Win Rate</div><div class="text-2xl font-bold text-blue-400">{bt_stats.get('win_rate', 0)}%</div></div>
-                    <div class="card text-center"><div class="text-xs text-slate-500">Trades</div><div class="text-2xl font-bold text-white">{bt_stats.get('total_trades', 0)}</div></div>
-                </div>
-                <div class="card h-64"><canvas id="equityChart"></canvas></div>
-            </div>
-        </div>
-
-        <script>
-            const DATA = {json_data};
-            function setTab(id) {{
-                ['dash', 'ledger', 'strat'].forEach(t => {{
-                    document.getElementById('view-'+t).classList.add('hidden');
-                    document.getElementById('btn-'+t).className = "pb-2 text-sm font-bold tab-inactive";
-                }});
-                document.getElementById('view-'+id).classList.remove('hidden');
-                document.getElementById('btn-'+id).className = "pb-2 text-sm font-bold tab-active";
-            }}
-
-            const portRoot = document.getElementById('portfolio');
-            const openT = DATA.trades.filter(t => t.status === 'OPEN');
-            if(openT.length === 0) portRoot.innerHTML = '<div class="col-span-full text-center text-slate-600 py-4">No active trades</div>';
-            else {{
-                portRoot.innerHTML = openT.map(p => `
-                    <div class="card">
-                        <div class="flex justify-between mb-2"><div class="font-bold text-white">${{p.symbol}}</div><div class="text-xs bg-blue-900 text-blue-200 px-2 py-1 rounded">OPEN</div></div>
-                        <div class="text-xs text-slate-400 flex justify-between"><span>Qty: ${{p.qty}}</span><span>Entry: ${{p.entry}}</span></div>
-                        <div class="flex justify-between text-[10px] font-mono mt-2"><span class="loss">${{p.stop_loss}} SL</span><span class="win">${{p.target}} TGT</span></div>
-                    </div>`).join('');
-            }}
-
-            const scanRoot = document.getElementById('scanner');
-            if(DATA.signals.length === 0) scanRoot.innerHTML = '<div class="col-span-full text-center text-slate-600 py-10">No new signals</div>';
-            else {{
-                scanRoot.innerHTML = DATA.signals.map(s => `
-                    <div class="card ${{s.verdict.includes('PRIME')?'prime':''}}">
-                        <div class="flex justify-between mb-2"><div class="font-bold text-white">${{s.symbol}}</div><div class="font-bold ${{s.change>=0?'win':'loss'}}">${{s.change}}%</div></div>
-                        <div class="flex justify-between bg-slate-900/50 p-2 rounded mb-2 text-[10px]"><div class="text-center"><div>Win%</div><div class="text-green-400 font-bold">${{s.win_rate}}%</div></div><div class="text-center"><div>RR</div><div class="text-white font-bold">${{s.rr}}</div></div></div>
-                        <div class="flex justify-between text-[10px] font-mono mt-2"><span class="loss">SL ${{s.levels.SL}}</span><span class="win">TGT ${{s.levels.TGT}}</span></div>
-                    </div>`).join('');
-            }}
-
-            const ledgerRoot = document.getElementById('ledger-body');
-            const closedT = DATA.trades.filter(t => t.status !== 'OPEN');
-            ledgerRoot.innerHTML = closedT.map(t => `
-                <tr class="border-b border-slate-800">
-                    <td class="p-3">${{t.exit_date || t.date}}</td><td class="p-3 font-bold">${{t.symbol}}</td>
-                    <td class="p-3"><span class="text-[10px] px-2 py-1 rounded ${{t.status==='WIN'?'bg-green-900 text-green-200':'bg-red-900 text-red-200'}}">${{t.status}}</span></td>
-                    <td class="p-3 font-mono ${{t.net_pnl>=0?'win':'loss'}}">₹${{t.net_pnl}}</td>
-                </tr>`).join('');
-
-            const ctx = document.getElementById('equityChart');
-            if(DATA.backtest.curve) {{
-                new Chart(ctx, {{
-                    type: 'line',
-                    data: {{ labels: DATA.backtest.curve.map((_, i) => i), datasets: [{{ label: 'Equity', data: DATA.backtest.curve, borderColor: '#a855f7', tension: 0.1, pointRadius: 0 }}] }},
-                    options: {{ maintainAspectRatio: false, scales: {{ y: {{ grid: {{ color: '#334155' }} }}, x: {{ display: false }} }} }}
-                }});
-            }}
-            lucide.createIcons();
-        </script>
-    </body>
-    </html>
-    """
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
-        
-    with open(HTML_FILE, "w") as f: f.write(html)
-
 if __name__ == "__main__":
-    logger.info("Starting Engine...")
     tickers = get_tickers()
-    bulk = robust_download(tickers + list(SECTOR_INDICES.values()))
+    bulk = robust_download(tickers)
     
-    regime = analyze_market_trend(bulk)
+    processed_data = {}
+    for t in tickers:
+        raw = extract_df(bulk, t)
+        if raw is not None and len(raw) > 250:
+            processed_data[t] = prepare_features(raw)
+            
+    if not processed_data:
+        logger.error("No Data.")
+        exit()
+        
+    # STEP 1: FIND BEST STRATEGY
+    best_genome = run_optimizer(list(processed_data.values()))
     
-    # Smart Caching
-    bt_stats = {}
-    if os.path.exists(CACHE_FILE):
-        try:
-            data = json.load(open(CACHE_FILE))
-            if data.get("last_run") == datetime.utcnow().strftime("%Y-%m-%d"):
-                bt_stats = data
-        except: pass
+    # STEP 2: SAVE STRATEGY
+    with open(STRATEGY_FILE, "w") as f:
+        json.dump({"updated": datetime.now().strftime("%Y-%m-%d"), "parameters": best_genome}, f, indent=2)
+        
+    # STEP 3: VALIDATE (FULL SIMULATION)
+    # Run the best strategy on ALL stocks (not just sample)
+    sim_engine = PortfolioSimulator(processed_data, best_genome)
+    stats = sim_engine.run()
     
-    if not bt_stats:
-        logger.info("Cache miss. Running Backtest...")
-        backtester = BacktestEngine(bulk, tickers)
-        bt_stats = backtester.run()
-        bt_stats["last_run"] = datetime.utcnow().strftime("%Y-%m-%d")
-        with open(CACHE_FILE, "w") as f: json.dump(bt_stats, f)
-    
-    sector_changes = {}
-    for name, ticker in SECTOR_INDICES.items():
-        df = extract_stock_df(bulk, ticker)
-        if df is not None and len(df)>1:
-            s = df['Close']
-            sector_changes[name] = round(((s.iloc[-1]-s.iloc[-2])/s.iloc[-2])*100, 2)
-    
-    signals = []
-    win_rates = bt_stats.get("tickers", {})
-    
-    cols = bulk.columns.get_level_values(0).unique() if isinstance(bulk.columns, pd.MultiIndex) else bulk.columns
-    for t in cols:
-        if str(t).startswith('^'): continue
-        try:
-            res = analyze_ticker(t, extract_stock_df(bulk, t), sector_changes, regime, win_rates)
-            if res: signals.append(res)
-        except: continue
+    # STEP 4: SAVE STATS (For Dashboard)
+    ticker_wins = {}
+    for t, df in processed_data.items():
+        w, l = fast_score(df, best_genome)
+        total = w + l
+        ticker_wins[t.replace('.NS','')] = round((w/total*100),0) if total > 0 else 0
 
-    trades = load_json_file(TRADE_HISTORY_FILE)
-    trades = update_trades(trades, bulk)
-    add_new_signals(signals, trades)
+    output = {
+        "updated": datetime.now().strftime("%Y-%m-%d %H:%M UTC"),
+        "portfolio": stats,
+        "tickers": ticker_wins
+    }
     
-    generate_html(signals, trades, bt_stats, datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"))
-    logger.info("Done.")
+    with open(CACHE_FILE, "w") as f:
+        json.dump(output, f)
+        
+    logger.info("✅ Optimization & Backtest Complete.")
