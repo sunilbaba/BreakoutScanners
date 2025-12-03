@@ -275,7 +275,7 @@ def run_pipeline():
     tickers = get_tickers()
     bulk = robust_download(tickers)
     
-    processed_data = {}
+    processed_data = []
     # Create full map for validation
     full_map = {} 
     
