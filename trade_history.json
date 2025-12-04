@@ -1,5 +1,27 @@
 [
   {
+    "id": "CESC-2025-12-04",
+    "date": "2025-12-04",
+    "symbol": "CESC",
+    "entry": 173.66,
+    "qty": 192,
+    "target": 189.27,
+    "stop_loss": 163.25,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "APOLLOTYRE-2025-12-04",
+    "date": "2025-12-04",
+    "symbol": "APOLLOTYRE",
+    "entry": 535.3,
+    "qty": 57,
+    "target": 587.4,
+    "stop_loss": 500.57,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "PVRINOX-2025-12-04",
     "date": "2025-12-04",
     "symbol": "PVRINOX",
