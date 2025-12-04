@@ -1,10 +1,10 @@
 """
 backtest_runner.py
-THE "HYPER-EVOLUTION" ENGINE
-----------------------------
-1. Fixes 'Stagnation': Triggers Mass Extinction if results don't improve.
-2. Wider Search: Tests Stop Losses up to 4.0 ATR (Swing Mode).
-3. Logic: Forces the AI to find a POSITIVE profit strategy.
+THE "MULTI-STRATEGY" GENETIC ENGINE (Fixed)
+-------------------------------------------
+1. Fixes NameError: 'ITERATIONS' is not defined.
+2. Features: Genetic AI, Multi-Strategy (RSI/BB/MACD), Strict Risk.
+3. Logic: Downloads 2Y data -> Evolves Strategy -> Validates -> Saves.
 """
 
 import yfinance as yf
@@ -14,11 +14,10 @@ import random
 import json
 import os
 import logging
-import copy
 from collections import Counter
 from datetime import datetime
 
-# --- CONFIG ---
+# --- CONFIGURATION ---
 DATA_PERIOD = "2y"
 CACHE_FILE = "backtest_stats.json"
 STRATEGY_FILE = "strategy_config.json"
@@ -28,12 +27,14 @@ RISK_PER_TRADE = 0.02
 BROKERAGE_PCT = 0.001
 MAX_POSITIONS = 5
 
-# AI PARAMS (Aggressive Learning)
+# AI PARAMS
 POPULATION_SIZE = 50      
-GENERATIONS = 8           # Increased generations
-MUTATION_RATE = 0.4       # High mutation to prevent stagnation
-MIN_TRADES = 15
-SAMPLE_SIZE = 150         # Large sample for robust validation
+GENERATIONS = 5 
+# FIX: Define ITERATIONS derived from Gen * Pop
+ITERATIONS = GENERATIONS * POPULATION_SIZE          
+MUTATION_RATE = 0.2       
+MIN_TRADES = 10
+SAMPLE_SIZE = 100
 
 SECTOR_INDICES = {
     "NIFTY 50": "^NSEI", "BANK": "^NSEBANK", "AUTO": "^CNXAUTO", "IT": "^CNXIT",
@@ -82,20 +83,22 @@ def prepare_features(df):
     df = df.copy()
     if len(df) < 200: return None
     
-    df['SMA50'] = df['Close'].rolling(50).mean()
+    # Moving Averages
     df['SMA200'] = df['Close'].rolling(200).mean()
-    df['EMA20'] = df['Close'].ewm(span=20).mean()
     
+    # ATR
     h_l = df['High'] - df['Low']
     h_c = (df['High'] - df['Close'].shift()).abs()
     l_c = (df['Low'] - df['Close'].shift()).abs()
     df['ATR'] = pd.concat([h_l, h_c, l_c], axis=1).max(axis=1).rolling(14).mean()
     
+    # RSI
     delta = df['Close'].diff()
     gain = (delta.where(delta > 0, 0)).ewm(alpha=1/14).mean()
     loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/14).mean()
     df['RSI'] = 100 - (100 / (1 + gain/loss)).fillna(50)
     
+    # ADX
     plus_dm = df['High'].diff()
     minus_dm = df['Low'].diff()
     p_dm = np.where((plus_dm > minus_dm) & (plus_dm > 0), plus_dm, 0.0)
@@ -123,38 +126,30 @@ def prepare_features(df):
 # -------------------------
 GENE_POOL = {
     "strategy_type": ["RSI_DIP", "BB_REVERSAL", "MACD_CROSS"],
-    "trend_filter": ["SMA200", "SMA50", "NONE"],
-    "adx_min": [10, 15, 20, 25],
-    "sl_mult": [1.5, 2.0, 2.5, 3.0, 4.0], # WIDER STOPS allowed
-    # tgt_mult is dynamic
+    "trend_filter": ["SMA200", "NONE"],
+    "adx_min": [15, 20, 25],
+    "sl_mult": [1.0, 1.5, 2.0],
+    "tgt_mult": [1.5, 2.0, 3.0] 
 }
 
 def create_random_genome():
-    genome = {k: random.choice(v) for k, v in GENE_POOL.items()}
-    # Forced R:R (Target >= 1.5x Stop)
-    genome['tgt_mult'] = random.choice([genome['sl_mult'] * 1.5, genome['sl_mult'] * 2.0, genome['sl_mult'] * 3.0])
-    genome['name'] = f"Gen-{random.randint(1000,9999)}"
-    return genome
+    return {k: random.choice(v) for k, v in GENE_POOL.items()}
 
 def crossover(parent_a, parent_b):
     child = {}
     for key in GENE_POOL.keys():
         child[key] = parent_a[key] if random.random() > 0.5 else parent_b[key]
-    
-    # Re-enforce R:R
-    child['tgt_mult'] = random.choice([child['sl_mult'] * 1.5, child['sl_mult'] * 2.0, child['sl_mult'] * 3.0])
-    child['name'] = f"Child-{random.randint(1000,9999)}"
+    child['name'] = f"Gen-{random.randint(1000,9999)}"
     return child
 
 def mutate(genome):
     if random.random() < MUTATION_RATE:
         gene = random.choice(list(GENE_POOL.keys()))
         genome[gene] = random.choice(GENE_POOL[gene])
-        if gene == "sl_mult":
-             genome['tgt_mult'] = random.choice([genome['sl_mult'] * 1.5, genome['sl_mult'] * 2.0, genome['sl_mult'] * 3.0])
     return genome
 
 def fast_score(df, genome):
+    """Scores strategy based on Profit Factor."""
     wins, losses = 0, 0
     profit_points = 0.0
     
@@ -162,31 +157,32 @@ def fast_score(df, genome):
     low = df['Low'].values
     high = df['High'].values
     sma200 = df['SMA200'].values
-    sma50 = df['SMA50'].values
     rsi = df['RSI'].values
     adx = df['ADX'].values
     atr = df['ATR'].values
     bb_low = df['BB_LOW'].values
     macd = df['MACD'].values
-    macds = df['MACD_SIG'].values
+    macd_sig = df['MACD_SIG'].values
     
     i = 1; end = len(df) - 20
     while i < end:
         is_entry = False
         
-        # Filters
-        if genome["trend_filter"] == "SMA200" and close[i] < sma200[i]: i += 1; continue
-        if genome["trend_filter"] == "SMA50" and close[i] < sma50[i]: i += 1; continue
+        # Global Trend Filter
+        if genome["trend_filter"] == "SMA200":
+            if close[i] < sma200[i]: i += 1; continue
+            
+        # Global ADX Filter
         if adx[i] <= genome["adx_min"]: i += 1; continue
-        
-        # Strategy
+
+        # --- MULTI-STRATEGY LOGIC ---
         st = genome["strategy_type"]
         if st == "RSI_DIP":
-            if rsi[i] < 35: is_entry = True
+            if rsi[i] < 30: is_entry = True
         elif st == "BB_REVERSAL":
             if low[i] <= bb_low[i] and close[i] > bb_low[i]: is_entry = True
         elif st == "MACD_CROSS":
-            if macd[i-1] < macds[i-1] and macd[i] > macds[i]: is_entry = True
+            if macd[i-1] < macd_sig[i-1] and macd[i] > macd_sig[i]: is_entry = True
             
         if is_entry:
             sl = close[i] - (genome["sl_mult"] * atr[i])
@@ -194,7 +190,7 @@ def fast_score(df, genome):
             
             outcome = "OPEN"
             days = 0
-            for j in range(1, 20): # Max 20 days
+            for j in range(1, 10): # Faster Trades (10 days max)
                 days = j
                 idx = i + j
                 if idx >= len(close): break
@@ -202,7 +198,7 @@ def fast_score(df, genome):
                 if low[idx] <= sl: outcome = "LOSS"; break
                 if high[idx] >= tgt: outcome = "WIN"; break
             
-            cost_drag = 0.1 
+            cost_drag = 0.1
             if outcome == "WIN": 
                 wins += 1
                 profit_points += (genome["tgt_mult"] - cost_drag)
@@ -218,51 +214,38 @@ def fast_score(df, genome):
 def run_evolution(processed_data):
     logger.info(f"🧬 EVOLUTION START: {ITERATIONS} Strategies | {POPULATION_SIZE} Pop")
     
-    validation_sample = random.sample(processed_data, min(len(processed_data), SAMPLE_SIZE))
-    logger.info(f"🧪 Training on: {len(validation_sample)} stocks")
+    # Fixed Validation Set
+    if len(processed_data) > SAMPLE_SIZE:
+        validation_sample = random.sample(processed_data, SAMPLE_SIZE)
+    else:
+        validation_sample = processed_data
     
     population = [create_random_genome() for _ in range(POPULATION_SIZE)]
+    
     best_genome = None
     best_score = -9999
-    stagnant_gens = 0
     
     for gen in range(GENERATIONS):
         scores = []
         for genome in population:
-            g_score = 0; g_trades = 0
+            g_score = 0; g_trades = 0; g_wins = 0
+            
             for df in validation_sample:
                 w, l, s = fast_score(df, genome)
-                g_score += s; g_trades += (w+l)
+                g_score += s; g_trades += (w+l); g_wins += w
             
-            # Penalize inactivity or negativity
+            # Penalize inactivity
             final_score = g_score if g_trades >= MIN_TRADES else -9999
-            scores.append((genome, final_score))
+            scores.append((genome, final_score, g_trades))
             
         scores.sort(key=lambda x: x[1], reverse=True)
         top = scores[0]
         
-        logger.info(f"   > Gen {gen+1}: Score {top[1]:.1f}")
-        
+        logger.info(f"   > Gen {gen+1}: Score {top[1]:.1f} | Trades {top[2]}")
         if top[1] > best_score:
             best_score = top[1]
             best_genome = top[0]
-            stagnant_gens = 0
-        else:
-            stagnant_gens += 1
-
-        # ANTI-STAGNATION: Mass Extinction if stuck
-        if stagnant_gens >= 2:
-            logger.info("   ⚠️ Stagnation Detected! Triggering Mass Extinction...")
-            # Keep top 5, kill the rest, spawn randoms
-            elites = [s[0] for s in scores[:5]]
-            new_pop = elites[:]
-            while len(new_pop) < POPULATION_SIZE:
-                new_pop.append(create_random_genome())
-            population = new_pop
-            stagnant_gens = 0
-            continue
-
-        # Normal Breeding
+            
         elites = [s[0] for s in scores[:int(POPULATION_SIZE*0.2)]]
         new_pop = elites[:]
         while len(new_pop) < POPULATION_SIZE:
@@ -271,12 +254,13 @@ def run_evolution(processed_data):
             new_pop.append(mutate(crossover(p1, p2)))
         population = new_pop
 
-    if not best_genome or best_score <= 0:
-        logger.warning("⚠️ No profitable strategy found. Defaulting to Wide BB.")
-        best_genome = {"strategy_type": "BB_REVERSAL", "trend_filter": "SMA200", "adx_min": 15, "sl_mult": 2.0, "tgt_mult": 4.0, "name": "Default-Safe"}
+    if not best_genome:
+        logger.warning("⚠️ Evolution Failed. Using Default MACD.")
+        best_genome = {"strategy_type": "MACD_CROSS", "trend_filter": "SMA200", "adx_min": 15, "sl_mult": 1.5, "tgt_mult": 2.5, "name": "Default"}
 
     logger.info(f"\n🏆 WINNER: {best_genome['strategy_type']} (Risk: {best_genome['sl_mult']}R)")
     
+    # Save Strategy
     with open(STRATEGY_FILE, "w") as f:
         json.dump({"updated": datetime.utcnow().strftime("%Y-%m-%d"), "parameters": best_genome}, f, indent=2)
         
@@ -310,11 +294,10 @@ class PortfolioSimulator:
             
         profit = round(self.curve[-1] - CAPITAL, 2)
         wins = len([h for h in self.history if h['pnl'] > 0])
-        total_trades = len(self.history)
-        wr = round(wins/total_trades*100, 1) if total_trades > 0 else 0
+        wr = round(wins/len(self.history)*100, 1) if self.history else 0
         
         logger.info(f"   > Final Profit: ₹{profit} | Win Rate: {wr}%")
-        return {"curve": self.curve, "win_rate": wr, "total_trades": total_trades, "profit": profit, "ledger": self.history[-50:]}
+        return {"curve": self.curve, "win_rate": wr, "total_trades": len(self.history), "profit": profit, "ledger": self.history[-50:]}
 
     def process_day(self, date):
         active = []
@@ -324,8 +307,9 @@ class PortfolioSimulator:
             row = self.data[sym].loc[date]
             
             exit_p = None
-            if row['Open'] < t['sl']: exit_p = row['Open'] 
+            if row['Open'] < t['sl']: exit_p = row['Open']
             elif row['Low'] <= t['sl']: exit_p = t['sl']
+            elif row['Open'] > t['tgt']: exit_p = row['Open']
             elif row['High'] >= t['tgt']: exit_p = t['tgt']
             
             if exit_p:
@@ -343,23 +327,26 @@ class PortfolioSimulator:
             if date not in df.index: continue
             row = df.loc[date]
             
-            g = self.genome
-            trend_ok = True
-            if g["trend_filter"] == "SMA200" and row['Close'] < row['SMA200']: trend_ok = False
-            elif g["trend_filter"] == "SMA50" and row['Close'] < row['SMA50']: trend_ok = False
-            
+            # Check Strategy
             is_entry = False
-            if g["strategy_type"] == "RSI_DIP" and row['RSI'] < 35: is_entry = True
-            elif g["strategy_type"] == "BB_REVERSAL" and row['Low'] <= row['BB_LOW'] and row['Close'] > row['BB_LOW']: is_entry = True
-            elif g["strategy_type"] == "MACD_CROSS" and row['MACD'] > row['MACD_SIG'] and df.iloc[df.index.get_loc(date)-1]['MACD'] < df.iloc[df.index.get_loc(date)-1]['MACD_SIG']: is_entry = True
+            g = self.genome
             
-            if trend_ok and is_entry and row['ADX'] > g["adx_min"]:
+            # Trend Filter
+            if g["trend_filter"] == "SMA200" and row['Close'] < row['SMA200']: pass
+            # ADX Filter
+            elif row['ADX'] <= g["adx_min"]: pass
+            else:
+                # Core Logic
+                if g["strategy_type"] == "RSI_DIP" and row['RSI'] < 30: is_entry = True
+                elif g["strategy_type"] == "BB_REVERSAL" and row['Low'] <= row['BB_LOW'] and row['Close'] > row['BB_LOW']: is_entry = True
+                elif g["strategy_type"] == "MACD_CROSS" and row['MACD'] > row['MACD_SIG'] and df.iloc[df.index.get_loc(date)-1]['MACD'] < df.iloc[df.index.get_loc(date)-1]['MACD_SIG']: is_entry = True
+            
+            if is_entry:
                 if any(t['symbol'] == sym for t in self.portfolio): continue
                 risk = row['ATR'] * g["sl_mult"]
                 if risk <= 0: continue
                 qty = int((self.curve[-1] * RISK_PER_TRADE) / risk)
                 cost = qty * row['Close']
-                
                 if cost > self.cash: qty = int(self.cash / row['Close']); cost = qty * row['Close']
                 
                 if qty > 0 and self.cash > cost:
@@ -397,6 +384,7 @@ if __name__ == "__main__":
     sim = PortfolioSimulator(full_map, best_genome)
     stats = sim.run()
     
+    # Save Stats
     ticker_wins = {}
     for t, df in full_map.items():
         w, l, s = fast_score(df, best_genome)
