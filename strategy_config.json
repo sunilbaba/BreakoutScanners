@@ -1,12 +1,12 @@
 {
   "updated": "2025-12-04",
   "parameters": {
-    "trend_filter": "SMA50",
+    "trend_filter": "SMA200",
     "rsi_logic": "OVERSOLD",
     "rsi_threshold": 30,
-    "adx_min": 10,
-    "sl_mult": 1.0,
-    "tgt_mult": 2.0,
-    "name": "Child-8492"
+    "adx_min": 20,
+    "sl_mult": 2.0,
+    "tgt_mult": 3.0,
+    "name": "Child-6652"
   }
 }
