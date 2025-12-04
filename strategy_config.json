@@ -1,11 +1,11 @@
 {
   "updated": "2025-12-04",
   "parameters": {
-    "strategy_type": "BB_REVERSAL",
-    "trend_filter": "NONE",
+    "strategy_type": "RSI_DIP",
+    "trend_filter": "SMA200",
     "adx_min": 15,
-    "sl_mult": 2.0,
-    "tgt_mult": 2.0,
-    "name": "Gen-3927"
+    "sl_mult": 1.5,
+    "tgt_mult": 2.25,
+    "name": "Child-2628"
   }
 }
