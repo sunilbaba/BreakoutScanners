@@ -1,12 +1,9 @@
 """
 backtest_runner.py
-THE "GENETIC AI" STRATEGY ENGINE (Final)
+THE "GENETIC AI" STRATEGY ENGINE (Fixed)
 ----------------------------------------
-1. Downloads 2 Years of Data.
-2. AI trains on 250 Stocks (Sample Size).
-3. Evolves 3 Strategy Types: RSI, Bollinger, MACD.
-4. Validates the winner on the full market.
-5. Saves 'strategy_config.json' & 'backtest_stats.json'.
+1. FIX: Added missing 'ITERATIONS' variable definition.
+2. Logic: Downloads Data -> Evolves Strategy (GA) -> Validates -> Saves.
 """
 
 import yfinance as yf
@@ -34,7 +31,10 @@ POPULATION_SIZE = 50
 GENERATIONS = 5           
 MUTATION_RATE = 0.2       
 MIN_TRADES = 10
-SAMPLE_SIZE = 250 # <--- INCREASED TO 250
+SAMPLE_SIZE = 250 
+
+# Fix: Define total iterations for logging
+ITERATIONS = GENERATIONS * POPULATION_SIZE 
 
 SECTOR_INDICES = {
     "NIFTY 50": "^NSEI", "BANK": "^NSEBANK", "AUTO": "^CNXAUTO", "IT": "^CNXIT",
@@ -132,7 +132,7 @@ GENE_POOL = {
     "trend_filter": ["SMA200", "SMA50", "NONE"],
     "adx_min": [15, 20, 25],
     "sl_mult": [1.0, 1.5, 2.0],
-    # tgt_mult is dynamic (Always >= SL)
+    # tgt_mult is dynamic
 }
 
 def create_random_genome():
@@ -204,10 +204,11 @@ def fast_score(df, genome):
                 days = j
                 idx = i + j
                 if idx >= len(close): break
+                
                 if low[idx] <= sl: outcome = "LOSS"; break
                 if high[idx] >= tgt: outcome = "WIN"; break
             
-            cost_drag = 0.1 # Commission penalty
+            cost_drag = 0.1 
             if outcome == "WIN": 
                 wins += 1
                 profit_points += (genome["tgt_mult"] - cost_drag)
@@ -223,7 +224,6 @@ def fast_score(df, genome):
 def run_evolution(processed_data):
     logger.info(f"🧬 EVOLUTION START: {ITERATIONS} Strategies | {POPULATION_SIZE} Pop")
     
-    # RULE: Fixed Large Sample for Stability
     if len(processed_data) > SAMPLE_SIZE:
         validation_sample = random.sample(processed_data, SAMPLE_SIZE)
     else:
@@ -231,7 +231,6 @@ def run_evolution(processed_data):
     logger.info(f"🧪 Training on: {len(validation_sample)} stocks")
     
     population = [create_random_genome() for _ in range(POPULATION_SIZE)]
-    
     best_genome = None
     best_score = -9999
     
@@ -251,7 +250,6 @@ def run_evolution(processed_data):
         top = scores[0]
         
         logger.info(f"   > Gen {gen+1}: Score {top[1]:.1f} | WR {top[2]:.1f}% | Trades {top[3]}")
-        
         if top[1] > best_score:
             best_score = top[1]
             best_genome = top[0]
@@ -303,10 +301,11 @@ class PortfolioSimulator:
             
         profit = round(self.curve[-1] - CAPITAL, 2)
         wins = len([h for h in self.history if h['pnl'] > 0])
-        wr = round(wins/len(self.history)*100, 1) if self.history else 0
+        total_trades = len(self.history)
+        wr = round(wins/total_trades*100, 1) if total_trades > 0 else 0
         
         logger.info(f"   > Final Profit: ₹{profit} | Win Rate: {wr}%")
-        return {"curve": self.curve, "win_rate": wr, "total_trades": len(self.history), "profit": profit, "ledger": self.history[-50:]}
+        return {"curve": self.curve, "win_rate": wr, "total_trades": total_trades, "profit": profit, "ledger": self.history[-50:]}
 
     def process_day(self, date):
         active = []
@@ -316,9 +315,9 @@ class PortfolioSimulator:
             row = self.data[sym].loc[date]
             
             exit_p = None
-            if row['Open'] < t['sl']: exit_p = row['Open'] 
+            if row['Open'] < t['sl']: exit_p = row['Open']
             elif row['Low'] <= t['sl']: exit_p = t['sl']
-            elif row['Open'] > t['tgt']: exit_p = row['Open'] 
+            elif row['Open'] > t['tgt']: exit_p = row['Open']
             elif row['High'] >= t['tgt']: exit_p = t['tgt']
             
             if exit_p:
@@ -387,14 +386,11 @@ if __name__ == "__main__":
                 
     if not processed: exit()
     
-    # 1. Evolve (Pass List of DFs)
     best_genome = run_evolution(list(processed.values()))
     
-    # 2. Simulate
     sim = PortfolioSimulator(full_map, best_genome)
     stats = sim.run()
     
-    # 3. Save Stats
     ticker_wins = {}
     for t, df in full_map.items():
         w, l, s = fast_score(df, best_genome)
