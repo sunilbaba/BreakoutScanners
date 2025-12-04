@@ -1,47 +1,51 @@
 """
 backtest_runner.py
-THE "GENETIC EVOLUTION" ENGINE (AI-Powered)
--------------------------------------------
-1. Uses Genetic Algorithms (GA) instead of Random Search.
-2. Evolves strategies over Generations (Breeding + Mutation).
-3. Optimizes for "Profit Factor" (Stability), not just Win Rate.
-4. Detailed Logging of the Evolution Process.
+THE "STRICT GENETIC" ENGINE
+---------------------------
+1. Forced R:R: Strategies MUST have Target >= Stop Loss.
+2. Stable Evolution: Uses a FIXED sample of stocks for all generations.
+3. Cost-Aware: Penalizes strategies that trade too often with low profit.
 """
 
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import random
 import json
 import os
 import logging
-import random
 import copy
+from collections import Counter
 from datetime import datetime
 
 # --- CONFIG ---
-DATA_PERIOD = "2y"
+DATA_PERIOD = "2y" 
 CACHE_FILE = "backtest_stats.json"
 STRATEGY_FILE = "strategy_config.json"
 
 CAPITAL = 100_000.0
 RISK_PER_TRADE = 0.02
 BROKERAGE_PCT = 0.001
+MAX_POSITIONS = 5
 
 # AI PARAMS
-POPULATION_SIZE = 50      # Strategies per generation
-GENERATIONS = 5           # How many times to evolve
-MUTATION_RATE = 0.2       # 20% chance to tweak a parameter
+POPULATION_SIZE = 50      
+GENERATIONS = 5           
+MUTATION_RATE = 0.2       
+MIN_TRADES = 10
+SAMPLE_SIZE = 50 # Fixed sample size
 
 SECTOR_INDICES = {
     "NIFTY 50": "^NSEI", "BANK": "^NSEBANK", "AUTO": "^CNXAUTO", "IT": "^CNXIT",
-    "METAL": "^CNXMETAL", "PHARMA": "^CNXPHARMA", "FMCG": "^CNXFMCG"
+    "METAL": "^CNXMETAL", "PHARMA": "^CNXPHARMA", "FMCG": "^CNXFMCG",
+    "ENERGY": "^CNXENERGY", "REALTY": "^CNXREALTY", "PSU BANK": "^CNXPSUBANK"
 }
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
-logger = logging.getLogger("AI-Evo")
+logger = logging.getLogger("AI-Lab")
 
 # -------------------------
-# 1. DATA LAYER
+# 1. DATA ENGINE
 # -------------------------
 def get_tickers():
     if os.path.exists("ind_nifty500list.csv"):
@@ -59,7 +63,7 @@ def robust_download(tickers):
         batch = tickers[i:i+batch_size]
         try:
             data = yf.download(batch, period=DATA_PERIOD, group_by='ticker', threads=True, progress=False, ignore_tz=True)
-            frames.append(data)
+            if not data.empty: frames.append(data)
         except: pass
     return pd.concat(frames, axis=1) if frames else pd.DataFrame()
 
@@ -71,8 +75,13 @@ def extract_df(bulk, ticker):
     except: pass
     return None
 
-def prepare_features(df):
+# -------------------------
+# 2. MATH & INDICATORS
+# -------------------------
+def prepare_features(df, ticker=None):
     df = df.copy()
+    if len(df) < 200: return None
+    
     df['SMA50'] = df['Close'].rolling(50).mean()
     df['SMA200'] = df['Close'].rolling(200).mean()
     df['EMA20'] = df['Close'].ewm(span=20).mean()
@@ -91,50 +100,62 @@ def prepare_features(df):
     minus_dm = df['Low'].diff()
     p_dm = np.where((plus_dm > minus_dm) & (plus_dm > 0), plus_dm, 0.0)
     m_dm = np.where((minus_dm > plus_dm) & (minus_dm > 0), -minus_dm, 0.0)
-    
+    plus_dm_s = pd.Series(p_dm, index=df.index)
+    minus_dm_s = pd.Series(m_dm, index=df.index)
     tr = pd.concat([h_l, h_c, l_c], axis=1).max(axis=1).ewm(alpha=1/14).mean()
-    df['ADX'] = (abs(100*(pd.Series(p_dm, index=df.index).ewm(alpha=1/14).mean()/tr) - 
-                     100*(pd.Series(m_dm, index=df.index).ewm(alpha=1/14).mean()/tr)) /
-                 (100*(pd.Series(p_dm, index=df.index).ewm(alpha=1/14).mean()/tr) + 
-                  100*(pd.Series(m_dm, index=df.index).ewm(alpha=1/14).mean()/tr)) * 100).ewm(alpha=1/14).mean().fillna(0)
+    plus_di = 100 * (plus_dm_s.ewm(alpha=1/14).mean() / tr)
+    minus_di = 100 * (minus_dm_s.ewm(alpha=1/14).mean() / tr)
+    df['ADX'] = (abs(plus_di - minus_di) / (plus_di + minus_di) * 100).ewm(alpha=1/14).mean().fillna(0)
     
     return df.dropna()
 
 # -------------------------
-# 2. GENETIC ALGORITHM ENGINE
+# 3. GENETIC ALGORITHM ENGINE
 # -------------------------
-
-# Define the DNA (Genes) of a strategy
 GENE_POOL = {
     "trend_filter": ["SMA200", "SMA50", "NONE"],
-    "rsi_logic": ["OVERSOLD", "MOMENTUM"],
+    "rsi_logic": ["OVERSOLD", "MOMENTUM", "NEUTRAL"],
     "rsi_threshold": [30, 35, 40, 45, 55, 60, 65, 70],
     "adx_min": [10, 15, 20, 25, 30],
     "sl_mult": [1.0, 1.5, 2.0, 2.5],
-    "tgt_mult": [2.0, 2.5, 3.0, 4.0, 5.0]
+    # "tgt_mult": Removed fixed pool to allow dynamic logic
 }
 
 def create_random_genome():
-    return {k: random.choice(v) for k, v in GENE_POOL.items()}
+    genome = {k: random.choice(v) for k, v in GENE_POOL.items()}
+    
+    # RULE 1: Forced R:R (Target >= Stop)
+    # We pick a target that is 1.5x, 2x, or 3x the Stop Loss
+    genome['tgt_mult'] = random.choice([genome['sl_mult'] * 1.5, genome['sl_mult'] * 2.0, genome['sl_mult'] * 3.0])
+    
+    genome['name'] = f"Gen-{random.randint(1000,9999)}"
+    return genome
 
 def crossover(parent_a, parent_b):
-    """Mating: Mixes genes from two parents to create a child."""
     child = {}
     for key in GENE_POOL.keys():
-        # 50% chance to take gene from Father or Mother
         child[key] = parent_a[key] if random.random() > 0.5 else parent_b[key]
+    
+    # Re-enforce R:R Logic after crossover
+    child['tgt_mult'] = random.choice([child['sl_mult'] * 1.5, child['sl_mult'] * 2.0, child['sl_mult'] * 3.0])
+    child['name'] = f"Child-{random.randint(1000,9999)}"
     return child
 
 def mutate(genome):
-    """Mutation: Randomly changes one gene to introduce diversity."""
     if random.random() < MUTATION_RATE:
-        gene_to_change = random.choice(list(GENE_POOL.keys()))
-        genome[gene_to_change] = random.choice(GENE_POOL[gene_to_change])
+        gene = random.choice(list(GENE_POOL.keys()))
+        genome[gene] = random.choice(GENE_POOL[gene])
+        
+        # Re-enforce R:R Logic after mutation
+        if gene == "sl_mult":
+             genome['tgt_mult'] = random.choice([genome['sl_mult'] * 1.5, genome['sl_mult'] * 2.0, genome['sl_mult'] * 3.0])
+
     return genome
 
-def fitness_score(df, genome):
-    """Calculates a score based on Profitability (Not just Wins)."""
+def fast_score(df, genome):
+    """Cost-Aware Scoring Function."""
     wins, losses = 0, 0
+    profit_points = 0.0
     
     close = df['Close'].values
     low = df['Low'].values
@@ -144,57 +165,59 @@ def fitness_score(df, genome):
     adx = df['ADX'].values
     atr = df['ATR'].values
     
-    start_idx = 0
-    end_idx = len(df) - 20
-    i = start_idx
-    
-    while i < end_idx:
+    i = 0; end = len(df) - 20
+    while i < end:
         is_entry = False
-        
-        # Gene Logic
         if genome["trend_filter"] == "SMA200" and close[i] < sma200[i]: i += 1; continue
         if adx[i] <= genome["adx_min"]: i += 1; continue
         
-        if genome["rsi_logic"] == "OVERSOLD":
-            if rsi[i] < genome["rsi_threshold"]: is_entry = True
-        elif genome["rsi_logic"] == "MOMENTUM":
-            if rsi[i] > genome["rsi_threshold"]: is_entry = True
+        val = rsi[i]
+        thresh = genome["rsi_threshold"]
+        if genome["rsi_logic"] == "OVERSOLD" and val < thresh: is_entry = True
+        elif genome["rsi_logic"] == "MOMENTUM" and val > thresh: is_entry = True
+        elif genome["rsi_logic"] == "NEUTRAL" and (40 < val < 60): is_entry = True
             
         if is_entry:
             sl = close[i] - (genome["sl_mult"] * atr[i])
             tgt = close[i] + (genome["tgt_mult"] * atr[i])
             
             outcome = "OPEN"
-            days_held = 0
+            days = 0
             for j in range(1, 15):
-                days_held = j
+                days = j
                 idx = i + j
                 if idx >= len(close): break
-                if low[idx] <= sl: outcome = "LOSS"; break
-                if high[idx] >= tgt: outcome = "WIN"; break
+                if low[idx] <= sl: outcome="LOSS"; break
+                if high[idx] >= tgt: outcome="WIN"; break
             
-            if outcome == "WIN": wins += 1
-            elif outcome == "LOSS": losses += 1
-            i += days_held
-        else:
-            i += 1
+            # RULE 2: Cost-Aware Scoring
+            # Subtract 0.1R (approx cost) from every trade
+            cost_drag = 0.1
             
-    # Score Formula: (Wins * Target_Mult) - (Losses * Stop_Mult)
-    # This prioritizes strategies that make money, not just win often.
-    score = (wins * genome["tgt_mult"]) - (losses * genome["sl_mult"])
-    total_trades = wins + losses
-    win_rate = (wins / total_trades * 100) if total_trades > 0 else 0
-    
-    return score, win_rate, total_trades
+            if outcome == "WIN": 
+                wins += 1
+                profit_points += (genome["tgt_mult"] - cost_drag)
+            elif outcome == "LOSS": 
+                losses += 1
+                profit_points -= (genome["sl_mult"] + cost_drag)
+            i += days
+        else: i += 1
+    return wins, losses, profit_points
 
 def run_evolution(processed_data):
     logger.info(f"🧬 STARTING EVOLUTION ({GENERATIONS} Gens, {POPULATION_SIZE} Pop)")
     
-    # 1. Create Initial Population
-    population = [create_random_genome() for _ in range(POPULATION_SIZE)]
+    # RULE 3: Stable Evolution (Fixed Sample)
+    # We pick the sample ONCE here, so all generations are tested on the same stocks.
+    validation_sample = random.sample(processed_data, min(len(processed_data), SAMPLE_SIZE))
+    logger.info(f"🧪 Fixed Validation Set: {len(validation_sample)} stocks")
     
-    # Inject Baseline (Don't forget what we already know works)
-    population[0] = { "trend_filter": "SMA200", "rsi_logic": "OVERSOLD", "rsi_threshold": 30, "adx_min": 20, "sl_mult": 1.0, "tgt_mult": 3.0 }
+    population = [create_random_genome() for _ in range(POPULATION_SIZE)]
+    # Inject Baseline
+    population[0] = { 
+        "name": "Baseline", "trend_filter": "SMA200", "rsi_logic": "OVERSOLD", 
+        "rsi_threshold": 30, "adx_min": 15, "sl_mult": 1.0, "tgt_mult": 3.0 
+    }
 
     best_genome = None
     best_score = -9999
@@ -202,60 +225,47 @@ def run_evolution(processed_data):
     for gen in range(GENERATIONS):
         scores = []
         
-        # Evaluate entire population
-        # Speed Optimization: Sample 30 random stocks per generation to test fitness
-        sample_data = random.sample(processed_data, min(len(processed_data), 30))
-        
         for genome in population:
-            gen_score = 0
-            gen_wr = 0
-            gen_trades = 0
+            g_score = 0
+            g_trades = 0
+            g_wins = 0
             
-            for df in sample_data:
-                s, w, t = fitness_score(df, genome)
-                gen_score += s
-                gen_trades += t
+            for df in validation_sample:
+                w, l, s = fast_score(df, genome)
+                g_score += s
+                g_trades += (w + l)
+                g_wins += w
             
-            scores.append((genome, gen_score, gen_trades))
+            wr = (g_wins / g_trades * 100) if g_trades > 0 else 0
+            final_score = g_score if g_trades >= MIN_TRADES else -9999
+            scores.append((genome, final_score, wr, g_trades))
             
-        # Sort by Score (High to Low)
         scores.sort(key=lambda x: x[1], reverse=True)
         
-        top_genome = scores[0][0]
-        top_score = scores[0][1]
+        top = scores[0]
+        logger.info(f"   > Gen {gen+1}: Score {top[1]:.1f} | WR {top[2]:.1f}% | Trades {top[3]}")
         
-        logger.info(f"   > Gen {gen+1}: Best Score {top_score:.1f} | Trades {scores[0][2]}")
-        
-        if top_score > best_score:
-            best_score = top_score
-            best_genome = top_genome
+        if top[1] > best_score:
+            best_score = top[1]
+            best_genome = top[0]
             
-        # Selection: Keep Top 20% (Elites)
         elites_count = int(POPULATION_SIZE * 0.2)
         elites = [s[0] for s in scores[:elites_count]]
         
-        # Breeding: Fill the rest of population
-        new_pop = elites[:] # Carry over elites
+        new_pop = elites[:]
         while len(new_pop) < POPULATION_SIZE:
-            parent_a = random.choice(elites)
-            parent_b = random.choice(elites)
-            child = crossover(parent_a, parent_b)
-            child = mutate(child)
+            p1 = random.choice(elites)
+            p2 = random.choice(elites)
+            child = mutate(crossover(p1, p2))
             new_pop.append(child)
-            
         population = new_pop
 
     logger.info("\n🏆 EVOLUTION COMPLETE. Best Strategy:")
     logger.info(json.dumps(best_genome, indent=2))
-    
-    # Save to file
-    with open(STRATEGY_FILE, "w") as f:
-        json.dump({"updated": datetime.utcnow().strftime("%Y-%m-%d"), "parameters": best_genome}, f, indent=2)
-    
     return best_genome
 
 # -------------------------
-# 3. PORTFOLIO VALIDATION
+# 4. PORTFOLIO SIMULATION
 # -------------------------
 class PortfolioSimulator:
     def __init__(self, data, genome):
@@ -267,7 +277,7 @@ class PortfolioSimulator:
         self.portfolio = []
 
     def run(self):
-        logger.info(f"\n📈 VALIDATION: Backtesting Winner on ALL stocks...")
+        logger.info(f"📈 Validating: {self.genome.get('name', 'AI')}...")
         dates = sorted(list(set().union(*[d.index for d in self.data.values()])))
         sim_dates = dates[200:]
         
@@ -285,12 +295,11 @@ class PortfolioSimulator:
         win_rate = round(wins / total * 100, 1) if total > 0 else 0
         profit = round(self.curve[-1] - CAPITAL, 2)
         
-        logger.info(f"   > Profit: ₹{profit} | Trades: {total} | Win Rate: {win_rate}%")
+        logger.info(f"   > Profit: ₹{profit} | Trades: {len(self.history)} | Win Rate: {win_rate}%")
         return {"curve": self.curve, "win_rate": win_rate, "total_trades": total, "profit": profit, "ledger": self.history[-50:]}
 
     def process_day(self, date):
         active = []
-        # Exits
         for t in self.portfolio:
             sym = t['symbol']
             if date not in self.data[sym].index: active.append(t); continue
@@ -299,19 +308,18 @@ class PortfolioSimulator:
             exit_p = None
             if row['Open'] < t['sl']: exit_p = row['Open']
             elif row['Low'] <= t['sl']: exit_p = t['sl']
-            elif row['Open'] > t['tgt']: exit_p = row['Open']
             elif row['High'] >= t['tgt']: exit_p = t['tgt']
             
             if exit_p:
-                pnl = (exit_p - t['entry']) * t['qty']
-                cost = exit_p * t['qty'] * BROKERAGE_PCT
-                self.cash += (exit_p * t['qty'] - cost)
-                self.history.append({"date": date.strftime("%Y-%m-%d"), "symbol": sym, "pnl": round(pnl-cost, 2), "result": "WIN" if pnl>0 else "LOSS"})
+                rev = exit_p * t['qty']
+                cost = rev * BROKERAGE_PCT
+                self.cash += (rev - cost)
+                pnl = rev - cost - t['cost_basis']
+                self.history.append({"date": date.strftime("%Y-%m-%d"), "symbol": sym, "pnl": round(pnl, 2), "result": "WIN" if pnl > 0 else "LOSS"})
             else: active.append(t)
         self.portfolio = active
         
-        # Entries (Max 5)
-        if len(self.portfolio) >= 5: return
+        if len(self.portfolio) >= MAX_POSITIONS: return
         for sym, df in self.data.items():
             if date not in df.index: continue
             row = df.loc[date]
@@ -319,50 +327,71 @@ class PortfolioSimulator:
             g = self.genome
             trend_ok = True
             if g["trend_filter"] == "SMA200" and row['Close'] < row['SMA200']: trend_ok = False
-            
             rsi_ok = False
             if g["rsi_logic"] == "OVERSOLD" and row['RSI'] < g["rsi_threshold"]: rsi_ok = True
             elif g["rsi_logic"] == "MOMENTUM" and row['RSI'] > g["rsi_threshold"]: rsi_ok = True
+            elif g["rsi_logic"] == "NEUTRAL" and 40 < row['RSI'] < 60: rsi_ok = True
             
             if trend_ok and rsi_ok and row['ADX'] > g["adx_min"]:
                 if any(t['symbol'] == sym for t in self.portfolio): continue
                 risk = row['ATR'] * g["sl_mult"]
                 if risk <= 0: continue
-                
                 qty = int((self.curve[-1] * RISK_PER_TRADE) / risk)
                 cost = qty * row['Close']
                 if cost > self.cash: qty = int(self.cash / row['Close']); cost = qty * row['Close']
                 
                 if qty > 0 and self.cash > cost:
-                    self.cash -= (cost + (cost*BROKERAGE_PCT))
-                    self.portfolio.append({"symbol": sym, "entry": row['Close'], "qty": qty, "sl": row['Close']-risk, "tgt": row['Close']+(row['ATR']*g["tgt_mult"]), "entry_cost": cost*BROKERAGE_PCT})
-                    if len(self.portfolio) >= 5: break
+                    fees = cost * BROKERAGE_PCT
+                    self.cash -= (cost + fees)
+                    self.portfolio.append({
+                        "symbol": sym, "entry": row['Close'], "qty": qty,
+                        "sl": row['Close'] - risk, 
+                        "tgt": row['Close'] + (row['ATR'] * g["tgt_mult"]),
+                        "cost_basis": cost + fees
+                    })
+                    if len(self.portfolio) >= MAX_POSITIONS: break
 
-# --- 4. MAIN ---
+# -------------------------
+# 6. MAIN
+# -------------------------
 if __name__ == "__main__":
     tickers = get_tickers()
     bulk = robust_download(tickers)
+    
     processed = {}
-    logger.info("📊 Preparing Data...")
+    full_map = {}
     for t in tickers:
         raw = extract_df(bulk, t)
         if raw is not None and len(raw) > 250:
-            processed[t] = prepare_features(raw)
-            
+            clean = prepare_features(raw, t)
+            if clean is not None:
+                processed[t] = clean 
+                
     if not processed: exit()
     
-    # 1. Evolve Best Strategy
+    # 1. Evolve
     best_genome = run_evolution(list(processed.values()))
     
-    # 2. Validate on Full Portfolio
+    # 2. Save Strategy
+    with open(STRATEGY_FILE, "w") as f:
+        json.dump({"updated": datetime.utcnow().strftime("%Y-%m-%d"), "parameters": best_genome}, f, indent=2)
+    
+    # 3. Simulate
     sim = PortfolioSimulator(processed, best_genome)
     stats = sim.run()
     
-    # 3. Save Stats
+    # 4. Save Stats
+    ticker_wins = {}
+    for t, df in processed.items():
+        w, l, s = fast_score(df, best_genome)
+        tot = w + l
+        ticker_wins[t.replace('.NS','')] = round(w/tot*100, 0) if tot > 0 else 0
+        
     output = {
         "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
         "portfolio": stats,
-        "tickers": {} # Fill if needed
+        "tickers": ticker_wins
     }
+    
     with open(CACHE_FILE, "w") as f: json.dump(output, f)
-    logger.info("✅ Backtest Complete.")
+    logger.info(f"✅ Done.")
