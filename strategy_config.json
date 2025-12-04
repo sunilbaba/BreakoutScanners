@@ -1,12 +1,11 @@
 {
   "updated": "2025-12-04",
   "parameters": {
+    "strategy_type": "RSI_DIP",
     "trend_filter": "SMA200",
-    "rsi_logic": "OVERSOLD",
-    "rsi_threshold": 30,
-    "adx_min": 20,
-    "sl_mult": 2.0,
-    "tgt_mult": 3.0,
-    "name": "Child-6652"
+    "adx_min": 25,
+    "sl_mult": 1.0,
+    "tgt_mult": 1.5,
+    "name": "Gen-4562"
   }
 }
