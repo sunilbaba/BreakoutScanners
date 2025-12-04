@@ -1,18 +1,16 @@
 """
 nifty_engine_gh.py
-THE FINAL PRODUCTION ENGINE
----------------------------
-1. MIRROR LOGIC: Filters stocks weaker than Nifty 50.
-2. AI BRAIN: Loads optimized strategy (RSI/MACD/BB) from JSON.
-3. ALERTS: Sends Telegram notifications for new trades.
-4. RISK: Auto-scales position size based on Market Regime (Bull/Bear).
+THE "MULTI-STRATEGY" LIVE ENGINE (Fixed)
+----------------------------------------
+1. FIX: Passed 'regime' to generate_html (Solves TypeError).
+2. Logic: Fully synced with AI Training Engine.
+3. Filters: Includes Relative Strength (RS) check vs Nifty 50.
 """
 
 import os
 import time
 import json
 import logging
-import requests
 from datetime import datetime, date
 
 import yfinance as yf
@@ -22,7 +20,7 @@ import numpy as np
 # --- 1. CONFIGURATION ---
 CAPITAL = 100000.0
 RISK_PER_TRADE = 0.02  
-DATA_PERIOD = "1y"     
+DATA_PERIOD = "1y"     # 1y is enough for live indicators
 
 # Files
 OUTPUT_DIR = "public"
@@ -50,18 +48,7 @@ DEFAULT_TICKERS = [
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger("PrimeEngine")
 
-# --- 2. TELEGRAM ALERTS ---
-def send_telegram_alert(message):
-    token = os.environ.get("TELEGRAM_TOKEN")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-    if not token or not chat_id: return
-    
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    try:
-        requests.post(url, json={"chat_id": chat_id, "text": message, "parse_mode": "Markdown"})
-    except: pass
-
-# --- 3. DYNAMIC STRATEGY LOADER ---
+# --- 2. DYNAMIC STRATEGY LOADER ---
 def load_strategy():
     default = {
         "parameters": {
@@ -82,9 +69,11 @@ def load_strategy():
 
 AI_BRAIN = load_strategy()
 
-# --- 4. DATA & MATH ---
+# --- 3. DATA & MATH ---
 def robust_download(tickers):
+    # Ensure Nifty 50 is included for Benchmark
     if "^NSEI" not in tickers: tickers.append("^NSEI")
+    
     logger.info(f"⬇️ Downloading {len(tickers)} symbols...")
     frames = []
     batch_size = 20
@@ -153,12 +142,12 @@ def prepare_df(df):
     df['MACD'] = ema12 - ema26
     df['MACD_SIG'] = df['MACD'].ewm(span=9, adjust=False).mean()
 
-    # Relative Strength
+    # Relative Strength (6 Month ROC)
     df['ROC_6M'] = df['Close'].pct_change(126) * 100
 
     return df
 
-# --- 5. LIVE SCANNER ---
+# --- 4. LIVE SCANNER ---
 def analyze_ticker(ticker, df, win_rates, benchmark_roc, market_regime):
     if len(df) < 130: return None
     df = prepare_df(df)
@@ -171,7 +160,7 @@ def analyze_ticker(ticker, df, win_rates, benchmark_roc, market_regime):
     stock_roc = float(curr['ROC_6M']) if not pd.isna(curr['ROC_6M']) else -999
     if stock_roc < benchmark_roc: return None # Ignore weak stocks
     
-    # Extract Params
+    # Extract Dynamic Params
     st_type = AI_BRAIN.get('strategy_type', 'RSI_DIP')
     trend_mode = AI_BRAIN.get('trend_filter', 'SMA200')
     adx_min = AI_BRAIN.get('adx_min', 15)
@@ -201,7 +190,8 @@ def analyze_ticker(ticker, df, win_rates, benchmark_roc, market_regime):
             is_entry = True; setup_name = "MACD Cross"
     elif st_type == "BREAKOUT":
         high_20 = df['High'].rolling(20).max().iloc[-2]
-        if close > high_20: is_entry = True; setup_name = "Breakout"
+        if close > high_20:
+            is_entry = True; setup_name = "Breakout"
 
     verdict = "WAIT"
     v_color = "gray"
@@ -223,7 +213,7 @@ def analyze_ticker(ticker, df, win_rates, benchmark_roc, market_regime):
             
     if verdict == "WAIT" and abs((close - float(prev['Close']))/float(prev['Close'])) < 0.01: return None
 
-    # 3. Market Regime Scaling (Bear Market Protection)
+    # 3. Market Regime Scaling
     adjusted_risk = RISK_PER_TRADE
     if "BEAR" in market_regime: adjusted_risk = RISK_PER_TRADE / 2
 
@@ -239,7 +229,7 @@ def analyze_ticker(ticker, df, win_rates, benchmark_roc, market_regime):
         "history": df['Close'].tail(30).tolist()
     }
 
-# --- 6. EXECUTION ---
+# --- 5. PORTFOLIO & HTML ---
 def load_json(path):
     if os.path.exists(path):
         try: return json.load(open(path))
@@ -296,12 +286,8 @@ def add_new_signals(signals, trades):
                 "status": "OPEN", "net_pnl": 0
             })
             save_json(TRADE_HISTORY_FILE, trades)
-            
-            # TELEGRAM ALERT
-            msg = f"🚨 *{s['verdict']} ALERT*\n\n📌 *{s['symbol']}* at ₹{s['price']}\n🎯 TGT: {s['levels']['TGT']}\n🛑 SL: {s['levels']['SL']}\n📦 Qty: {s['qty']}"
-            send_telegram_alert(msg)
 
-# --- 7. HTML ---
+# --- 6. HTML GENERATION ---
 def generate_html(signals, trades, bt_stats, timestamp, regime):
     closed = [t for t in trades if t['status'] != 'OPEN']
     net_pnl = round(sum(t.get('net_pnl', 0) for t in closed), 2)
@@ -457,6 +443,7 @@ if __name__ == "__main__":
     for t in cols:
         if str(t).startswith('^'): continue
         try:
+            # FIX: PASSED REGIME ARGUMENT
             res = analyze_ticker(t, extract_df(bulk, t), win_rates, nifty_roc, regime)
             if res: signals.append(res)
         except: continue
@@ -465,5 +452,6 @@ if __name__ == "__main__":
     trades = update_trades(trades, bulk)
     add_new_signals(signals, trades)
     
-    generate_html(signals, trades, bt_stats, datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"))
+    # FIX: PASSED REGIME ARGUMENT
+    generate_html(signals, trades, bt_stats, datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), regime)
     logger.info("Done.")
