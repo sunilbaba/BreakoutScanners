@@ -1,11 +1,11 @@
 {
   "updated": "2025-12-04",
   "parameters": {
-    "strategy_type": "BB_REVERSAL",
+    "strategy_type": "MACD_CROSS",
     "trend_filter": "SMA50",
-    "adx_min": 10,
-    "sl_mult": 1.5,
-    "tgt_mult": 2.25,
-    "name": "Child-1397"
+    "adx_min": 20,
+    "sl_mult": 2.5,
+    "tgt_mult": 3.75,
+    "name": "Child-5440"
   }
 }
