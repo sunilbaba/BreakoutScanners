@@ -1,1 +1,35 @@
-
+[
+  {
+    "id": "PVRINOX-2025-12-04",
+    "date": "2025-12-04",
+    "symbol": "PVRINOX",
+    "entry": 1129.7,
+    "qty": 25,
+    "target": 1247.05,
+    "stop_loss": 1051.47,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "DOMS-2025-12-04",
+    "date": "2025-12-04",
+    "symbol": "DOMS",
+    "entry": 2609.0,
+    "qty": 13,
+    "target": 2835.71,
+    "stop_loss": 2457.86,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
+    "id": "DCMSHRIRAM-2025-12-04",
+    "date": "2025-12-04",
+    "symbol": "DCMSHRIRAM",
+    "entry": 1221.3,
+    "qty": 16,
+    "target": 1398.57,
+    "stop_loss": 1103.12,
+    "status": "OPEN",
+    "net_pnl": 0
+  }
+]
