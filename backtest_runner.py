@@ -36,6 +36,7 @@ GENERATIONS = 5
 MUTATION_RATE = 0.4       
 MIN_TRADES = 20           # Higher requirement since we check 500 stocks
 SAMPLE_SIZE = 600         # Set > 500 to force using ALL available stocks
+ITERATIONS = POPULATION_SIZE * GENERATIONS
 
 SECTOR_INDICES = {
     "NIFTY 50": "^NSEI", "BANK": "^NSEBANK", "AUTO": "^CNXAUTO", "IT": "^CNXIT",
