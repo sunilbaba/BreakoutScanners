@@ -1,5 +1,16 @@
 [
   {
+    "id": "NATIONALUM-2025-12-05",
+    "date": "2025-12-05",
+    "symbol": "NATIONALUM",
+    "entry": 270.8,
+    "qty": 137,
+    "target": 292.59,
+    "stop_loss": 256.27,
+    "status": "OPEN",
+    "net_pnl": 0
+  },
+  {
     "id": "CESC-2025-12-04",
     "date": "2025-12-04",
     "symbol": "CESC",
