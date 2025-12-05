@@ -11,8 +11,11 @@
     "net_pnl": 0,
     "deep_dive": {
       "wr": 0,
-      "trades": 0
-    }
+      "trades": 0,
+      "log": []
+    },
+    "current_price": 1026.1,
+    "current_pnl": -42.9
   },
   {
     "id": "JBCHEPHARM-2025-12-05",
@@ -26,8 +29,11 @@
     "net_pnl": 0,
     "deep_dive": {
       "wr": 0,
-      "trades": 0
-    }
+      "trades": 0,
+      "log": []
+    },
+    "current_price": 1825.4,
+    "current_pnl": -189.6
   },
   {
     "id": "NATIONALUM-2025-12-05",
@@ -41,8 +47,11 @@
     "net_pnl": 0,
     "deep_dive": {
       "wr": 0,
-      "trades": 0
-    }
+      "trades": 0,
+      "log": []
+    },
+    "current_price": 273.15,
+    "current_pnl": 321.95
   },
   {
     "id": "CESC-2025-12-04",
@@ -56,8 +65,11 @@
     "net_pnl": 0,
     "deep_dive": {
       "wr": 0,
-      "trades": 0
-    }
+      "trades": 0,
+      "log": []
+    },
+    "current_price": 174.0,
+    "current_pnl": 65.28
   },
   {
     "id": "APOLLOTYRE-2025-12-04",
@@ -71,8 +83,11 @@
     "net_pnl": 0,
     "deep_dive": {
       "wr": 0,
-      "trades": 0
-    }
+      "trades": 0,
+      "log": []
+    },
+    "current_price": 521.45,
+    "current_pnl": -789.45
   },
   {
     "id": "PVRINOX-2025-12-04",
@@ -86,8 +101,11 @@
     "net_pnl": 0,
     "deep_dive": {
       "wr": 0,
-      "trades": 0
-    }
+      "trades": 0,
+      "log": []
+    },
+    "current_price": 1091.0,
+    "current_pnl": -967.5
   },
   {
     "id": "DOMS-2025-12-04",
@@ -101,8 +119,11 @@
     "net_pnl": 0,
     "deep_dive": {
       "wr": 0,
-      "trades": 0
-    }
+      "trades": 0,
+      "log": []
+    },
+    "current_price": 2600.5,
+    "current_pnl": -110.5
   },
   {
     "id": "DCMSHRIRAM-2025-12-04",
@@ -116,7 +137,10 @@
     "net_pnl": 0,
     "deep_dive": {
       "wr": 0,
-      "trades": 0
-    }
+      "trades": 0,
+      "log": []
+    },
+    "current_price": 1220.9,
+    "current_pnl": -6.4
   }
 ]
