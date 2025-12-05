@@ -1,11 +1,12 @@
 """
 nifty_engine_gh.py
-THE "DEEP DIVE" ENGINE
-----------------------
-1. Scans Live Market.
-2. If Signal Found -> Downloads 5Y Data for that specific stock.
-3. VALIDATES the strategy on that stock's long-term history.
-4. Adds '5Y Win Rate' & '5Y Profit' to the dashboard card.
+THE "FULL CYLINDER" ENGINE
+--------------------------
+1. Scans Live Market for New Setups.
+2. Validates New Signals with 5Y Deep Dive.
+3. **NEW**: Validates ACTIVE TRADES with 5Y Deep Dive (Enrichment).
+4. Manages Portfolio (SL/Target/TSL).
+5. Generates 3-Tab Dashboard.
 """
 
 import os
@@ -22,8 +23,8 @@ import numpy as np
 # --- 1. CONFIGURATION ---
 CAPITAL = 100000.0
 RISK_PER_TRADE = 0.02  
-DATA_PERIOD = "1y" # Fast scan first
-DEEP_PERIOD = "5y" # Deep dive for winners
+DATA_PERIOD = "1y" 
+DEEP_PERIOD = "5y"
 
 # Files
 OUTPUT_DIR = "public"
@@ -41,12 +42,28 @@ SECTOR_INDICES = {
     "ENERGY": "^CNXENERGY", "REALTY": "^CNXREALTY", "PSU BANK": "^CNXPSUBANK"
 }
 
-DEFAULT_TICKERS = [ "RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "SBIN.NS", "ITC.NS", "TATAMOTORS.NS" ]
+DEFAULT_TICKERS = [
+    "RELIANCE.NS", "HDFCBANK.NS", "INFY.NS", "TCS.NS", "ICICIBANK.NS", "SBIN.NS",
+    "ITC.NS", "BHARTIARTL.NS", "KOTAKBANK.NS", "LTIM.NS", "AXISBANK.NS", "MARUTI.NS",
+    "TITAN.NS", "SUNPHARMA.NS", "BAJFINANCE.NS", "HCLTECH.NS", "TATASTEEL.NS",
+    "ADANIENT.NS", "JIOFIN.NS", "ZOMATO.NS", "DLF.NS", "HAL.NS", "TRENT.NS"
+]
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger("PrimeEngine")
 
-# --- 2. STRATEGY LOADER ---
+# --- 2. TELEGRAM ALERTS ---
+def send_telegram_alert(message):
+    token = os.environ.get("TELEGRAM_TOKEN")
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    if not token or not chat_id: return
+    
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    try:
+        requests.post(url, json={"chat_id": chat_id, "text": message, "parse_mode": "Markdown"})
+    except: pass
+
+# --- 3. STRATEGY LOADER ---
 def load_strategy():
     default = {
         "parameters": { "strategy_type": "RSI_DIP", "trend_filter": "SMA200", "rsi_threshold": 30, "adx_min": 20, "sl_mult": 1.5, "tgt_mult": 3.0 }
@@ -60,13 +77,20 @@ def load_strategy():
 
 AI_BRAIN = load_strategy()
 
-# --- 3. DATA ENGINE ---
+# --- 4. DATA ENGINE ---
 def robust_download(tickers, period):
     if "^NSEI" not in tickers and period == DATA_PERIOD: tickers.append("^NSEI")
     logger.info(f"⬇️ Downloading {len(tickers)} symbols ({period})...")
-    try:
-        return yf.download(tickers, period=period, group_by='ticker', threads=True, progress=False, ignore_tz=True)
-    except: return pd.DataFrame()
+    frames = []
+    batch_size = 20
+    for i in range(0, len(tickers), batch_size):
+        batch = tickers[i:i+batch_size]
+        try:
+            data = yf.download(batch, period=period, group_by='ticker', threads=True, progress=False, ignore_tz=True)
+            frames.append(data)
+        except: pass
+    if not frames: return pd.DataFrame()
+    return pd.concat(frames, axis=1)
 
 def get_tickers():
     if os.path.exists("ind_nifty500list.csv"):
@@ -84,74 +108,60 @@ def extract_df(bulk, ticker):
     except: pass
     return None
 
-# --- 4. INDICATORS ---
+# --- 5. INDICATORS ---
 def prepare_df(df):
     df = df.copy()
     df['SMA50'] = df['Close'].rolling(50).mean()
     df['SMA200'] = df['Close'].rolling(200).mean()
     df['EMA20'] = df['Close'].ewm(span=20).mean()
     
-    # ATR
     h_l = df['High'] - df['Low']
     h_c = (df['High'] - df['Close'].shift()).abs()
     l_c = (df['Low'] - df['Close'].shift()).abs()
     df['ATR'] = pd.concat([h_l, h_c, l_c], axis=1).max(axis=1).rolling(14).mean()
     
-    # RSI
     delta = df['Close'].diff()
     gain = (delta.where(delta > 0, 0)).ewm(alpha=1/14).mean()
     loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/14).mean()
     df['RSI'] = 100 - (100 / (1 + gain/loss)).fillna(50)
     
-    # ADX
     plus_dm = df['High'].diff()
     minus_dm = df['Low'].diff()
     p_dm = np.where((plus_dm > minus_dm) & (plus_dm > 0), plus_dm, 0.0)
     m_dm = np.where((minus_dm > plus_dm) & (minus_dm > 0), -minus_dm, 0.0)
     tr = pd.concat([h_l, h_c, l_c], axis=1).max(axis=1).ewm(alpha=1/14).mean()
-    p_di = 100 * (pd.Series(p_dm, index=df.index).ewm(alpha=1/14).mean() / tr)
-    m_di = 100 * (pd.Series(m_dm, index=df.index).ewm(alpha=1/14).mean() / tr)
-    df['ADX'] = (abs(p_di - m_di) / (p_di + m_di) * 100).ewm(alpha=1/14).mean().fillna(0)
+    plus_di = 100 * (pd.Series(p_dm, index=df.index).ewm(alpha=1/14).mean() / tr)
+    minus_di = 100 * (pd.Series(m_dm, index=df.index).ewm(alpha=1/14).mean() / tr)
+    df['ADX'] = (abs(plus_di - minus_di) / (plus_di + minus_di) * 100).ewm(alpha=1/14).mean().fillna(0)
     
-    # BB
     df['BB_MID'] = df['Close'].rolling(20).mean()
     df['BB_LOW'] = df['BB_MID'] - (2 * df['Close'].rolling(20).std())
 
-    # MACD
-    ema12 = df['Close'].ewm(span=12).mean()
-    ema26 = df['Close'].ewm(span=26).mean()
+    ema12 = df['Close'].ewm(span=12, adjust=False).mean()
+    ema26 = df['Close'].ewm(span=26, adjust=False).mean()
     df['MACD'] = ema12 - ema26
-    df['MACD_SIG'] = df['MACD'].ewm(span=9).mean()
+    df['MACD_SIG'] = df['MACD'].ewm(span=9, adjust=False).mean()
     
     df['ROC_6M'] = df['Close'].pct_change(126) * 100
     return df
 
-# --- 5. THE "DEEP DIVE" VALIDATOR (5Y Check) ---
+# --- 6. THE 5-YEAR DEEP DIVE ---
 def run_deep_dive(ticker):
-    """
-    Downloads 5 Years of data for this specific stock and tests the strategy.
-    Returns: 5Y Win Rate, Total Profit, Trade Count.
-    """
-    logger.info(f"🔎 Running 5-Year Deep Dive for {ticker}...")
+    """Downloads 5Y data and tests strategy on this specific stock."""
+    logger.info(f"🔎 Deep Dive: {ticker}...")
     try:
         df = yf.download(ticker, period=DEEP_PERIOD, progress=False, ignore_tz=True)
-        if df.empty: return 0, 0, 0
+        if df.empty: return 0, 0
         df = prepare_df(df)
-    except: return 0, 0, 0
+    except: return 0, 0
 
     wins, losses = 0, 0
-    
-    # Simulation Loop (Vector-friendly)
-    # Logic: We can reuse the 'fast_score' logic logic from backtest_runner but customized
-    # To keep this file independent, we replicate the core check:
-    
     st = AI_BRAIN.get('strategy_type', 'RSI_DIP')
     trend_m = AI_BRAIN.get('trend_filter', 'SMA200')
     adx_m = AI_BRAIN.get('adx_min', 15)
     sl_m = AI_BRAIN.get('sl_mult', 1.5)
     tgt_m = AI_BRAIN.get('tgt_mult', 3.0)
     
-    # Iterate manually to account for hold time
     close = df['Close'].values
     low = df['Low'].values
     high = df['High'].values
@@ -159,17 +169,19 @@ def run_deep_dive(ticker):
     rsi = df['RSI'].values
     adx = df['ADX'].values
     atr = df['ATR'].values
+    bb_low = df['BB_LOW'].values
+    macd = df['MACD'].values
+    macds = df['MACD_SIG'].values
     
     i = 200; end = len(df) - 20
     while i < end:
         is_entry = False
-        # Filters
         if trend_m == "SMA200" and close[i] < sma200[i]: i+=1; continue
         if adx[i] <= adx_m: i+=1; continue
         
-        # Signal
         if st == "RSI_DIP" and rsi[i] < AI_BRAIN.get('rsi_threshold', 30): is_entry = True
-        elif st == "BREAKOUT" and close[i] >= np.max(high[max(0, i-20):i]): is_entry = True
+        elif st == "BB_REVERSAL" and low[i] <= bb_low[i] and close[i] > bb_low[i]: is_entry = True
+        elif st == "MACD_CROSS" and macd[i-1] < macds[i-1] and macd[i] > macds[i]: is_entry = True
         
         if is_entry:
             sl = close[i] - (sl_m * atr[i])
@@ -192,7 +204,7 @@ def run_deep_dive(ticker):
     wr = round(wins/total*100, 1) if total > 0 else 0
     return wr, total
 
-# --- 6. LIVE SCANNER ---
+# --- 7. LIVE SCANNER ---
 def analyze_ticker(ticker, df, benchmark_roc, market_regime):
     if len(df) < 130: return None
     df = prepare_df(df)
@@ -205,7 +217,6 @@ def analyze_ticker(ticker, df, benchmark_roc, market_regime):
     stock_roc = float(curr['ROC_6M']) if not pd.isna(curr['ROC_6M']) else -999
     if stock_roc < benchmark_roc: return None
     
-    # Logic Check
     st_type = AI_BRAIN.get('strategy_type', 'RSI_DIP')
     trend_mode = AI_BRAIN.get('trend_filter', 'SMA200')
     adx_min = AI_BRAIN.get('adx_min', 15)
@@ -232,28 +243,18 @@ def analyze_ticker(ticker, df, benchmark_roc, market_regime):
     verdict = "WAIT"
     v_color = "gray"
     
-    # If setup detected, perform DEEP DIVE
     deep_wr = 0
     deep_trades = 0
     
     if trend_ok and is_entry:
-        # *** THE DEEP DIVE ***
-        # Only download 5Y history if we are about to buy.
+        # 5Y VALIDATION ON NEW SIGNAL
         deep_wr, deep_trades = run_deep_dive(ticker)
-        
-        if deep_wr >= 60:
-            verdict = "PRIME BUY ⭐"
-            v_color = "purple"
-        elif deep_wr >= 40:
-            verdict = "BUY"
-            v_color = "green"
-        else:
-            verdict = "RISKY (Bad History)"
-            v_color = "orange"
+        if deep_wr >= 60: verdict = "PRIME BUY ⭐"; v_color = "purple"
+        elif deep_wr >= 40: verdict = "BUY"; v_color = "green"
+        else: verdict = "RISKY"; v_color = "orange"
             
-    if verdict == "WAIT": return None
+    if verdict == "WAIT" and abs((close - float(prev['Close']))/float(prev['Close'])) < 0.01: return None
 
-    # Sizing
     atr_val = float(curr['ATR'])
     stop = close - (AI_BRAIN.get('sl_mult', 1.5) * atr_val)
     target = close + (AI_BRAIN.get('tgt_mult', 3.0) * atr_val)
@@ -266,13 +267,13 @@ def analyze_ticker(ticker, df, benchmark_roc, market_regime):
         "symbol": clean_sym, "price": round(close, 2),
         "change": round(((close - float(prev['Close']))/float(prev['Close']))*100, 2),
         "verdict": verdict, "v_color": v_color, "rr": rr, "qty": qty,
-        "setups": [setup_name],
-        "deep_dive": {"wr": deep_wr, "trades": deep_trades}, # <--- NEW DATA FOR UI
+        "setups": [setup_name] if is_entry else [],
+        "deep_dive": {"wr": deep_wr, "trades": deep_trades},
         "levels": {"TGT": round(target, 2), "SL": round(stop, 2)},
         "history": df['Close'].tail(30).tolist()
     }
 
-# --- 6. EXECUTION & HTML ---
+# --- 8. PORTFOLIO MANAGEMENT ---
 def load_json(path):
     if os.path.exists(path):
         try: return json.load(open(path))
@@ -285,28 +286,38 @@ def save_json(path, data):
 def update_trades(trades, bulk_data):
     updated = False
     today = date.today().isoformat()
+    
     for t in trades:
         if t['status'] == 'OPEN':
+            # Enriched Check: Do we have 5Y stats for this holding?
+            if 'deep_dive' not in t:
+                wr, total = run_deep_dive(t['symbol'] + ".NS")
+                t['deep_dive'] = {"wr": wr, "trades": total}
+                updated = True
+
+            # Price Check
             df = extract_df(bulk_data, t['symbol']+".NS")
             if df is not None:
                 curr = df.iloc[-1]
-                low, high = float(curr['Low']), float(curr['High'])
+                low, high, close = float(curr['Low']), float(curr['High']), float(curr['Close'])
+                
                 if low <= t['stop_loss']:
                     t['status'] = 'LOSS'; t['exit_price'] = t['stop_loss']; updated = True
                 elif high >= t['target']:
                     t['status'] = 'WIN'; t['exit_price'] = t['target']; updated = True
+                
                 if t['status'] != 'OPEN':
                     t['exit_date'] = today
                     pnl = (t['exit_price'] - t['entry']) * t['qty']
                     t['net_pnl'] = round(pnl - (pnl * BROKERAGE_PCT), 2)
+                    updated = True
+    
     if updated: save_json(TRADE_HISTORY_FILE, trades)
     return trades
 
 def add_new_signals(signals, trades):
     today = date.today().isoformat()
     owned = {t['symbol'] for t in trades if t['status'] == 'OPEN'}
-    
-    # Sort by Deep Dive Win Rate
     valid = [s for s in signals if "BUY" in s['verdict'] and s['symbol'] not in owned]
     valid.sort(key=lambda x: x['deep_dive']['wr'], reverse=True)
     
@@ -317,9 +328,12 @@ def add_new_signals(signals, trades):
                 "id": tid, "date": today, "symbol": s['symbol'],
                 "entry": s['price'], "qty": s['qty'],
                 "target": s['levels']['TGT'], "stop_loss": s['levels']['SL'],
-                "status": "OPEN", "net_pnl": 0
+                "status": "OPEN", "net_pnl": 0, "setup": s['setups'][0],
+                "deep_dive": s['deep_dive'] # Save 5Y stats to history
             })
             save_json(TRADE_HISTORY_FILE, trades)
+            msg = f"🚨 *{s['verdict']} ALERT*\n\n📌 *{s['symbol']}* at ₹{s['price']}\n🎯 TGT: {s['levels']['TGT']}\n🛑 SL: {s['levels']['SL']}\n📦 Qty: {s['qty']}\n✅ 5Y Win Rate: {s['deep_dive']['wr']}%"
+            send_telegram_alert(msg)
 
 def generate_html(signals, trades, bt_stats, timestamp, regime):
     closed = [t for t in trades if t['status'] != 'OPEN']
@@ -385,25 +399,28 @@ def generate_html(signals, trades, bt_stats, timestamp, regime):
                 document.getElementById('btn-'+id).className="font-bold text-white border-b-2 border-purple-500 pb-2";
             }}
 
-            function showModal(idx) {{
-                const s = DATA.signals[idx];
+            function showModal(idx, type) {{
+                // Supports both Signal and Trade arrays
+                const s = type === 'trade' ? DATA.trades[idx] : DATA.signals[idx];
+                const stats = s.deep_dive || {{wr: 0, trades: 0}};
                 document.getElementById('m-sym').innerText = s.symbol;
-                document.getElementById('m-wr').innerText = s.deep_dive.wr + "%";
-                document.getElementById('m-tr').innerText = s.deep_dive.trades;
+                document.getElementById('m-wr').innerText = stats.wr + "%";
+                document.getElementById('m-tr').innerText = stats.trades;
                 document.getElementById('stockModal').classList.remove('hidden');
             }}
 
             const portRoot = document.getElementById('portfolio');
             const openT = DATA.trades.filter(t => t.status === 'OPEN');
-            portRoot.innerHTML = openT.length ? openT.map(p => `
-                <div class="bg-slate-800 p-4 rounded border border-slate-700">
+            portRoot.innerHTML = openT.length ? openT.map((p, i) => `
+                <div class="bg-slate-800 p-4 rounded border border-slate-700 cursor-pointer hover:border-blue-500 transition" onclick="showModal(${{i}}, 'trade')">
                     <div class="flex justify-between mb-2"><div class="font-bold text-white">${{p.symbol}}</div><div class="text-xs bg-blue-900 text-blue-200 px-2 py-1 rounded">OPEN</div></div>
                     <div class="flex justify-between text-[10px] font-mono mt-2"><span class="text-red-400">SL ${{p.stop_loss}}</span><span class="text-green-400">TGT ${{p.target}}</span></div>
+                    <div class="text-[10px] text-center mt-2 text-slate-500">5Y Win Rate: <span class="text-white">${{p.deep_dive ? p.deep_dive.wr : '...'}}%</span></div>
                 </div>`).join('') : '<div class="col-span-full text-center text-slate-600 py-4">No active trades</div>';
 
             const scanRoot = document.getElementById('scanner');
             scanRoot.innerHTML = DATA.signals.length ? DATA.signals.map((s, i) => `
-                <div class="bg-slate-800 p-4 rounded border border-slate-700 cursor-pointer hover:border-purple-500 transition" onclick="showModal(${{i}})">
+                <div class="bg-slate-800 p-4 rounded border border-slate-700 cursor-pointer hover:border-purple-500 transition" onclick="showModal(${{i}}, 'signal')">
                     <div class="flex justify-between mb-2"><div class="font-bold text-white">${{s.symbol}}</div><div class="${{s.change>=0?'text-green-400':'text-red-400'}}">${{s.change}}%</div></div>
                     <div class="flex justify-between text-xs mb-2"><span class="text-slate-500">5Y Win: <span class="${{s.deep_dive.wr>50?'text-green-400':'text-yellow-400'}}">${{s.deep_dive.wr}}%</span></span><span class="text-slate-500">RR: ${{s.rr}}</span></div>
                     <div class="font-bold text-sm text-center py-1 rounded bg-slate-700 ${{s.v_color === 'purple' ? 'text-purple-400' : 'text-green-400'}}">${{s.verdict}}</div>
@@ -420,14 +437,7 @@ def generate_html(signals, trades, bt_stats, timestamp, regime):
 
 if __name__ == "__main__":
     tickers = get_tickers()
-    bulk = robust_download(tickers)
-    
-    # Load AI Brain
-    bt_stats = {}
-    if os.path.exists(CACHE_FILE):
-        try: bt_stats = json.load(open(CACHE_FILE))
-        except: pass
-    win_rates = bt_stats.get("tickers", {})
+    bulk = robust_download(tickers, DATA_PERIOD)
     
     # Benchmark
     nifty_roc = -999
@@ -446,7 +456,7 @@ if __name__ == "__main__":
     for t in cols:
         if str(t).startswith('^'): continue
         try:
-            res = analyze_ticker(t, extract_df(bulk, t), win_rates, nifty_roc, regime)
+            res = analyze_ticker(t, extract_df(bulk, t), {}, nifty_roc, regime)
             if res: signals.append(res)
         except: continue
 
@@ -454,5 +464,6 @@ if __name__ == "__main__":
     trades = update_trades(trades, bulk)
     add_new_signals(signals, trades)
     
+    bt_stats = {} # Placeholder
     generate_html(signals, trades, bt_stats, datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), regime)
-    logging.info("Done.")
+    logger.info("Done.")
