@@ -8,7 +8,11 @@
     "target": 1117.27,
     "stop_loss": 967.49,
     "status": "OPEN",
-    "net_pnl": 0
+    "net_pnl": 0,
+    "deep_dive": {
+      "wr": 0,
+      "trades": 0
+    }
   },
   {
     "id": "JBCHEPHARM-2025-12-05",
@@ -19,7 +23,11 @@
     "target": 1954.59,
     "stop_loss": 1752.44,
     "status": "OPEN",
-    "net_pnl": 0
+    "net_pnl": 0,
+    "deep_dive": {
+      "wr": 0,
+      "trades": 0
+    }
   },
   {
     "id": "NATIONALUM-2025-12-05",
@@ -30,7 +38,11 @@
     "target": 292.59,
     "stop_loss": 256.27,
     "status": "OPEN",
-    "net_pnl": 0
+    "net_pnl": 0,
+    "deep_dive": {
+      "wr": 0,
+      "trades": 0
+    }
   },
   {
     "id": "CESC-2025-12-04",
@@ -41,7 +53,11 @@
     "target": 189.27,
     "stop_loss": 163.25,
     "status": "OPEN",
-    "net_pnl": 0
+    "net_pnl": 0,
+    "deep_dive": {
+      "wr": 0,
+      "trades": 0
+    }
   },
   {
     "id": "APOLLOTYRE-2025-12-04",
@@ -52,7 +68,11 @@
     "target": 587.4,
     "stop_loss": 500.57,
     "status": "OPEN",
-    "net_pnl": 0
+    "net_pnl": 0,
+    "deep_dive": {
+      "wr": 0,
+      "trades": 0
+    }
   },
   {
     "id": "PVRINOX-2025-12-04",
@@ -63,7 +83,11 @@
     "target": 1247.05,
     "stop_loss": 1051.47,
     "status": "OPEN",
-    "net_pnl": 0
+    "net_pnl": 0,
+    "deep_dive": {
+      "wr": 0,
+      "trades": 0
+    }
   },
   {
     "id": "DOMS-2025-12-04",
@@ -74,7 +98,11 @@
     "target": 2835.71,
     "stop_loss": 2457.86,
     "status": "OPEN",
-    "net_pnl": 0
+    "net_pnl": 0,
+    "deep_dive": {
+      "wr": 0,
+      "trades": 0
+    }
   },
   {
     "id": "DCMSHRIRAM-2025-12-04",
@@ -85,6 +113,10 @@
     "target": 1398.57,
     "stop_loss": 1103.12,
     "status": "OPEN",
-    "net_pnl": 0
+    "net_pnl": 0,
+    "deep_dive": {
+      "wr": 0,
+      "trades": 0
+    }
   }
 ]
