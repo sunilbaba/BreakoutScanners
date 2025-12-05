@@ -1,4 +1,4 @@
-l"""
+"""
 nifty_engine_gh.py
 THE "FULL STACK" LIVE ENGINE
 ----------------------------
@@ -150,7 +150,8 @@ def prepare_df(df):
     
     # Bollinger
     df['BB_MID'] = df['Close'].rolling(20).mean()
-    df['BB_LOW'] = df['BB_MID'] - (2 * df['Close'].rolling(20).std())
+    df['BB_STD'] = df['Close'].rolling(20).std()
+    df['BB_LOW'] = df['BB_MID'] - (2 * df['BB_STD'])
 
     # MACD
     ema12 = df['Close'].ewm(span=12, adjust=False).mean()
@@ -255,23 +256,20 @@ def analyze_ticker(ticker, df, benchmark_roc, market_regime):
     close = float(curr['Close'])
     clean_sym = ticker.replace(".NS", "")
     
-    # Relative Strength Filter (The Mirror)
+    # RS Filter
     stock_roc = float(curr['ROC_6M']) if not pd.isna(curr['ROC_6M']) else -999
-    if stock_roc < benchmark_roc: return None # Ignore stocks weaker than Nifty
+    if stock_roc < benchmark_roc: return None
     
-    # Strategy Config
     st_type = AI_BRAIN.get('strategy_type', 'RSI_DIP')
     trend_mode = AI_BRAIN.get('trend_filter', 'SMA200')
     adx_min = AI_BRAIN.get('adx_min', 15)
     
     sma200 = float(curr['SMA200']) if not pd.isna(curr['SMA200']) else close
     
-    # 1. Technical Filter
     trend_ok = True
     if trend_mode == "SMA200" and close < sma200: trend_ok = False
     if float(curr['ADX']) <= adx_min: trend_ok = False
     
-    # 2. Signal Check
     is_entry = False
     setup_name = ""
     
@@ -282,13 +280,13 @@ def analyze_ticker(ticker, df, benchmark_roc, market_regime):
     elif st_type == "MACD_CROSS":
         if float(prev['MACD']) < float(prev['MACD_SIG']) and float(curr['MACD']) > float(curr['MACD_SIG']): is_entry = True; setup_name = "MACD Cross"
     elif st_type == "BREAKOUT":
-         if close > df['High'].rolling(20).max().iloc[-2]: is_entry = True; setup_name = "Breakout"
+        if close > df['High'].rolling(20).max().iloc[-2]: is_entry = True; setup_name = "Breakout"
 
     verdict = "WAIT"; v_color = "gray"
     deep_wr = 0; deep_trades = 0; deep_log = []
     
     if trend_ok and is_entry:
-        # 3. Asset-Specific Validation (Deep Dive)
+        # *** THE DEEP DIVE ***
         deep_wr, deep_trades, deep_log = run_deep_dive(ticker)
         
         if deep_wr >= 60: verdict = "PRIME BUY ⭐"; v_color = "purple"
@@ -297,7 +295,6 @@ def analyze_ticker(ticker, df, benchmark_roc, market_regime):
             
     if verdict == "WAIT" and abs((close - float(prev['Close']))/float(prev['Close'])) < 0.01: return None
 
-    # Position Sizing
     atr_val = float(curr['ATR'])
     stop = close - (AI_BRAIN.get('sl_mult', 1.5) * atr_val)
     target = close + (AI_BRAIN.get('tgt_mult', 3.0) * atr_val)
@@ -358,7 +355,6 @@ def update_trades(trades, bulk_data):
 def add_new_signals(signals, trades):
     today = date.today().isoformat()
     owned = {t['symbol'] for t in trades if t['status'] == 'OPEN'}
-    # Prioritize by Historical Win Rate
     valid = [s for s in signals if "BUY" in s['verdict'] and s['symbol'] not in owned]
     valid.sort(key=lambda x: x['deep_dive']['wr'], reverse=True)
     
@@ -373,7 +369,7 @@ def add_new_signals(signals, trades):
                 "deep_dive": s['deep_dive']
             })
             save_json(TRADE_HISTORY_FILE, trades)
-            msg = f"🚨 *{s['verdict']} ALERT*\n📌 {s['symbol']} @ {s['price']}\n🎯 {s['levels']['TGT']} | 🛑 {s['levels']['SL']}\n✅ 5Y Win Rate: {s['deep_dive']['wr']}%"
+            msg = f"🚨 *{s['verdict']} ALERT*\n\n📌 *{s['symbol']}* at ₹{s['price']}\n🎯 TGT: {s['levels']['TGT']}\n🛑 SL: {s['levels']['SL']}\n📦 Qty: {s['qty']}\n✅ 5Y Win Rate: {s['deep_dive']['wr']}%"
             send_telegram_alert(msg)
 
 def generate_html(signals, trades, bt_stats, timestamp, regime):
@@ -406,12 +402,13 @@ def generate_html(signals, trades, bt_stats, timestamp, regime):
             
             <div id="view-dash">
                 <h2 class="text-xs font-bold text-slate-500 mb-3">ACTIVE PORTFOLIO</h2><div id="portfolio" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"></div>
-                <h2 class="text-xs font-bold text-slate-500 mb-3">NEW SIGNALS</h2><div id="scanner" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+                <h2 class="text-xs font-bold text-slate-500 mb-3">NEW SIGNALS (5Y VALIDATED)</h2><div id="scanner" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
             </div>
             
             <div id="view-ledger" class="hidden"><div class="bg-slate-800 rounded overflow-hidden"><table class="w-full text-sm text-left"><thead class="bg-slate-700"><tr><th class="p-3">Date</th><th>Symbol</th><th>Result</th><th>PnL</th></tr></thead><tbody id="live-body"></tbody></table></div></div>
         </div>
 
+        <!-- MODAL -->
         <div id="stockModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-50" onclick="this.classList.add('hidden')">
             <div class="bg-slate-800 p-6 rounded-lg border border-slate-600 w-full max-w-2xl h-3/4 overflow-hidden flex flex-col" onclick="event.stopPropagation()">
                 <div class="flex justify-between items-center mb-4">
@@ -469,12 +466,14 @@ if __name__ == "__main__":
     bulk = robust_download(tickers, DATA_PERIOD)
     
     # Benchmark
-    nifty_roc = -999; regime = "UNKNOWN"
+    nifty_roc = -999
+    regime = "UNKNOWN"
     nifty_df = extract_df(bulk, "^NSEI")
     if nifty_df is not None:
         nifty_df = prepare_df(nifty_df)
         if not nifty_df.empty and 'ROC_6M' in nifty_df.columns: nifty_roc = nifty_df['ROC_6M'].iloc[-1]
-        if nifty_df.iloc[-1]['Close'] > nifty_df.iloc[-1]['SMA200']: regime = "BULL MARKET 🟢"
+        curr = nifty_df.iloc[-1]
+        if curr['Close'] > curr['SMA200']: regime = "BULL MARKET 🟢"
         else: regime = "BEAR MARKET 🔴"
 
     # Scan
