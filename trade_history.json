@@ -10,9 +10,64 @@
     "status": "OPEN",
     "net_pnl": 0,
     "deep_dive": {
-      "wr": 0,
-      "trades": 0,
-      "log": []
+      "wr": 33.3,
+      "trades": 9,
+      "log": [
+        {
+          "date": "2025-10-16",
+          "exit": "2025-10-29",
+          "result": "WIN",
+          "pnl": 10.8
+        },
+        {
+          "date": "2025-09-09",
+          "exit": "2025-09-26",
+          "result": "LOSS",
+          "pnl": -5.6
+        },
+        {
+          "date": "2025-07-28",
+          "exit": "2025-08-06",
+          "result": "LOSS",
+          "pnl": -6.0
+        },
+        {
+          "date": "2024-04-02",
+          "exit": "2024-04-08",
+          "result": "WIN",
+          "pnl": 11.8
+        },
+        {
+          "date": "2023-09-06",
+          "exit": "2023-09-12",
+          "result": "LOSS",
+          "pnl": -5.7
+        },
+        {
+          "date": "2023-03-29",
+          "exit": "2023-04-12",
+          "result": "WIN",
+          "pnl": 9.2
+        },
+        {
+          "date": "2023-03-06",
+          "exit": "2023-03-14",
+          "result": "LOSS",
+          "pnl": -6.1
+        },
+        {
+          "date": "2023-01-30",
+          "exit": "2023-02-22",
+          "result": "LOSS",
+          "pnl": -6.4
+        },
+        {
+          "date": "2022-10-06",
+          "exit": "2022-10-21",
+          "result": "LOSS",
+          "pnl": -7.3
+        }
+      ]
     },
     "current_price": 1026.1,
     "current_pnl": -42.9
@@ -28,9 +83,58 @@
     "status": "OPEN",
     "net_pnl": 0,
     "deep_dive": {
-      "wr": 0,
-      "trades": 0,
-      "log": []
+      "wr": 25.0,
+      "trades": 8,
+      "log": [
+        {
+          "date": "2025-03-19",
+          "exit": "2025-04-07",
+          "result": "LOSS",
+          "pnl": -10.3
+        },
+        {
+          "date": "2024-09-24",
+          "exit": "2024-10-03",
+          "result": "LOSS",
+          "pnl": -7.4
+        },
+        {
+          "date": "2024-02-07",
+          "exit": "2024-02-20",
+          "result": "LOSS",
+          "pnl": -9.0
+        },
+        {
+          "date": "2023-12-07",
+          "exit": "2024-01-02",
+          "result": "WIN",
+          "pnl": 11.7
+        },
+        {
+          "date": "2023-10-04",
+          "exit": "2023-10-18",
+          "result": "LOSS",
+          "pnl": -8.6
+        },
+        {
+          "date": "2023-05-29",
+          "exit": "2023-06-20",
+          "result": "WIN",
+          "pnl": 14.2
+        },
+        {
+          "date": "2022-12-16",
+          "exit": "2022-12-20",
+          "result": "LOSS",
+          "pnl": -5.1
+        },
+        {
+          "date": "2022-05-30",
+          "exit": "2022-06-10",
+          "result": "LOSS",
+          "pnl": -6.7
+        }
+      ]
     },
     "current_price": 1825.4,
     "current_pnl": -189.6
@@ -46,9 +150,28 @@
     "status": "OPEN",
     "net_pnl": 0,
     "deep_dive": {
-      "wr": 0,
-      "trades": 0,
-      "log": []
+      "wr": 66.7,
+      "trades": 3,
+      "log": [
+        {
+          "date": "2025-08-19",
+          "exit": "2025-09-03",
+          "result": "WIN",
+          "pnl": 8.5
+        },
+        {
+          "date": "2022-09-12",
+          "exit": "2022-09-19",
+          "result": "LOSS",
+          "pnl": -6.5
+        },
+        {
+          "date": "2021-10-04",
+          "exit": "2021-10-18",
+          "result": "WIN",
+          "pnl": 17.9
+        }
+      ]
     },
     "current_price": 273.15,
     "current_pnl": 321.95
@@ -64,9 +187,88 @@
     "status": "OPEN",
     "net_pnl": 0,
     "deep_dive": {
-      "wr": 0,
-      "trades": 0,
-      "log": []
+      "wr": 61.5,
+      "trades": 13,
+      "log": [
+        {
+          "date": "2025-10-03",
+          "exit": "2025-10-24",
+          "result": "WIN",
+          "pnl": 10.9
+        },
+        {
+          "date": "2025-06-11",
+          "exit": "2025-06-19",
+          "result": "LOSS",
+          "pnl": -6.1
+        },
+        {
+          "date": "2025-02-18",
+          "exit": "2025-03-19",
+          "result": "WIN",
+          "pnl": 15.9
+        },
+        {
+          "date": "2025-02-01",
+          "exit": "2025-02-12",
+          "result": "LOSS",
+          "pnl": -10.6
+        },
+        {
+          "date": "2024-03-26",
+          "exit": "2024-04-08",
+          "result": "WIN",
+          "pnl": 16.8
+        },
+        {
+          "date": "2023-11-08",
+          "exit": "2023-11-20",
+          "result": "WIN",
+          "pnl": 10.4
+        },
+        {
+          "date": "2023-08-23",
+          "exit": "2023-09-06",
+          "result": "WIN",
+          "pnl": 10.3
+        },
+        {
+          "date": "2023-07-27",
+          "exit": "2023-08-23",
+          "result": "WIN",
+          "pnl": 6.6
+        },
+        {
+          "date": "2023-07-05",
+          "exit": "2023-07-26",
+          "result": "WIN",
+          "pnl": 6.0
+        },
+        {
+          "date": "2022-11-24",
+          "exit": "2022-12-14",
+          "result": "WIN",
+          "pnl": 7.9
+        },
+        {
+          "date": "2022-10-19",
+          "exit": "2022-11-17",
+          "result": "LOSS",
+          "pnl": -5.8
+        },
+        {
+          "date": "2022-09-07",
+          "exit": "2022-09-26",
+          "result": "LOSS",
+          "pnl": -7.0
+        },
+        {
+          "date": "2022-04-28",
+          "exit": "2022-05-11",
+          "result": "LOSS",
+          "pnl": -7.5
+        }
+      ]
     },
     "current_price": 174.0,
     "current_pnl": 65.28
@@ -82,9 +284,64 @@
     "status": "OPEN",
     "net_pnl": 0,
     "deep_dive": {
-      "wr": 0,
-      "trades": 0,
-      "log": []
+      "wr": 22.2,
+      "trades": 9,
+      "log": [
+        {
+          "date": "2025-07-30",
+          "exit": "2025-08-06",
+          "result": "LOSS",
+          "pnl": -5.4
+        },
+        {
+          "date": "2025-04-15",
+          "exit": "2025-05-07",
+          "result": "WIN",
+          "pnl": 12.2
+        },
+        {
+          "date": "2025-01-31",
+          "exit": "2025-02-17",
+          "result": "LOSS",
+          "pnl": -6.9
+        },
+        {
+          "date": "2024-11-01",
+          "exit": "2024-11-13",
+          "result": "LOSS",
+          "pnl": -7.3
+        },
+        {
+          "date": "2024-07-30",
+          "exit": "2024-08-08",
+          "result": "LOSS",
+          "pnl": -9.0
+        },
+        {
+          "date": "2024-07-16",
+          "exit": "2024-07-19",
+          "result": "LOSS",
+          "pnl": -7.3
+        },
+        {
+          "date": "2021-12-28",
+          "exit": "2022-01-17",
+          "result": "WIN",
+          "pnl": 10.6
+        },
+        {
+          "date": "2021-11-08",
+          "exit": "2021-11-29",
+          "result": "LOSS",
+          "pnl": -8.7
+        },
+        {
+          "date": "2021-10-08",
+          "exit": "2021-10-28",
+          "result": "LOSS",
+          "pnl": -8.6
+        }
+      ]
     },
     "current_price": 521.45,
     "current_pnl": -789.45
@@ -100,9 +357,34 @@
     "status": "OPEN",
     "net_pnl": 0,
     "deep_dive": {
-      "wr": 0,
-      "trades": 0,
-      "log": []
+      "wr": 25.0,
+      "trades": 4,
+      "log": [
+        {
+          "date": "2025-02-21",
+          "exit": "2025-02-27",
+          "result": "LOSS",
+          "pnl": -10.1
+        },
+        {
+          "date": "2024-06-06",
+          "exit": "2024-06-27",
+          "result": "WIN",
+          "pnl": 10.0
+        },
+        {
+          "date": "2024-05-21",
+          "exit": "2024-06-04",
+          "result": "LOSS",
+          "pnl": -6.4
+        },
+        {
+          "date": "2023-10-13",
+          "exit": "2023-10-23",
+          "result": "LOSS",
+          "pnl": -4.8
+        }
+      ]
     },
     "current_price": 1091.0,
     "current_pnl": -967.5
@@ -118,9 +400,28 @@
     "status": "OPEN",
     "net_pnl": 0,
     "deep_dive": {
-      "wr": 0,
-      "trades": 0,
-      "log": []
+      "wr": 33.3,
+      "trades": 3,
+      "log": [
+        {
+          "date": "2025-07-24",
+          "exit": "2025-08-12",
+          "result": "WIN",
+          "pnl": 8.2
+        },
+        {
+          "date": "2025-01-07",
+          "exit": "2025-01-22",
+          "result": "LOSS",
+          "pnl": -11.9
+        },
+        {
+          "date": "2024-12-11",
+          "exit": "2024-12-23",
+          "result": "LOSS",
+          "pnl": -8.9
+        }
+      ]
     },
     "current_price": 2600.5,
     "current_pnl": -110.5
@@ -136,9 +437,52 @@
     "status": "OPEN",
     "net_pnl": 0,
     "deep_dive": {
-      "wr": 0,
-      "trades": 0,
-      "log": []
+      "wr": 71.4,
+      "trades": 7,
+      "log": [
+        {
+          "date": "2025-10-09",
+          "exit": "2025-10-29",
+          "result": "WIN",
+          "pnl": 9.9
+        },
+        {
+          "date": "2025-09-10",
+          "exit": "2025-09-17",
+          "result": "WIN",
+          "pnl": 8.8
+        },
+        {
+          "date": "2024-11-01",
+          "exit": "2024-11-07",
+          "result": "WIN",
+          "pnl": 19.6
+        },
+        {
+          "date": "2024-07-24",
+          "exit": "2024-08-08",
+          "result": "WIN",
+          "pnl": 11.4
+        },
+        {
+          "date": "2024-02-27",
+          "exit": "2024-03-11",
+          "result": "LOSS",
+          "pnl": -6.4
+        },
+        {
+          "date": "2024-01-04",
+          "exit": "2024-01-16",
+          "result": "LOSS",
+          "pnl": -11.1
+        },
+        {
+          "date": "2023-08-09",
+          "exit": "2023-08-30",
+          "result": "WIN",
+          "pnl": 8.3
+        }
+      ]
     },
     "current_price": 1220.9,
     "current_pnl": -6.4
