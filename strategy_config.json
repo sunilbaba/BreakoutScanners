@@ -1,11 +1,11 @@
 {
-  "updated": "2025-12-07",
+  "updated": "2025-12-08",
   "parameters": {
-    "strategy_type": "MACD_CROSS",
+    "strategy_type": "BREAKOUT",
     "trend_filter": "SMA50",
-    "adx_min": 25,
-    "sl_mult": 2.5,
-    "tgt_mult": 3.75,
-    "name": "Child-3891"
+    "adx_min": 20,
+    "sl_mult": 1.5,
+    "tgt_mult": 2.25,
+    "name": "Child-9225"
   }
 }
