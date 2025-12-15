@@ -106,8 +106,8 @@
         }
       ]
     },
-    "current_price": 243.88,
-    "current_pnl": 252.28
+    "current_price": 247.3,
+    "current_pnl": 614.8
   },
   {
     "id": "ADANIGREEN-2025-12-12",
@@ -168,8 +168,8 @@
         }
       ]
     },
-    "current_price": 1039.4,
-    "current_pnl": -14.0
+    "current_price": 1049.9,
+    "current_pnl": 280.0
   },
   {
     "id": "GPIL-2025-12-12",
@@ -242,8 +242,8 @@
         }
       ]
     },
-    "current_price": 238.4,
-    "current_pnl": 295.55
+    "current_price": 248.2,
+    "current_pnl": 1422.55
   },
   {
     "id": "NAVINFLUOR-2025-12-12",
@@ -304,8 +304,8 @@
         }
       ]
     },
-    "current_price": 6117.5,
-    "current_pnl": -196.0
+    "current_price": 6179.5,
+    "current_pnl": 52.0
   },
   {
     "id": "TATASTEEL-2025-12-12",
@@ -354,8 +354,8 @@
         }
       ]
     },
-    "current_price": 171.93,
-    "current_pnl": 610.46
+    "current_price": 172.49,
+    "current_pnl": 757.18
   },
   {
     "id": "GVT&D-2025-12-11",
@@ -428,8 +428,8 @@
         }
       ]
     },
-    "current_price": 3050.6,
-    "current_pnl": 152.5
+    "current_price": 2994.1,
+    "current_pnl": -130.0
   },
   {
     "id": "IPCALAB-2025-12-10",
@@ -502,8 +502,8 @@
         }
       ]
     },
-    "current_price": 1467.3,
-    "current_pnl": 7.2
+    "current_price": 1446.1,
+    "current_pnl": -374.4
   },
   {
     "id": "CUMMINSIND-2025-12-10",
@@ -570,8 +570,8 @@
         }
       ]
     },
-    "current_price": 4613.7,
-    "current_pnl": 411.3
+    "current_price": 4516.6,
+    "current_pnl": -462.6
   },
   {
     "id": "CENTURYPLY-2025-12-10",
@@ -656,8 +656,8 @@
         }
       ]
     },
-    "current_price": 841.45,
-    "current_pnl": 1084.8
+    "current_price": 833.7,
+    "current_pnl": 836.8
   },
   {
     "id": "POLICYBZR-2025-12-09",
@@ -754,8 +754,8 @@
         }
       ]
     },
-    "current_price": 1928.4,
-    "current_pnl": -90.0
+    "current_price": 1890.5,
+    "current_pnl": -1227.0
   },
   {
     "id": "ABCAPITAL-2025-12-09",
@@ -906,8 +906,8 @@
         }
       ]
     },
-    "current_price": 362.75,
-    "current_pnl": 172.0
+    "current_price": 354.4,
+    "current_pnl": -1264.2
   },
   {
     "id": "IDEA-2025-12-08",
@@ -1016,8 +1016,8 @@
         }
       ]
     },
-    "current_price": 11.67,
-    "current_pnl": 2028.48
+    "current_price": 11.54,
+    "current_pnl": 1753.79
   },
   {
     "id": "USHAMART-2025-12-08",
@@ -1026,7 +1026,7 @@
     "entry": 428.65,
     "qty": 57,
     "target": 481.2,
-    "stop_loss": 393.61,
+    "stop_loss": 428.65,
     "status": "OPEN",
     "net_pnl": 0,
     "setup": "MACD Cross",
@@ -1126,8 +1126,8 @@
         }
       ]
     },
-    "current_price": 440.8,
-    "current_pnl": 692.55
+    "current_price": 457.35,
+    "current_pnl": 1635.9
   },
   {
     "id": "SARDAEN-2025-12-08",
@@ -1206,8 +1206,8 @@
         }
       ]
     },
-    "current_price": 512.85,
-    "current_pnl": 1512.5
+    "current_price": 514.0,
+    "current_pnl": 1570.0
   },
   {
     "id": "LAURUSLABS-2025-12-05",
@@ -1279,8 +1279,8 @@
         }
       ]
     },
-    "current_price": 1012.6,
-    "current_pnl": -488.4
+    "current_price": 1000.0,
+    "current_pnl": -904.2
   },
   {
     "id": "JBCHEPHARM-2025-12-05",
@@ -1346,8 +1346,8 @@
         }
       ]
     },
-    "current_price": 1796.3,
-    "current_pnl": -888.0
+    "current_price": 1790.0,
+    "current_pnl": -1039.2
   },
   {
     "id": "NATIONALUM-2025-12-05",
@@ -1383,8 +1383,8 @@
         }
       ]
     },
-    "current_price": 278.65,
-    "current_pnl": 1075.45
+    "current_price": 277.4,
+    "current_pnl": 904.2
   },
   {
     "id": "CESC-2025-12-04",
@@ -1480,8 +1480,8 @@
         }
       ]
     },
-    "current_price": 170.11,
-    "current_pnl": -681.6
+    "current_price": 170.5,
+    "current_pnl": -606.72
   },
   {
     "id": "APOLLOTYRE-2025-12-04",
@@ -1553,8 +1553,8 @@
         }
       ]
     },
-    "current_price": 507.65,
-    "current_pnl": -1576.05
+    "current_price": 505.95,
+    "current_pnl": -1672.95
   },
   {
     "id": "PVRINOX-2025-12-04",
@@ -1635,8 +1635,8 @@
         }
       ]
     },
-    "current_price": 2573.0,
-    "current_pnl": -468.0
+    "current_price": 2599.6,
+    "current_pnl": -122.2
   },
   {
     "id": "DCMSHRIRAM-2025-12-04",
@@ -1696,7 +1696,7 @@
         }
       ]
     },
-    "current_price": 1243.3,
-    "current_pnl": 352.0
+    "current_price": 1247.8,
+    "current_pnl": 424.0
   }
 ]
