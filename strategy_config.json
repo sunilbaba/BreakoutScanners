@@ -1,11 +1,11 @@
 {
-  "updated": "2025-12-15",
+  "updated": "2025-12-16",
   "parameters": {
     "strategy_type": "MACD_CROSS",
     "trend_filter": "SMA50",
-    "adx_min": 20,
+    "adx_min": 25,
     "sl_mult": 2.5,
     "tgt_mult": 3.75,
-    "name": "Gen-3031"
+    "name": "Gen-3069"
   }
 }
