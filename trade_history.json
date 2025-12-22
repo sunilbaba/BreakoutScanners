@@ -1,5 +1,173 @@
 [
   {
+    "id": "POONAWALLA-2025-12-22",
+    "date": "2025-12-22",
+    "symbol": "POONAWALLA",
+    "entry": 457.05,
+    "qty": 62,
+    "target": 505.22,
+    "stop_loss": 424.93,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 66.7,
+      "trades": 9,
+      "log": [
+        {
+          "date": "2025-09-16",
+          "exit": "2025-09-18",
+          "result": "WIN",
+          "pnl": 11.7
+        },
+        {
+          "date": "2025-06-06",
+          "exit": "2025-06-27",
+          "result": "WIN",
+          "pnl": 8.7
+        },
+        {
+          "date": "2025-03-06",
+          "exit": "2025-03-21",
+          "result": "WIN",
+          "pnl": 16.3
+        },
+        {
+          "date": "2024-06-07",
+          "exit": "2024-06-20",
+          "result": "LOSS",
+          "pnl": -9.4
+        },
+        {
+          "date": "2023-11-07",
+          "exit": "2023-12-01",
+          "result": "WIN",
+          "pnl": 13.8
+        },
+        {
+          "date": "2023-10-03",
+          "exit": "2023-10-23",
+          "result": "LOSS",
+          "pnl": -7.4
+        },
+        {
+          "date": "2023-03-29",
+          "exit": "2023-04-26",
+          "result": "WIN",
+          "pnl": 11.4
+        },
+        {
+          "date": "2022-05-30",
+          "exit": "2022-06-20",
+          "result": "LOSS",
+          "pnl": -17.0
+        },
+        {
+          "date": "2021-12-30",
+          "exit": "2022-01-07",
+          "result": "WIN",
+          "pnl": 18.2
+        }
+      ]
+    }
+  },
+  {
+    "id": "PAYTM-2025-12-22",
+    "date": "2025-12-22",
+    "symbol": "PAYTM",
+    "entry": 1343.8,
+    "qty": 21,
+    "target": 1481.02,
+    "stop_loss": 1252.32,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 66.7,
+      "trades": 3,
+      "log": [
+        {
+          "date": "2024-11-06",
+          "exit": "2024-11-29",
+          "result": "WIN",
+          "pnl": 19.3
+        },
+        {
+          "date": "2023-02-06",
+          "exit": "2023-02-07",
+          "result": "WIN",
+          "pnl": 15.6
+        },
+        {
+          "date": "2022-11-03",
+          "exit": "2022-11-16",
+          "result": "LOSS",
+          "pnl": -6.6
+        }
+      ]
+    }
+  },
+  {
+    "id": "DCMSHRIRAM-2025-12-22",
+    "date": "2025-12-22",
+    "symbol": "DCMSHRIRAM",
+    "entry": 1236.0,
+    "qty": 23,
+    "target": 1364.57,
+    "stop_loss": 1150.29,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 71.4,
+      "trades": 7,
+      "log": [
+        {
+          "date": "2025-10-09",
+          "exit": "2025-10-29",
+          "result": "WIN",
+          "pnl": 9.9
+        },
+        {
+          "date": "2025-09-10",
+          "exit": "2025-09-17",
+          "result": "WIN",
+          "pnl": 8.8
+        },
+        {
+          "date": "2024-11-01",
+          "exit": "2024-11-07",
+          "result": "WIN",
+          "pnl": 19.6
+        },
+        {
+          "date": "2024-07-24",
+          "exit": "2024-08-08",
+          "result": "WIN",
+          "pnl": 11.4
+        },
+        {
+          "date": "2024-02-27",
+          "exit": "2024-03-11",
+          "result": "LOSS",
+          "pnl": -6.4
+        },
+        {
+          "date": "2024-01-04",
+          "exit": "2024-01-16",
+          "result": "LOSS",
+          "pnl": -11.1
+        },
+        {
+          "date": "2023-08-09",
+          "exit": "2023-08-30",
+          "result": "WIN",
+          "pnl": 8.3
+        }
+      ]
+    }
+  },
+  {
     "id": "HEG-2025-12-19",
     "date": "2025-12-19",
     "symbol": "HEG",
@@ -69,7 +237,9 @@
           "pnl": -13.9
         }
       ]
-    }
+    },
+    "current_price": 536.4,
+    "current_pnl": 327.0
   },
   {
     "id": "MSUMI-2025-12-19",
@@ -117,7 +287,9 @@
           "pnl": -5.2
         }
       ]
-    }
+    },
+    "current_price": 47.85,
+    "current_pnl": -0.0
   },
   {
     "id": "KARURVYSYA-2025-12-19",
@@ -166,8 +338,8 @@
         }
       ]
     },
-    "current_price": 252.5,
-    "current_pnl": 137.0
+    "current_price": 252.84,
+    "current_pnl": 183.58
   },
   {
     "id": "HBLENGINE-2025-12-19",
@@ -198,8 +370,8 @@
         }
       ]
     },
-    "current_price": 846.95,
-    "current_pnl": 830.25
+    "current_price": 864.0,
+    "current_pnl": 1290.6
   },
   {
     "id": "JKTYRE-2025-12-19",
@@ -266,8 +438,8 @@
         }
       ]
     },
-    "current_price": 486.8,
-    "current_pnl": 398.75
+    "current_price": 485.0,
+    "current_pnl": 299.75
   },
   {
     "id": "FORCEMOT-2025-12-19",
@@ -322,8 +494,8 @@
         }
       ]
     },
-    "current_price": 17898.0,
-    "current_pnl": -192.0
+    "current_price": 18515.0,
+    "current_pnl": 425.0
   },
   {
     "id": "IDBI-2025-12-17",
@@ -408,8 +580,8 @@
         }
       ]
     },
-    "current_price": 98.0,
-    "current_pnl": -412.36
+    "current_price": 101.63,
+    "current_pnl": 814.58
   },
   {
     "id": "TITAN-2025-12-17",
@@ -506,8 +678,8 @@
         }
       ]
     },
-    "current_price": 3932.7,
-    "current_pnl": 33.8
+    "current_price": 3945.0,
+    "current_pnl": 193.7
   },
   {
     "id": "KIRLOSENG-2025-12-17",
@@ -580,8 +752,8 @@
         }
       ]
     },
-    "current_price": 1244.6,
-    "current_pnl": -351.0
+    "current_price": 1277.3,
+    "current_pnl": 74.1
   },
   {
     "id": "IOC-2025-12-16",
@@ -660,8 +832,8 @@
         }
       ]
     },
-    "current_price": 162.58,
-    "current_pnl": -1200.32
+    "current_price": 164.16,
+    "current_pnl": -817.96
   },
   {
     "id": "GESHIP-2025-12-16",
@@ -758,8 +930,8 @@
         }
       ]
     },
-    "current_price": 1094.0,
-    "current_pnl": -532.0
+    "current_price": 1096.0,
+    "current_pnl": -476.0
   },
   {
     "id": "MSUMI-2025-12-16",
@@ -902,7 +1074,7 @@
         }
       ]
     },
-    "current_price": 153545.0,
+    "current_price": 153915.0,
     "current_pnl": 0.0
   },
   {
@@ -1018,8 +1190,8 @@
         }
       ]
     },
-    "current_price": 6668.0,
-    "current_pnl": -514.5
+    "current_price": 6720.0,
+    "current_pnl": -358.5
   },
   {
     "id": "NLCINDIA-2025-12-12",
@@ -1128,8 +1300,8 @@
         }
       ]
     },
-    "current_price": 239.22,
-    "current_pnl": -241.68
+    "current_price": 242.42,
+    "current_pnl": 97.52
   },
   {
     "id": "ADANIGREEN-2025-12-12",
@@ -1190,8 +1362,8 @@
         }
       ]
     },
-    "current_price": 1022.5,
-    "current_pnl": -487.2
+    "current_price": 1023.4,
+    "current_pnl": -462.0
   },
   {
     "id": "GPIL-2025-12-12",
@@ -1328,8 +1500,8 @@
         }
       ]
     },
-    "current_price": 5842.0,
-    "current_pnl": -1298.0
+    "current_price": 5907.0,
+    "current_pnl": -1038.0
   },
   {
     "id": "TATASTEEL-2025-12-12",
@@ -1378,8 +1550,8 @@
         }
       ]
     },
-    "current_price": 168.64,
-    "current_pnl": -251.52
+    "current_price": 170.65,
+    "current_pnl": 275.1
   },
   {
     "id": "GVT&D-2025-12-11",
@@ -1452,8 +1624,8 @@
         }
       ]
     },
-    "current_price": 2933.7,
-    "current_pnl": -432.0
+    "current_price": 3126.6,
+    "current_pnl": 532.5
   },
   {
     "id": "IPCALAB-2025-12-10",
@@ -1526,8 +1698,8 @@
         }
       ]
     },
-    "current_price": 1422.6,
-    "current_pnl": -797.4
+    "current_price": 1432.7,
+    "current_pnl": -615.6
   },
   {
     "id": "CUMMINSIND-2025-12-10",
@@ -1682,8 +1854,8 @@
         }
       ]
     },
-    "current_price": 823.65,
-    "current_pnl": 515.2
+    "current_price": 826.7,
+    "current_pnl": 612.8
   },
   {
     "id": "POLICYBZR-2025-12-09",
@@ -2046,8 +2218,8 @@
         }
       ]
     },
-    "current_price": 11.97,
-    "current_pnl": 2662.38
+    "current_price": 11.66,
+    "current_pnl": 2007.35
   },
   {
     "id": "USHAMART-2025-12-08",
@@ -2156,8 +2328,8 @@
         }
       ]
     },
-    "current_price": 452.0,
-    "current_pnl": 1330.95
+    "current_price": 455.2,
+    "current_pnl": 1513.35
   },
   {
     "id": "SARDAEN-2025-12-08",
@@ -2236,8 +2408,8 @@
         }
       ]
     },
-    "current_price": 511.3,
-    "current_pnl": 1435.0
+    "current_price": 514.85,
+    "current_pnl": 1612.5
   },
   {
     "id": "LAURUSLABS-2025-12-05",
@@ -2309,8 +2481,8 @@
         }
       ]
     },
-    "current_price": 1044.3,
-    "current_pnl": 557.7
+    "current_price": 1056.3,
+    "current_pnl": 953.7
   },
   {
     "id": "JBCHEPHARM-2025-12-05",
@@ -2376,8 +2548,8 @@
         }
       ]
     },
-    "current_price": 1803.5,
-    "current_pnl": -715.2
+    "current_price": 1807.5,
+    "current_pnl": -619.2
   },
   {
     "id": "NATIONALUM-2025-12-05",
@@ -2413,8 +2585,8 @@
         }
       ]
     },
-    "current_price": 278.55,
-    "current_pnl": 1061.75
+    "current_price": 284.55,
+    "current_pnl": 1883.75
   },
   {
     "id": "CESC-2025-12-04",
@@ -2669,8 +2841,8 @@
         }
       ]
     },
-    "current_price": 2592.7,
-    "current_pnl": -211.9
+    "current_price": 2586.3,
+    "current_pnl": -295.1
   },
   {
     "id": "DCMSHRIRAM-2025-12-04",
