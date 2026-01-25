@@ -1,11 +1,11 @@
 {
-  "updated": "2025-12-22",
+  "updated": "2026-01-25",
   "parameters": {
     "strategy_type": "MACD_CROSS",
-    "trend_filter": "SMA50",
+    "trend_filter": "SMA200",
     "adx_min": 20,
-    "sl_mult": 2.5,
-    "tgt_mult": 3.75,
-    "name": "Child-4354"
+    "sl_mult": 3.0,
+    "tgt_mult": 4.5,
+    "name": "Gen-3688"
   }
 }
