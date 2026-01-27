@@ -1,5 +1,41 @@
 [
   {
+    "id": "KARURVYSYA-2026-01-27",
+    "date": "2026-01-27",
+    "symbol": "KARURVYSYA",
+    "entry": 289.4,
+    "qty": 33,
+    "target": 334.01,
+    "stop_loss": 259.66,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 66.7,
+      "trades": 3,
+      "log": [
+        {
+          "date": "2025-12-19",
+          "exit": "2026-01-06",
+          "result": "WIN",
+          "pnl": 10.5
+        },
+        {
+          "date": "2022-09-01",
+          "exit": "2022-09-14",
+          "result": "WIN",
+          "pnl": 17.5
+        },
+        {
+          "date": "2022-01-31",
+          "exit": "2022-02-24",
+          "result": "LOSS",
+          "pnl": -14.0
+        }
+      ]
+    }
+  },
+  {
     "id": "JSWSTEEL-2026-01-27",
     "date": "2026-01-27",
     "symbol": "JSWSTEEL",
@@ -51,7 +87,9 @@
           "pnl": 8.6
         }
       ]
-    }
+    },
+    "current_price": 1211.0,
+    "current_pnl": 18.0
   },
   {
     "id": "AXISBANK-2026-01-27",
@@ -99,7 +137,9 @@
           "pnl": -6.5
         }
       ]
-    }
+    },
+    "current_price": 1328.0,
+    "current_pnl": 91.3
   },
   {
     "id": "SAGILITY-2026-01-27",
@@ -123,7 +163,9 @@
           "pnl": 13.0
         }
       ]
-    }
+    },
+    "current_price": 52.56,
+    "current_pnl": -64.79
   },
   {
     "id": "PNB-2025-12-22",
@@ -184,8 +226,8 @@
         }
       ]
     },
-    "current_price": 120.61,
-    "current_pnl": -223.57
+    "current_price": 121.0,
+    "current_pnl": -113.2
   },
   {
     "id": "EICHERMOT-2025-12-22",
@@ -404,8 +446,8 @@
         }
       ]
     },
-    "current_price": 3736.4,
-    "current_pnl": -1245.6
+    "current_price": 3733.9,
+    "current_pnl": -1260.6
   },
   {
     "id": "POONAWALLA-2025-12-22",
@@ -658,8 +700,8 @@
         }
       ]
     },
-    "current_price": 534.3,
-    "current_pnl": 201.0
+    "current_price": 534.2,
+    "current_pnl": 195.0
   },
   {
     "id": "MSUMI-2025-12-19",
@@ -864,8 +906,8 @@
         }
       ]
     },
-    "current_price": 508.6,
-    "current_pnl": 1597.75
+    "current_price": 508.2,
+    "current_pnl": 1575.75
   },
   {
     "id": "FORCEMOT-2025-12-19",
@@ -1008,8 +1050,8 @@
         }
       ]
     },
-    "current_price": 96.78,
-    "current_pnl": -824.72
+    "current_price": 96.75,
+    "current_pnl": -834.86
   },
   {
     "id": "TITAN-2025-12-17",
@@ -1106,8 +1148,8 @@
         }
       ]
     },
-    "current_price": 4013.9,
-    "current_pnl": 1089.4
+    "current_price": 4020.9,
+    "current_pnl": 1180.4
   },
   {
     "id": "KIRLOSENG-2025-12-17",
@@ -1362,8 +1404,8 @@
         }
       ]
     },
-    "current_price": 1093.5,
-    "current_pnl": -546.0
+    "current_price": 1100.0,
+    "current_pnl": -364.0
   },
   {
     "id": "MSUMI-2025-12-16",
@@ -1736,8 +1778,8 @@
         }
       ]
     },
-    "current_price": 244.65,
-    "current_pnl": 333.9
+    "current_price": 244.2,
+    "current_pnl": 286.2
   },
   {
     "id": "ADANIGREEN-2025-12-12",
@@ -1938,8 +1980,8 @@
         }
       ]
     },
-    "current_price": 5804.0,
-    "current_pnl": -1450.0
+    "current_price": 5791.5,
+    "current_pnl": -1500.0
   },
   {
     "id": "TATASTEEL-2025-12-12",
@@ -2140,8 +2182,8 @@
         }
       ]
     },
-    "current_price": 1458.8,
-    "current_pnl": -145.8
+    "current_price": 1471.6,
+    "current_pnl": 84.6
   },
   {
     "id": "CUMMINSIND-2025-12-10",
@@ -2931,8 +2973,8 @@
         }
       ]
     },
-    "current_price": 1015.6,
-    "current_pnl": -389.4
+    "current_price": 1002.7,
+    "current_pnl": -815.1
   },
   {
     "id": "JBCHEPHARM-2025-12-05",
@@ -2998,8 +3040,8 @@
         }
       ]
     },
-    "current_price": 1872.1,
-    "current_pnl": 931.2
+    "current_price": 1868.6,
+    "current_pnl": 847.2
   },
   {
     "id": "NATIONALUM-2025-12-05",
