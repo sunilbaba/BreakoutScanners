@@ -1,5 +1,161 @@
 [
   {
+    "id": "JKTYRE-2026-02-03",
+    "date": "2026-02-03",
+    "symbol": "JKTYRE",
+    "entry": 541.4,
+    "qty": 47,
+    "target": 604.05,
+    "stop_loss": 499.63,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 50.0,
+      "trades": 8,
+      "log": [
+        {
+          "date": "2025-10-09",
+          "exit": "2025-10-20",
+          "result": "WIN",
+          "pnl": 9.1
+        },
+        {
+          "date": "2025-07-04",
+          "exit": "2025-07-25",
+          "result": "LOSS",
+          "pnl": -6.4
+        },
+        {
+          "date": "2024-09-25",
+          "exit": "2024-10-07",
+          "result": "LOSS",
+          "pnl": -8.5
+        },
+        {
+          "date": "2024-01-18",
+          "exit": "2024-01-23",
+          "result": "WIN",
+          "pnl": 11.8
+        },
+        {
+          "date": "2023-09-22",
+          "exit": "2023-10-12",
+          "result": "WIN",
+          "pnl": 13.6
+        },
+        {
+          "date": "2022-11-28",
+          "exit": "2022-12-23",
+          "result": "LOSS",
+          "pnl": -8.6
+        },
+        {
+          "date": "2022-09-02",
+          "exit": "2022-09-15",
+          "result": "WIN",
+          "pnl": 16.3
+        },
+        {
+          "date": "2022-01-17",
+          "exit": "2022-02-07",
+          "result": "LOSS",
+          "pnl": -6.8
+        }
+      ]
+    }
+  },
+  {
+    "id": "BSOFT-2026-02-03",
+    "date": "2026-02-03",
+    "symbol": "BSOFT",
+    "entry": 446.25,
+    "qty": 46,
+    "target": 510.31,
+    "stop_loss": 403.54,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 83.3,
+      "trades": 6,
+      "log": [
+        {
+          "date": "2025-12-02",
+          "exit": "2025-12-22",
+          "result": "WIN",
+          "pnl": 10.4
+        },
+        {
+          "date": "2024-07-15",
+          "exit": "2024-07-23",
+          "result": "LOSS",
+          "pnl": -6.8
+        },
+        {
+          "date": "2023-12-06",
+          "exit": "2023-12-15",
+          "result": "WIN",
+          "pnl": 9.0
+        },
+        {
+          "date": "2023-11-01",
+          "exit": "2023-11-20",
+          "result": "WIN",
+          "pnl": 10.5
+        },
+        {
+          "date": "2023-10-09",
+          "exit": "2023-11-01",
+          "result": "WIN",
+          "pnl": 11.8
+        },
+        {
+          "date": "2021-12-14",
+          "exit": "2022-01-10",
+          "result": "WIN",
+          "pnl": 15.3
+        }
+      ]
+    }
+  },
+  {
+    "id": "TCS-2026-02-03",
+    "date": "2026-02-03",
+    "symbol": "TCS",
+    "entry": 3221.5,
+    "qty": 12,
+    "target": 3468.51,
+    "stop_loss": 3056.82,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 100.0,
+      "trades": 3,
+      "log": [
+        {
+          "date": "2024-01-15",
+          "exit": "2024-02-06",
+          "result": "WIN",
+          "pnl": 6.9
+        },
+        {
+          "date": "2023-06-30",
+          "exit": "2023-07-14",
+          "result": "WIN",
+          "pnl": 4.8
+        },
+        {
+          "date": "2023-01-03",
+          "exit": "2023-01-24",
+          "result": "WIN",
+          "pnl": 6.1
+        }
+      ]
+    }
+  },
+  {
     "id": "CANFINHOME-2026-01-30",
     "date": "2026-01-30",
     "symbol": "CANFINHOME",
@@ -52,8 +208,8 @@
         }
       ]
     },
-    "current_price": 926.1,
-    "current_pnl": -376.65
+    "current_price": 937.3,
+    "current_pnl": -74.25
   },
   {
     "id": "AUROPHARMA-2026-01-30",
@@ -102,8 +258,8 @@
         }
       ]
     },
-    "current_price": 1159.3,
-    "current_pnl": -876.2
+    "current_price": 1233.2,
+    "current_pnl": 1045.2
   },
   {
     "id": "LT-2026-01-30",
@@ -112,7 +268,7 @@
     "entry": 3922.2,
     "qty": 10,
     "target": 4218.99,
-    "stop_loss": 3724.34,
+    "stop_loss": 3922.2,
     "status": "OPEN",
     "net_pnl": 0,
     "setup": "MACD Cross",
@@ -164,8 +320,8 @@
         }
       ]
     },
-    "current_price": 3879.2,
-    "current_pnl": -430.0
+    "current_price": 4081.6,
+    "current_pnl": 1594.0
   },
   {
     "id": "INDUSTOWER-2026-01-30",
@@ -232,8 +388,8 @@
         }
       ]
     },
-    "current_price": 427.1,
-    "current_pnl": -1403.65
+    "current_price": 433.5,
+    "current_pnl": -974.85
   },
   {
     "id": "NAM-INDIA-2026-01-30",
@@ -282,8 +438,8 @@
         }
       ]
     },
-    "current_price": 863.35,
-    "current_pnl": -841.25
+    "current_price": 925.0,
+    "current_pnl": 700.0
   },
   {
     "id": "AIAENG-2026-01-30",
@@ -368,8 +524,8 @@
         }
       ]
     },
-    "current_price": 3860.7,
-    "current_pnl": -997.5
+    "current_price": 4050.2,
+    "current_pnl": -50.0
   },
   {
     "id": "TECHM-2026-01-29",
@@ -418,8 +574,8 @@
         }
       ]
     },
-    "current_price": 1726.3,
-    "current_pnl": -924.0
+    "current_price": 1741.0,
+    "current_pnl": -615.3
   },
   {
     "id": "INDIANB-2026-01-29",
@@ -580,8 +736,8 @@
         }
       ]
     },
-    "current_price": 279.5,
-    "current_pnl": -739.35
+    "current_price": 285.8,
+    "current_pnl": -153.45
   },
   {
     "id": "VEDL-2026-01-29",
@@ -929,8 +1085,8 @@
     "qty": 5,
     "target": 3452.22,
     "stop_loss": 2883.0,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "WIN",
+    "net_pnl": 2843.25,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 75.0,
@@ -962,8 +1118,10 @@
         }
       ]
     },
-    "current_price": 3182.2,
-    "current_pnl": 1496.0
+    "current_price": 3421.3,
+    "current_pnl": 2691.5,
+    "exit_price": 3452.22,
+    "exit_date": "2026-02-03"
   },
   {
     "id": "IOC-2026-01-28",
@@ -1018,8 +1176,8 @@
         }
       ]
     },
-    "current_price": 160.92,
-    "current_pnl": -523.92
+    "current_price": 164.86,
+    "current_pnl": 173.46
   },
   {
     "id": "SAMMAANCAP-2026-01-28",
@@ -1068,8 +1226,8 @@
         }
       ]
     },
-    "current_price": 144.01,
-    "current_pnl": 527.22
+    "current_price": 148.18,
+    "current_pnl": 1252.8
   },
   {
     "id": "MCX-2026-01-28",
@@ -1292,8 +1450,8 @@
         }
       ]
     },
-    "current_price": 965.6,
-    "current_pnl": 49.5
+    "current_price": 956.15,
+    "current_pnl": -158.4
   },
   {
     "id": "ASAHIINDIA-2026-01-27",
@@ -1348,8 +1506,8 @@
         }
       ]
     },
-    "current_price": 988.5,
-    "current_pnl": 292.8
+    "current_price": 998.5,
+    "current_pnl": 372.8
   },
   {
     "id": "KARURVYSYA-2026-01-27",
@@ -1386,8 +1544,8 @@
         }
       ]
     },
-    "current_price": 291.45,
-    "current_pnl": 67.65
+    "current_price": 300.5,
+    "current_pnl": 366.3
   },
   {
     "id": "JSWSTEEL-2026-01-27",
@@ -1442,8 +1600,8 @@
         }
       ]
     },
-    "current_price": 1185.5,
-    "current_pnl": -288.0
+    "current_price": 1230.5,
+    "current_pnl": 252.0
   },
   {
     "id": "AXISBANK-2026-01-27",
@@ -1492,8 +1650,8 @@
         }
       ]
     },
-    "current_price": 1326.6,
-    "current_pnl": 75.9
+    "current_price": 1353.4,
+    "current_pnl": 370.7
   },
   {
     "id": "SAGILITY-2026-01-27",
@@ -1582,8 +1740,8 @@
         }
       ]
     },
-    "current_price": 119.66,
-    "current_pnl": -492.42
+    "current_price": 123.4,
+    "current_pnl": 566.0
   },
   {
     "id": "EICHERMOT-2025-12-22",
@@ -2209,8 +2367,8 @@
     "qty": 55,
     "target": 533.36,
     "stop_loss": 479.55,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "WIN",
+    "net_pnl": 3596.15,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 50.0,
@@ -2266,8 +2424,10 @@
         }
       ]
     },
-    "current_price": 510.6,
-    "current_pnl": 1707.75
+    "current_price": 541.4,
+    "current_pnl": 3401.75,
+    "exit_price": 545.0,
+    "exit_date": "2026-02-03"
   },
   {
     "id": "FORCEMOT-2025-12-19",
@@ -2410,8 +2570,8 @@
         }
       ]
     },
-    "current_price": 98.08,
-    "current_pnl": -385.32
+    "current_price": 101.15,
+    "current_pnl": 652.34
   },
   {
     "id": "TITAN-2025-12-17",
@@ -2420,7 +2580,7 @@
     "entry": 3930.1,
     "qty": 13,
     "target": 4156.6,
-    "stop_loss": 3779.1,
+    "stop_loss": 3930.1,
     "status": "OPEN",
     "net_pnl": 0,
     "setup": "MACD Cross",
@@ -2508,8 +2668,8 @@
         }
       ]
     },
-    "current_price": 3928.1,
-    "current_pnl": -26.0
+    "current_price": 4079.4,
+    "current_pnl": 1940.9
   },
   {
     "id": "KIRLOSENG-2025-12-17",
@@ -3140,8 +3300,8 @@
         }
       ]
     },
-    "current_price": 246.0,
-    "current_pnl": 477.0
+    "current_price": 249.55,
+    "current_pnl": 853.3
   },
   {
     "id": "ADANIGREEN-2025-12-12",
@@ -3546,8 +3706,8 @@
         }
       ]
     },
-    "current_price": 1429.4,
-    "current_pnl": -675.0
+    "current_price": 1453.6,
+    "current_pnl": -239.4
   },
   {
     "id": "CUMMINSIND-2025-12-10",
@@ -4349,7 +4509,7 @@
     "entry": 1833.3,
     "qty": 24,
     "target": 1954.59,
-    "stop_loss": 1752.44,
+    "stop_loss": 1833.3,
     "status": "OPEN",
     "net_pnl": 0,
     "deep_dive": {
@@ -4406,8 +4566,8 @@
         }
       ]
     },
-    "current_price": 1837.2,
-    "current_pnl": 93.6
+    "current_price": 1898.6,
+    "current_pnl": 1567.2
   },
   {
     "id": "NATIONALUM-2025-12-05",
