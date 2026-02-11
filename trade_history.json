@@ -267,8 +267,8 @@
     "qty": 24,
     "target": 1380.57,
     "stop_loss": 1260.0,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": 0.0,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 52.6,
@@ -391,7 +391,9 @@
       ]
     },
     "current_price": 1324.6,
-    "current_pnl": 1550.4
+    "current_pnl": 1550.4,
+    "exit_price": 1260.0,
+    "exit_date": "2026-02-11"
   },
   {
     "id": "BLUESTARCO-2026-02-10",
