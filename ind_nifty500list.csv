@@ -40,7 +40,7 @@ Amber Enterprises India Ltd.,Consumer Durables,AMBER,EQ,INE371P01015
 Ambuja Cements Ltd.,Construction Materials,AMBUJACEM,EQ,INE079A01024
 Anand Rathi Wealth Ltd.,Financial Services,ANANDRATHI,EQ,INE463V01026
 Anant Raj Ltd.,Realty,ANANTRAJ,EQ,INE242C01024
-Angel One Ltd.,Financial Services,ANGELONE,EQ,INE732I01013
+Angel One Ltd.,Financial Services,ANGELONE,EQ,INE732I01021
 Apar Industries Ltd.,Capital Goods,APARINDS,EQ,INE372A01015
 Apollo Hospitals Enterprise Ltd.,Healthcare,APOLLOHOSP,EQ,INE437A01024
 Apollo Tyres Ltd.,Automobile and Auto Components,APOLLOTYRE,EQ,INE438A01022
@@ -148,7 +148,6 @@ Dixon Technologies (India) Ltd.,Consumer Durables,DIXON,EQ,INE935N01020
 Dr. Agarwal's Health Care Ltd.,Healthcare,AGARWALEYE,EQ,INE943P01029
 Dr. Lal Path Labs Ltd.,Healthcare,LALPATHLAB,EQ,INE600L01024
 Dr. Reddy's Laboratories Ltd.,Healthcare,DRREDDY,EQ,INE089A01031
-Dummy Hindustan Unilever Ltd.,Fast Moving Consumer Goods,DUMMYHDLVR,EQ,DUM030A01027
 E.I.D. Parry (India) Ltd.,Fast Moving Consumer Goods,EIDPARRY,EQ,INE126A01031
 EIH Ltd.,Consumer Services,EIHOTEL,EQ,INE230A01023
 Eicher Motors Ltd.,Automobile and Auto Components,EICHERMOT,EQ,INE066A01021
@@ -296,7 +295,7 @@ L&T Finance Ltd.,Financial Services,LTF,EQ,INE498L01015
 L&T Technology Services Ltd.,Information Technology,LTTS,EQ,INE010V01017
 LIC Housing Finance Ltd.,Financial Services,LICHSGFIN,EQ,INE115A01026
 LT Foods Ltd.,Fast Moving Consumer Goods,LTFOODS,EQ,INE818H01020
-LTIMindtree Ltd.,Information Technology,LTIM,EQ,INE214T01019
+LTIMindtree Ltd.,Information Technology,LTM,EQ,INE214T01019
 Larsen & Toubro Ltd.,Construction,LT,EQ,INE018A01030
 Latent View Analytics Ltd.,Information Technology,LATENTVIEW,EQ,INE0I7C01011
 Laurus Labs Ltd.,Healthcare,LAURUSLABS,EQ,INE947Q01028
@@ -411,7 +410,7 @@ Sapphire Foods India Ltd.,Consumer Services,SAPPHIRE,EQ,INE806T01020
 Sarda Energy and Minerals Ltd.,Metals & Mining,SARDAEN,EQ,INE385C01021
 Saregama India Ltd,Media Entertainment & Publication,SAREGAMA,EQ,INE979A01025
 Schaeffler India Ltd.,Automobile and Auto Components,SCHAEFFLER,EQ,INE513A01022
-Schneider Electric Infrastructure Ltd.,Capital Goods,SCHNEIDER,EQ,INE839M01018
+Schneider Electric Infrastructure Ltd.,Capital Goods,SCHNEIDER,BE,INE839M01018
 Shipping Corporation of India Ltd.,Services,SCI,EQ,INE109A01011
 Shree Cement Ltd.,Construction Materials,SHREECEM,EQ,INE070A01015
 Shriram Finance Ltd.,Financial Services,SHRIRAMFIN,EQ,INE721A01047
