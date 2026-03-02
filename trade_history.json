@@ -40,8 +40,8 @@
         }
       ]
     },
-    "current_price": 37505.0,
-    "current_pnl": 0.0
+    "current_price": 36725.0,
+    "current_pnl": -0.0
   },
   {
     "id": "TRIVENI-2026-02-27",
@@ -120,8 +120,8 @@
         }
       ]
     },
-    "current_price": 394.9,
-    "current_pnl": -118.5
+    "current_price": 390.15,
+    "current_pnl": -261.0
   },
   {
     "id": "VEDL-2026-02-26",
@@ -194,8 +194,8 @@
         }
       ]
     },
-    "current_price": 718.4,
-    "current_pnl": -571.2
+    "current_price": 720.0,
+    "current_pnl": -504.0
   },
   {
     "id": "GICRE-2026-02-25",
@@ -286,8 +286,8 @@
         }
       ]
     },
-    "current_price": 383.05,
-    "current_pnl": -636.0
+    "current_price": 374.3,
+    "current_pnl": -1336.0
   },
   {
     "id": "IOC-2026-02-25",
@@ -348,8 +348,8 @@
         }
       ]
     },
-    "current_price": 187.47,
-    "current_pnl": 898.32
+    "current_price": 180.22,
+    "current_pnl": -529.93
   },
   {
     "id": "SUNPHARMA-2026-02-24",
@@ -731,8 +731,8 @@
     "qty": 510,
     "target": 77.62,
     "stop_loss": 71.74,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -555.34,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 60.0,
@@ -830,8 +830,10 @@
         }
       ]
     },
-    "current_price": 74.76,
-    "current_pnl": 1540.2
+    "current_price": 74.21,
+    "current_pnl": 1259.7,
+    "exit_price": 70.65,
+    "exit_date": "2026-03-02"
   },
   {
     "id": "KARURVYSYA-2026-02-24",
@@ -841,8 +843,8 @@
     "qty": 108,
     "target": 363.71,
     "stop_loss": 317.78,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -2281.92,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 46.2,
@@ -928,8 +930,10 @@
         }
       ]
     },
-    "current_price": 326.2,
-    "current_pnl": -1074.6
+    "current_price": 322.9,
+    "current_pnl": -1431.0,
+    "exit_price": 315.0,
+    "exit_date": "2026-03-02"
   },
   {
     "id": "POWERINDIA-2026-02-24",
@@ -939,8 +943,8 @@
     "qty": 1,
     "target": 26863.14,
     "stop_loss": 24452.0,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": 0.0,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 57.9,
@@ -1062,8 +1066,10 @@
         }
       ]
     },
-    "current_price": 25562.0,
-    "current_pnl": 1110.0
+    "current_price": 25800.0,
+    "current_pnl": 1348.0,
+    "exit_price": 24452.0,
+    "exit_date": "2026-03-02"
   },
   {
     "id": "UNIONBANK-2026-02-24",
@@ -1202,8 +1208,8 @@
         }
       ]
     },
-    "current_price": 202.27,
-    "current_pnl": 358.98
+    "current_price": 198.94,
+    "current_pnl": -283.71
   },
   {
     "id": "NETWEB-2026-02-18",
@@ -1240,8 +1246,8 @@
         }
       ]
     },
-    "current_price": 3861.4,
-    "current_pnl": 1675.6
+    "current_price": 3913.7,
+    "current_pnl": 1884.8
   },
   {
     "id": "AUROPHARMA-2026-02-17",
@@ -1290,8 +1296,8 @@
         }
       ]
     },
-    "current_price": 1220.4,
-    "current_pnl": 320.0
+    "current_price": 1212.8,
+    "current_pnl": 198.4
   },
   {
     "id": "INDUSINDBK-2026-02-17",
@@ -1322,8 +1328,8 @@
         }
       ]
     },
-    "current_price": 956.75,
-    "current_pnl": 280.5
+    "current_price": 941.7,
+    "current_pnl": -231.2
   },
   {
     "id": "BEL-2026-02-12",
@@ -1396,8 +1402,8 @@
         }
       ]
     },
-    "current_price": 444.7,
-    "current_pnl": 91.8
+    "current_price": 453.9,
+    "current_pnl": 588.6
   },
   {
     "id": "LAURUSLABS-2026-02-11",
@@ -1446,8 +1452,8 @@
         }
       ]
     },
-    "current_price": 1075.8,
-    "current_pnl": 1535.1
+    "current_price": 1063.3,
+    "current_pnl": 1272.6
   },
   {
     "id": "TORNTPHARM-2026-02-11",
@@ -1660,8 +1666,8 @@
         }
       ]
     },
-    "current_price": 3075.9,
-    "current_pnl": 865.6
+    "current_price": 3079.1,
+    "current_pnl": 891.2
   },
   {
     "id": "KIRLOSENG-2026-02-10",
@@ -1924,8 +1930,8 @@
         }
       ]
     },
-    "current_price": 1941.2,
-    "current_pnl": -450.5
+    "current_price": 1930.6,
+    "current_pnl": -630.7
   },
   {
     "id": "TATASTEEL-2026-02-10",
@@ -1935,8 +1941,8 @@
     "qty": 188,
     "target": 223.89,
     "stop_loss": 208.0,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -563.44,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 41.7,
@@ -2016,8 +2022,10 @@
         }
       ]
     },
-    "current_price": 212.33,
-    "current_pnl": 814.04
+    "current_price": 210.72,
+    "current_pnl": 511.36,
+    "exit_price": 205.0,
+    "exit_date": "2026-03-02"
   },
   {
     "id": "DATAPATTNS-2026-02-10",
@@ -2302,8 +2310,8 @@
         }
       ]
     },
-    "current_price": 454.8,
-    "current_pnl": -402.6
+    "current_price": 451.0,
+    "current_pnl": -528.0
   },
   {
     "id": "AUBANK-2026-02-09",
@@ -2313,8 +2321,8 @@
     "qty": 25,
     "target": 1115.54,
     "stop_loss": 920.72,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -2587.41,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 75.0,
@@ -2346,8 +2354,10 @@
         }
       ]
     },
-    "current_price": 958.35,
-    "current_pnl": -1007.5
+    "current_price": 960.65,
+    "current_pnl": -950.0,
+    "exit_price": 895.05,
+    "exit_date": "2026-03-02"
   },
   {
     "id": "INDIANB-2026-02-09",
@@ -2438,8 +2448,8 @@
         }
       ]
     },
-    "current_price": 990.5,
-    "current_pnl": 1819.4
+    "current_price": 977.7,
+    "current_pnl": 1537.8
   },
   {
     "id": "CENTRALBK-2026-02-09",
@@ -2449,8 +2459,8 @@
     "qty": 690,
     "target": 42.17,
     "stop_loss": 37.82,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -20.68,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 42.9,
@@ -2500,8 +2510,10 @@
         }
       ]
     },
-    "current_price": 40.07,
-    "current_pnl": 1552.5
+    "current_price": 38.98,
+    "current_pnl": 800.4,
+    "exit_price": 37.79,
+    "exit_date": "2026-03-02"
   },
   {
     "id": "LTF-2026-02-09",
@@ -2544,8 +2556,8 @@
         }
       ]
     },
-    "current_price": 283.95,
-    "current_pnl": -723.6
+    "current_price": 279.2,
+    "current_pnl": -1041.85
   },
   {
     "id": "TITAN-2026-02-06",
@@ -2630,8 +2642,8 @@
         }
       ]
     },
-    "current_price": 4327.5,
-    "current_pnl": 1516.0
+    "current_price": 4271.2,
+    "current_pnl": 1065.6
   },
   {
     "id": "IFCI-2026-02-06",
@@ -2732,8 +2744,8 @@
         }
       ]
     },
-    "current_price": 582.25,
-    "current_pnl": 118.8
+    "current_price": 576.0,
+    "current_pnl": -87.45
   },
   {
     "id": "M&M-2026-02-05",
@@ -2794,8 +2806,8 @@
         }
       ]
     },
-    "current_price": 3397.4,
-    "current_pnl": -1113.7
+    "current_price": 3338.0,
+    "current_pnl": -1529.5
   },
   {
     "id": "USHAMART-2026-02-05",
@@ -2868,8 +2880,8 @@
         }
       ]
     },
-    "current_price": 418.4,
-    "current_pnl": 142.5
+    "current_price": 420.9,
+    "current_pnl": 285.0
   },
   {
     "id": "CRAFTSMAN-2026-02-05",
@@ -2930,8 +2942,8 @@
         }
       ]
     },
-    "current_price": 7526.0,
-    "current_pnl": -528.0
+    "current_price": 7551.0,
+    "current_pnl": -478.0
   },
   {
     "id": "MCX-2026-02-04",
@@ -3080,8 +3092,8 @@
         }
       ]
     },
-    "current_price": 116.01,
-    "current_pnl": 1197.56
+    "current_price": 114.67,
+    "current_pnl": 934.92
   },
   {
     "id": "CHOLAFIN-2026-02-04",
@@ -3160,8 +3172,8 @@
         }
       ]
     },
-    "current_price": 1730.8,
-    "current_pnl": 225.0
+    "current_price": 1706.9,
+    "current_pnl": -133.5
   },
   {
     "id": "MSUMI-2026-02-04",
@@ -3210,8 +3222,8 @@
         }
       ]
     },
-    "current_price": 43.2,
-    "current_pnl": -672.7
+    "current_price": 41.88,
+    "current_pnl": -1245.58
   },
   {
     "id": "RELIANCE-2026-02-03",
@@ -3272,8 +3284,8 @@
         }
       ]
     },
-    "current_price": 1393.9,
-    "current_pnl": -1154.6
+    "current_price": 1365.5,
+    "current_pnl": -1807.8
   },
   {
     "id": "KEI-2026-02-03",
@@ -3486,8 +3498,8 @@
         }
       ]
     },
-    "current_price": 1103.6,
-    "current_pnl": -1108.4
+    "current_price": 1086.4,
+    "current_pnl": -1400.8
   },
   {
     "id": "RBLBANK-2026-02-03",
@@ -3542,8 +3554,8 @@
         }
       ]
     },
-    "current_price": 319.75,
-    "current_pnl": 931.0
+    "current_price": 314.05,
+    "current_pnl": 497.8
   },
   {
     "id": "JKTYRE-2026-02-03",
@@ -3895,8 +3907,8 @@
     "qty": 67,
     "target": 492.33,
     "stop_loss": 448.05,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -595.7,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 50.0,
@@ -3952,8 +3964,10 @@
         }
       ]
     },
-    "current_price": 454.95,
-    "current_pnl": 462.3
+    "current_price": 457.8,
+    "current_pnl": 653.25,
+    "exit_price": 439.15,
+    "exit_date": "2026-03-02"
   },
   {
     "id": "NAM-INDIA-2026-01-30",
@@ -4002,8 +4016,8 @@
         }
       ]
     },
-    "current_price": 931.2,
-    "current_pnl": 855.0
+    "current_price": 922.0,
+    "current_pnl": 625.0
   },
   {
     "id": "AIAENG-2026-01-30",
@@ -4013,8 +4027,8 @@
     "qty": 5,
     "target": 4604.41,
     "stop_loss": 3697.4,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -1989.01,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 63.6,
@@ -4088,8 +4102,10 @@
         }
       ]
     },
-    "current_price": 3851.6,
-    "current_pnl": -1043.0
+    "current_price": 3813.6,
+    "current_pnl": -1233.0,
+    "exit_price": 3662.0,
+    "exit_date": "2026-03-02"
   },
   {
     "id": "TECHM-2026-01-29",
@@ -4302,8 +4318,8 @@
         }
       ]
     },
-    "current_price": 299.85,
-    "current_pnl": 1153.2
+    "current_price": 295.65,
+    "current_pnl": 762.6
   },
   {
     "id": "VEDL-2026-01-29",
@@ -5020,8 +5036,8 @@
         }
       ]
     },
-    "current_price": 1014.95,
-    "current_pnl": 1135.2
+    "current_price": 1000.6,
+    "current_pnl": 819.5
   },
   {
     "id": "ASAHIINDIA-2026-01-27",
@@ -5076,8 +5092,8 @@
         }
       ]
     },
-    "current_price": 900.7,
-    "current_pnl": -409.6
+    "current_price": 866.0,
+    "current_pnl": -687.2
   },
   {
     "id": "KARURVYSYA-2026-01-27",
@@ -5172,8 +5188,8 @@
         }
       ]
     },
-    "current_price": 1264.7,
-    "current_pnl": 662.4
+    "current_price": 1256.8,
+    "current_pnl": 567.6
   },
   {
     "id": "AXISBANK-2026-01-27",
@@ -5222,8 +5238,8 @@
         }
       ]
     },
-    "current_price": 1383.9,
-    "current_pnl": 706.2
+    "current_price": 1365.1,
+    "current_pnl": 499.4
   },
   {
     "id": "SAGILITY-2026-01-27",
@@ -7286,8 +7302,8 @@
         }
       ]
     },
-    "current_price": 1528.9,
-    "current_pnl": 1116.0
+    "current_price": 1523.0,
+    "current_pnl": 1009.8
   },
   {
     "id": "CUMMINSIND-2025-12-10",
