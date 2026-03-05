@@ -1,11 +1,11 @@
 {
-  "updated": "2026-03-04",
+  "updated": "2026-03-05",
   "parameters": {
-    "strategy_type": "BB_REVERSAL",
+    "strategy_type": "MACD_CROSS",
     "trend_filter": "SMA200",
-    "adx_min": 25,
-    "sl_mult": 2.0,
-    "tgt_mult": 3.0,
-    "name": "Gen-9257"
+    "adx_min": 20,
+    "sl_mult": 2.5,
+    "tgt_mult": 3.75,
+    "name": "Child-7622"
   }
 }
