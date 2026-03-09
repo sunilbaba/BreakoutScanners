@@ -88,8 +88,8 @@
         }
       ]
     },
-    "current_price": 1378.7,
-    "current_pnl": -178.2
+    "current_price": 1338.1,
+    "current_pnl": -543.6
   },
   {
     "id": "NYKAA-2026-03-05",
@@ -226,8 +226,8 @@
         }
       ]
     },
-    "current_price": 493.65,
-    "current_pnl": -450.5
+    "current_price": 500.55,
+    "current_pnl": -215.9
   },
   {
     "id": "ASHOKLEY-2026-03-05",
@@ -382,7 +382,7 @@
         }
       ]
     },
-    "current_price": 13957.0,
+    "current_price": 13923.0,
     "current_pnl": -0.0
   },
   {
@@ -538,8 +538,8 @@
         }
       ]
     },
-    "current_price": 276.8,
-    "current_pnl": -338.4
+    "current_price": 276.2,
+    "current_pnl": -366.6
   },
   {
     "id": "NAM-INDIA-2026-03-05",
@@ -594,8 +594,8 @@
         }
       ]
     },
-    "current_price": 823.55,
-    "current_pnl": -554.45
+    "current_price": 829.2,
+    "current_pnl": -481.0
   },
   {
     "id": "JSWSTEEL-2026-03-05",
@@ -684,8 +684,8 @@
         }
       ]
     },
-    "current_price": 392.2,
-    "current_pnl": 1071.0
+    "current_price": 387.4,
+    "current_pnl": 907.8
   },
   {
     "id": "OIL-2026-03-04",
@@ -758,8 +758,8 @@
         }
       ]
     },
-    "current_price": 471.85,
-    "current_pnl": -527.5
+    "current_price": 470.55,
+    "current_pnl": -560.0
   },
   {
     "id": "3MINDIA-2026-02-27",
@@ -884,8 +884,8 @@
         }
       ]
     },
-    "current_price": 379.5,
-    "current_pnl": -580.5
+    "current_price": 373.2,
+    "current_pnl": -769.5
   },
   {
     "id": "VEDL-2026-02-26",
@@ -958,8 +958,8 @@
         }
       ]
     },
-    "current_price": 700.8,
-    "current_pnl": -1310.4
+    "current_price": 705.0,
+    "current_pnl": -1134.0
   },
   {
     "id": "GICRE-2026-02-25",
@@ -2068,8 +2068,8 @@
         }
       ]
     },
-    "current_price": 1213.0,
-    "current_pnl": 201.6
+    "current_price": 1248.7,
+    "current_pnl": 772.8
   },
   {
     "id": "INDUSINDBK-2026-02-17",
@@ -2176,8 +2176,8 @@
         }
       ]
     },
-    "current_price": 450.8,
-    "current_pnl": 421.2
+    "current_price": 453.35,
+    "current_pnl": 558.9
   },
   {
     "id": "LAURUSLABS-2026-02-11",
@@ -2442,8 +2442,8 @@
         }
       ]
     },
-    "current_price": 3145.2,
-    "current_pnl": 1420.0
+    "current_price": 3142.4,
+    "current_pnl": 1397.6
   },
   {
     "id": "KIRLOSENG-2026-02-10",
@@ -3530,8 +3530,8 @@
         }
       ]
     },
-    "current_price": 555.95,
-    "current_pnl": -749.1
+    "current_price": 557.85,
+    "current_pnl": -686.4
   },
   {
     "id": "M&M-2026-02-05",
@@ -3668,8 +3668,8 @@
         }
       ]
     },
-    "current_price": 402.65,
-    "current_pnl": -755.25
+    "current_price": 401.2,
+    "current_pnl": -837.9
   },
   {
     "id": "CRAFTSMAN-2026-02-05",
@@ -3730,8 +3730,8 @@
         }
       ]
     },
-    "current_price": 7258.0,
-    "current_pnl": -1064.0
+    "current_price": 7288.5,
+    "current_pnl": -1003.0
   },
   {
     "id": "MCX-2026-02-04",
@@ -3817,8 +3817,8 @@
     "qty": 196,
     "target": 125.15,
     "stop_loss": 99.73,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -1991.33,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 66.7,
@@ -3880,8 +3880,10 @@
         }
       ]
     },
-    "current_price": 101.8,
-    "current_pnl": -1587.6
+    "current_price": 99.59,
+    "current_pnl": -2020.76,
+    "exit_price": 99.73,
+    "exit_date": "2026-03-09"
   },
   {
     "id": "CHOLAFIN-2026-02-04",
@@ -5118,8 +5120,8 @@
         }
       ]
     },
-    "current_price": 269.2,
-    "current_pnl": -1697.25
+    "current_price": 270.95,
+    "current_pnl": -1534.5
   },
   {
     "id": "VEDL-2026-01-29",
@@ -5836,8 +5838,8 @@
         }
       ]
     },
-    "current_price": 1003.5,
-    "current_pnl": 883.3
+    "current_price": 1011.3,
+    "current_pnl": 1054.9
   },
   {
     "id": "ASAHIINDIA-2026-01-27",
@@ -8108,8 +8110,8 @@
         }
       ]
     },
-    "current_price": 1451.1,
-    "current_pnl": -284.4
+    "current_price": 1487.5,
+    "current_pnl": 370.8
   },
   {
     "id": "CUMMINSIND-2025-12-10",
