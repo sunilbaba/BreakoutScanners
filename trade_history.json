@@ -1,5 +1,137 @@
 [
   {
+    "id": "GESHIP-2026-03-12",
+    "date": "2026-03-12",
+    "symbol": "GESHIP",
+    "entry": 1486.5,
+    "qty": 9,
+    "target": 1648.99,
+    "stop_loss": 1378.17,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 47.4,
+      "trades": 19,
+      "log": [
+        {
+          "date": "2026-02-05",
+          "exit": "2026-03-05",
+          "result": "WIN",
+          "pnl": 9.8
+        },
+        {
+          "date": "2026-01-28",
+          "exit": "2026-02-05",
+          "result": "WIN",
+          "pnl": 8.3
+        },
+        {
+          "date": "2025-11-12",
+          "exit": "2025-11-25",
+          "result": "LOSS",
+          "pnl": -6.9
+        },
+        {
+          "date": "2025-10-31",
+          "exit": "2025-11-07",
+          "result": "LOSS",
+          "pnl": -5.2
+        },
+        {
+          "date": "2025-03-19",
+          "exit": "2025-04-07",
+          "result": "LOSS",
+          "pnl": -6.0
+        },
+        {
+          "date": "2024-10-16",
+          "exit": "2024-10-21",
+          "result": "LOSS",
+          "pnl": -6.1
+        },
+        {
+          "date": "2024-07-11",
+          "exit": "2024-07-18",
+          "result": "LOSS",
+          "pnl": -9.4
+        },
+        {
+          "date": "2024-07-08",
+          "exit": "2024-07-11",
+          "result": "WIN",
+          "pnl": 11.8
+        },
+        {
+          "date": "2023-09-07",
+          "exit": "2023-09-27",
+          "result": "WIN",
+          "pnl": 7.8
+        },
+        {
+          "date": "2023-06-15",
+          "exit": "2023-06-23",
+          "result": "LOSS",
+          "pnl": -5.6
+        },
+        {
+          "date": "2023-05-15",
+          "exit": "2023-05-22",
+          "result": "LOSS",
+          "pnl": -6.5
+        },
+        {
+          "date": "2022-12-13",
+          "exit": "2022-12-23",
+          "result": "LOSS",
+          "pnl": -7.8
+        },
+        {
+          "date": "2022-11-23",
+          "exit": "2022-12-13",
+          "result": "WIN",
+          "pnl": 12.0
+        },
+        {
+          "date": "2022-11-07",
+          "exit": "2022-11-10",
+          "result": "LOSS",
+          "pnl": -7.0
+        },
+        {
+          "date": "2022-08-01",
+          "exit": "2022-08-24",
+          "result": "WIN",
+          "pnl": 14.0
+        },
+        {
+          "date": "2022-07-19",
+          "exit": "2022-08-01",
+          "result": "WIN",
+          "pnl": 12.2
+        },
+        {
+          "date": "2022-05-18",
+          "exit": "2022-05-25",
+          "result": "LOSS",
+          "pnl": -8.1
+        },
+        {
+          "date": "2022-04-21",
+          "exit": "2022-04-25",
+          "result": "WIN",
+          "pnl": 8.6
+        },
+        {
+          "date": "2022-04-11",
+          "exit": "2022-04-21",
+          "result": "WIN",
+          "pnl": 7.8
+        }
+      ]
+    }
+  },
+  {
     "id": "TIMKEN-2026-03-12",
     "date": "2026-03-12",
     "symbol": "TIMKEN",
@@ -1069,8 +1201,8 @@
     "qty": 9,
     "target": 1561.41,
     "stop_loss": 1398.5,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": 0.0,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 66.7,
@@ -1151,7 +1283,9 @@
       ]
     },
     "current_price": 1486.5,
-    "current_pnl": 792.0
+    "current_pnl": 792.0,
+    "exit_price": 1398.5,
+    "exit_date": "2026-03-12"
   },
   {
     "id": "NYKAA-2026-03-05",
