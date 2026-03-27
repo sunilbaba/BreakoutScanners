@@ -1,5 +1,53 @@
 [
   {
+    "id": "BEL-2026-03-27",
+    "date": "2026-03-27",
+    "symbol": "BEL",
+    "entry": 413.2,
+    "qty": 28,
+    "target": 465.28,
+    "stop_loss": 378.48,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "BB Reversal",
+    "deep_dive": {
+      "wr": 40.0,
+      "trades": 5,
+      "log": [
+        {
+          "date": "2025-07-21",
+          "exit": "2025-07-29",
+          "result": "LOSS",
+          "pnl": -4.9
+        },
+        {
+          "date": "2024-02-05",
+          "exit": "2024-02-23",
+          "result": "WIN",
+          "pnl": 12.8
+        },
+        {
+          "date": "2023-10-27",
+          "exit": "2023-11-13",
+          "result": "WIN",
+          "pnl": 9.1
+        },
+        {
+          "date": "2022-12-20",
+          "exit": "2022-12-26",
+          "result": "LOSS",
+          "pnl": -6.0
+        },
+        {
+          "date": "2022-11-30",
+          "exit": "2022-12-16",
+          "result": "LOSS",
+          "pnl": -5.9
+        }
+      ]
+    }
+  },
+  {
     "id": "GMDCLTD-2026-03-20",
     "date": "2026-03-20",
     "symbol": "GMDCLTD",
@@ -112,8 +160,8 @@
         }
       ]
     },
-    "current_price": 583.8,
-    "current_pnl": -140.7
+    "current_price": 564.5,
+    "current_pnl": -410.9
   },
   {
     "id": "KSB-2026-03-18",
@@ -186,8 +234,8 @@
         }
       ]
     },
-    "current_price": 809.2,
-    "current_pnl": 29.4
+    "current_price": 801.05,
+    "current_pnl": -84.7
   },
   {
     "id": "CHENNPETRO-2026-03-17",
@@ -290,8 +338,8 @@
         }
       ]
     },
-    "current_price": 1025.05,
-    "current_pnl": -153.2
+    "current_price": 945.65,
+    "current_pnl": -470.8
   },
   {
     "id": "MCX-2026-03-17",
@@ -440,8 +488,8 @@
         }
       ]
     },
-    "current_price": 7444.0,
-    "current_pnl": 163.5
+    "current_price": 7153.5,
+    "current_pnl": -127.0
   },
   {
     "id": "NLCINDIA-2026-03-13",
@@ -502,8 +550,8 @@
         }
       ]
     },
-    "current_price": 267.9,
-    "current_pnl": 117.8
+    "current_price": 266.6,
+    "current_pnl": 77.5
   },
   {
     "id": "GESHIP-2026-03-12",
@@ -2326,8 +2374,8 @@
         }
       ]
     },
-    "current_price": 865.0,
-    "current_pnl": -15.6
+    "current_price": 843.95,
+    "current_pnl": -289.25
   },
   {
     "id": "JSWSTEEL-2026-03-05",
@@ -2492,8 +2540,8 @@
         }
       ]
     },
-    "current_price": 471.7,
-    "current_pnl": -531.25
+    "current_price": 466.85,
+    "current_pnl": -652.5
   },
   {
     "id": "3MINDIA-2026-02-27",
@@ -3806,8 +3854,8 @@
         }
       ]
     },
-    "current_price": 1326.0,
-    "current_pnl": 2009.6
+    "current_price": 1312.0,
+    "current_pnl": 1785.6
   },
   {
     "id": "INDUSINDBK-2026-02-17",
@@ -5272,8 +5320,8 @@
         }
       ]
     },
-    "current_price": 629.15,
-    "current_pnl": 1666.5
+    "current_price": 624.25,
+    "current_pnl": 1504.8
   },
   {
     "id": "M&M-2026-02-05",
@@ -9860,8 +9908,8 @@
         }
       ]
     },
-    "current_price": 1588.5,
-    "current_pnl": 2188.8
+    "current_price": 1563.0,
+    "current_pnl": 1729.8
   },
   {
     "id": "CUMMINSIND-2025-12-10",
