@@ -1,5 +1,101 @@
 [
   {
+    "id": "SCHNEIDER-2026-03-31",
+    "date": "2026-03-31",
+    "symbol": "SCHNEIDER",
+    "entry": 845.8,
+    "qty": 10,
+    "target": 990.78,
+    "stop_loss": 749.15,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "BB Reversal",
+    "deep_dive": {
+      "wr": 40.0,
+      "trades": 5,
+      "log": [
+        {
+          "date": "2023-10-09",
+          "exit": "2023-10-23",
+          "result": "LOSS",
+          "pnl": -10.8
+        },
+        {
+          "date": "2023-09-12",
+          "exit": "2023-09-25",
+          "result": "WIN",
+          "pnl": 13.7
+        },
+        {
+          "date": "2023-03-10",
+          "exit": "2023-03-27",
+          "result": "LOSS",
+          "pnl": -7.9
+        },
+        {
+          "date": "2022-12-26",
+          "exit": "2023-01-04",
+          "result": "WIN",
+          "pnl": 15.6
+        },
+        {
+          "date": "2022-12-19",
+          "exit": "2022-12-22",
+          "result": "LOSS",
+          "pnl": -6.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "JBCHEPHARM-2026-03-31",
+    "date": "2026-03-31",
+    "symbol": "JBCHEPHARM",
+    "entry": 2064.4,
+    "qty": 7,
+    "target": 2273.73,
+    "stop_loss": 1924.85,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "BB Reversal",
+    "deep_dive": {
+      "wr": 40.0,
+      "trades": 5,
+      "log": [
+        {
+          "date": "2024-10-01",
+          "exit": "2024-10-04",
+          "result": "LOSS",
+          "pnl": -7.8
+        },
+        {
+          "date": "2024-06-27",
+          "exit": "2024-07-01",
+          "result": "WIN",
+          "pnl": 13.2
+        },
+        {
+          "date": "2024-02-28",
+          "exit": "2024-02-29",
+          "result": "LOSS",
+          "pnl": -7.4
+        },
+        {
+          "date": "2023-05-22",
+          "exit": "2023-06-16",
+          "result": "WIN",
+          "pnl": 13.7
+        },
+        {
+          "date": "2023-05-15",
+          "exit": "2023-05-22",
+          "result": "LOSS",
+          "pnl": -7.0
+        }
+      ]
+    }
+  },
+  {
     "id": "STARHEALTH-2026-03-30",
     "date": "2026-03-30",
     "symbol": "STARHEALTH",
@@ -27,7 +123,9 @@
           "pnl": 10.1
         }
       ]
-    }
+    },
+    "current_price": 457.5,
+    "current_pnl": 0.0
   },
   {
     "id": "CRAFTSMAN-2026-03-30",
