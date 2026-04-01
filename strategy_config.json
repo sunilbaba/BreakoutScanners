@@ -1,11 +1,11 @@
 {
-  "updated": "2026-03-31",
+  "updated": "2026-04-01",
   "parameters": {
     "strategy_type": "BB_REVERSAL",
     "trend_filter": "SMA200",
     "adx_min": 20,
-    "sl_mult": 2.5,
-    "tgt_mult": 3.75,
-    "name": "Child-6749"
+    "sl_mult": 2.0,
+    "tgt_mult": 3.0,
+    "name": "Child-7331"
   }
 }
