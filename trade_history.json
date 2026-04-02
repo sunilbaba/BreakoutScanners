@@ -1,5 +1,89 @@
 [
   {
+    "id": "SONACOMS-2026-04-02",
+    "date": "2026-04-02",
+    "symbol": "SONACOMS",
+    "entry": 490.0,
+    "qty": 23,
+    "target": 552.9,
+    "stop_loss": 448.06,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "BB Reversal",
+    "deep_dive": {
+      "wr": 42.9,
+      "trades": 7,
+      "log": [
+        {
+          "date": "2026-03-02",
+          "exit": "2026-03-13",
+          "result": "LOSS",
+          "pnl": -5.3
+        },
+        {
+          "date": "2026-01-06",
+          "exit": "2026-01-12",
+          "result": "LOSS",
+          "pnl": -4.6
+        },
+        {
+          "date": "2024-08-05",
+          "exit": "2024-08-27",
+          "result": "WIN",
+          "pnl": 11.6
+        },
+        {
+          "date": "2024-04-29",
+          "exit": "2024-05-13",
+          "result": "LOSS",
+          "pnl": -7.9
+        },
+        {
+          "date": "2023-10-10",
+          "exit": "2023-10-23",
+          "result": "LOSS",
+          "pnl": -5.8
+        },
+        {
+          "date": "2023-08-14",
+          "exit": "2023-08-22",
+          "result": "WIN",
+          "pnl": 8.6
+        },
+        {
+          "date": "2022-04-18",
+          "exit": "2022-04-22",
+          "result": "WIN",
+          "pnl": 9.6
+        }
+      ]
+    }
+  },
+  {
+    "id": "SAILIFE-2026-04-02",
+    "date": "2026-04-02",
+    "symbol": "SAILIFE",
+    "entry": 951.5,
+    "qty": 12,
+    "target": 1068.8,
+    "stop_loss": 873.3,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "BB Reversal",
+    "deep_dive": {
+      "wr": 100.0,
+      "trades": 1,
+      "log": [
+        {
+          "date": "2025-10-09",
+          "exit": "2025-10-30",
+          "result": "WIN",
+          "pnl": 9.4
+        }
+      ]
+    }
+  },
+  {
     "id": "SUNPHARMA-2026-04-01",
     "date": "2026-04-01",
     "symbol": "SUNPHARMA",
@@ -7,8 +91,8 @@
     "qty": 10,
     "target": 1879.4,
     "stop_loss": 1629.4,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -999.0,
     "setup": "BB Reversal",
     "deep_dive": {
       "wr": 42.9,
@@ -57,7 +141,11 @@
           "pnl": 9.5
         }
       ]
-    }
+    },
+    "current_price": 1673.2,
+    "current_pnl": -562.0,
+    "exit_price": 1629.4,
+    "exit_date": "2026-04-02"
   },
   {
     "id": "SCHNEIDER-2026-03-31",
@@ -106,8 +194,8 @@
         }
       ]
     },
-    "current_price": 871.6,
-    "current_pnl": 258.0
+    "current_price": 847.0,
+    "current_pnl": 12.0
   },
   {
     "id": "JBCHEPHARM-2026-03-31",
@@ -117,8 +205,8 @@
     "qty": 7,
     "target": 2273.73,
     "stop_loss": 1924.85,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -975.87,
     "setup": "BB Reversal",
     "deep_dive": {
       "wr": 40.0,
@@ -156,8 +244,10 @@
         }
       ]
     },
-    "current_price": 2007.8,
-    "current_pnl": -396.2
+    "current_price": 1923.2,
+    "current_pnl": -988.4,
+    "exit_price": 1924.85,
+    "exit_date": "2026-04-02"
   },
   {
     "id": "STARHEALTH-2026-03-30",
@@ -188,8 +278,8 @@
         }
       ]
     },
-    "current_price": 469.6,
-    "current_pnl": 266.2
+    "current_price": 454.95,
+    "current_pnl": -56.1
   },
   {
     "id": "CRAFTSMAN-2026-03-30",
@@ -226,8 +316,8 @@
         }
       ]
     },
-    "current_price": 6822.5,
-    "current_pnl": -141.0
+    "current_price": 6757.5,
+    "current_pnl": -206.0
   },
   {
     "id": "BEL-2026-03-27",
@@ -276,8 +366,8 @@
         }
       ]
     },
-    "current_price": 418.3,
-    "current_pnl": 142.8
+    "current_price": 415.1,
+    "current_pnl": 53.2
   },
   {
     "id": "GMDCLTD-2026-03-20",
@@ -392,8 +482,8 @@
         }
       ]
     },
-    "current_price": 580.45,
-    "current_pnl": -187.6
+    "current_price": 569.8,
+    "current_pnl": -336.7
   },
   {
     "id": "KSB-2026-03-18",
@@ -570,8 +660,8 @@
         }
       ]
     },
-    "current_price": 1014.4,
-    "current_pnl": -195.8
+    "current_price": 994.5,
+    "current_pnl": -275.4
   },
   {
     "id": "MCX-2026-03-17",
@@ -720,8 +810,8 @@
         }
       ]
     },
-    "current_price": 7032.5,
-    "current_pnl": -248.0
+    "current_price": 6929.5,
+    "current_pnl": -351.0
   },
   {
     "id": "NLCINDIA-2026-03-13",
@@ -782,8 +872,8 @@
         }
       ]
     },
-    "current_price": 284.15,
-    "current_pnl": 621.55
+    "current_price": 273.5,
+    "current_pnl": 291.4
   },
   {
     "id": "GESHIP-2026-03-12",
@@ -2606,8 +2696,8 @@
         }
       ]
     },
-    "current_price": 866.0,
-    "current_pnl": -2.6
+    "current_price": 819.45,
+    "current_pnl": -607.75
   },
   {
     "id": "JSWSTEEL-2026-03-05",
@@ -2772,8 +2862,8 @@
         }
       ]
     },
-    "current_price": 475.0,
-    "current_pnl": -448.75
+    "current_price": 465.85,
+    "current_pnl": -677.5
   },
   {
     "id": "3MINDIA-2026-02-27",
@@ -4086,8 +4176,8 @@
         }
       ]
     },
-    "current_price": 1342.9,
-    "current_pnl": 2280.0
+    "current_price": 1288.0,
+    "current_pnl": 1401.6
   },
   {
     "id": "INDUSINDBK-2026-02-17",
@@ -5552,8 +5642,8 @@
         }
       ]
     },
-    "current_price": 628.5,
-    "current_pnl": 1645.05
+    "current_price": 608.1,
+    "current_pnl": 971.85
   },
   {
     "id": "M&M-2026-02-05",
@@ -10077,8 +10167,8 @@
     "qty": 18,
     "target": 1632.3,
     "stop_loss": 1466.9,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": 0.0,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 44.4,
@@ -10140,8 +10230,10 @@
         }
       ]
     },
-    "current_price": 1510.1,
-    "current_pnl": 777.6
+    "current_price": 1448.6,
+    "current_pnl": -329.4,
+    "exit_price": 1466.9,
+    "exit_date": "2026-04-02"
   },
   {
     "id": "CUMMINSIND-2025-12-10",
