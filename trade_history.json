@@ -1,5 +1,65 @@
 [
   {
+    "id": "NYKAA-2026-04-03",
+    "date": "2026-04-03",
+    "symbol": "NYKAA",
+    "entry": 245.98,
+    "qty": 59,
+    "target": 271.09,
+    "stop_loss": 229.24,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 42.9,
+      "trades": 7,
+      "log": [
+        {
+          "date": "2026-02-04",
+          "exit": "2026-02-06",
+          "result": "WIN",
+          "pnl": 8.6
+        },
+        {
+          "date": "2025-12-23",
+          "exit": "2026-01-20",
+          "result": "LOSS",
+          "pnl": -5.1
+        },
+        {
+          "date": "2025-06-25",
+          "exit": "2025-07-14",
+          "result": "WIN",
+          "pnl": 7.7
+        },
+        {
+          "date": "2024-10-31",
+          "exit": "2024-11-13",
+          "result": "LOSS",
+          "pnl": -6.4
+        },
+        {
+          "date": "2024-01-09",
+          "exit": "2024-01-16",
+          "result": "LOSS",
+          "pnl": -7.9
+        },
+        {
+          "date": "2023-11-06",
+          "exit": "2023-11-17",
+          "result": "WIN",
+          "pnl": 7.8
+        },
+        {
+          "date": "2023-09-27",
+          "exit": "2023-10-23",
+          "result": "LOSS",
+          "pnl": -6.0
+        }
+      ]
+    }
+  },
+  {
     "id": "ADANIENSOL-2026-04-02",
     "date": "2026-04-02",
     "symbol": "ADANIENSOL",
@@ -39,7 +99,9 @@
           "pnl": 7.6
         }
       ]
-    }
+    },
+    "current_price": 941.6,
+    "current_pnl": -0.0
   },
   {
     "id": "AARTIIND-2026-04-02",
