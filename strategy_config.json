@@ -1,11 +1,11 @@
 {
-  "updated": "2026-04-15",
+  "updated": "2026-04-16",
   "parameters": {
     "strategy_type": "MACD_CROSS",
     "trend_filter": "SMA200",
     "adx_min": 25,
-    "sl_mult": 3.0,
-    "tgt_mult": 4.5,
-    "name": "Gen-6005"
+    "sl_mult": 2.0,
+    "tgt_mult": 3.0,
+    "name": "Gen-6267"
   }
 }
