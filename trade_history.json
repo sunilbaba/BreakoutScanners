@@ -1,5 +1,95 @@
 [
   {
+    "id": "TORNTPHARM-2026-04-17",
+    "date": "2026-04-17",
+    "symbol": "TORNTPHARM",
+    "entry": 4165.3,
+    "qty": 4,
+    "target": 4494.27,
+    "stop_loss": 3945.99,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 50.0,
+      "trades": 12,
+      "log": [
+        {
+          "date": "2026-03-12",
+          "exit": "2026-03-16",
+          "result": "LOSS",
+          "pnl": -4.4
+        },
+        {
+          "date": "2026-02-11",
+          "exit": "2026-02-24",
+          "result": "WIN",
+          "pnl": 7.8
+        },
+        {
+          "date": "2025-10-17",
+          "exit": "2025-11-10",
+          "result": "WIN",
+          "pnl": 5.4
+        },
+        {
+          "date": "2025-09-22",
+          "exit": "2025-09-25",
+          "result": "LOSS",
+          "pnl": -3.3
+        },
+        {
+          "date": "2024-11-22",
+          "exit": "2024-12-02",
+          "result": "WIN",
+          "pnl": 6.6
+        },
+        {
+          "date": "2024-10-09",
+          "exit": "2024-10-22",
+          "result": "LOSS",
+          "pnl": -5.7
+        },
+        {
+          "date": "2024-07-09",
+          "exit": "2024-07-23",
+          "result": "WIN",
+          "pnl": 6.4
+        },
+        {
+          "date": "2023-06-28",
+          "exit": "2023-07-03",
+          "result": "LOSS",
+          "pnl": -3.5
+        },
+        {
+          "date": "2023-05-25",
+          "exit": "2023-05-31",
+          "result": "WIN",
+          "pnl": 5.5
+        },
+        {
+          "date": "2023-02-08",
+          "exit": "2023-02-15",
+          "result": "LOSS",
+          "pnl": -4.4
+        },
+        {
+          "date": "2023-01-10",
+          "exit": "2023-01-27",
+          "result": "LOSS",
+          "pnl": -3.3
+        },
+        {
+          "date": "2022-06-24",
+          "exit": "2022-07-14",
+          "result": "WIN",
+          "pnl": 6.4
+        }
+      ]
+    }
+  },
+  {
     "id": "ASTRAL-2026-04-15",
     "date": "2026-04-15",
     "symbol": "ASTRAL",
@@ -46,8 +136,8 @@
         }
       ]
     },
-    "current_price": 1570.6,
-    "current_pnl": -242.8
+    "current_price": 1583.8,
+    "current_pnl": -190.0
   },
   {
     "id": "FINCABLES-2026-04-10",
@@ -56,7 +146,7 @@
     "entry": 853.1,
     "qty": 9,
     "target": 1012.75,
-    "stop_loss": 746.66,
+    "stop_loss": 853.1,
     "status": "OPEN",
     "net_pnl": 0,
     "setup": "MACD Cross",
@@ -90,8 +180,8 @@
         }
       ]
     },
-    "current_price": 916.55,
-    "current_pnl": 571.05
+    "current_price": 945.6,
+    "current_pnl": 832.5
   },
   {
     "id": "VTL-2026-04-09",
@@ -146,8 +236,8 @@
         }
       ]
     },
-    "current_price": 549.0,
-    "current_pnl": -175.95
+    "current_price": 547.55,
+    "current_pnl": -200.6
   },
   {
     "id": "KARURVYSYA-2026-04-09",
@@ -178,8 +268,8 @@
         }
       ]
     },
-    "current_price": 281.35,
-    "current_pnl": -87.4
+    "current_price": 277.6,
+    "current_pnl": -173.65
   },
   {
     "id": "ASHOKLEY-2026-04-08",
@@ -270,8 +360,8 @@
         }
       ]
     },
-    "current_price": 176.02,
-    "current_pnl": 252.52
+    "current_price": 174.77,
+    "current_pnl": 178.77
   },
   {
     "id": "POLYCAB-2026-04-08",
@@ -280,7 +370,7 @@
     "entry": 7584.5,
     "qty": 1,
     "target": 8421.71,
-    "stop_loss": 7026.36,
+    "stop_loss": 7584.5,
     "status": "OPEN",
     "net_pnl": 0,
     "setup": "MACD Cross",
@@ -356,8 +446,8 @@
         }
       ]
     },
-    "current_price": 7864.5,
-    "current_pnl": 280.0
+    "current_price": 8199.0,
+    "current_pnl": 614.5
   },
   {
     "id": "INDUSINDBK-2026-04-08",
@@ -400,8 +490,8 @@
         }
       ]
     },
-    "current_price": 845.15,
-    "current_pnl": 99.4
+    "current_price": 845.05,
+    "current_pnl": 98.0
   },
   {
     "id": "HEROMOTOCO-2026-04-08",
@@ -510,8 +600,8 @@
         }
       ]
     },
-    "current_price": 5184.5,
-    "current_pnl": -286.0
+    "current_price": 5238.0,
+    "current_pnl": -179.0
   },
   {
     "id": "BAJAJ-AUTO-2026-04-07",
@@ -820,8 +910,8 @@
         }
       ]
     },
-    "current_price": 930.55,
-    "current_pnl": 368.4
+    "current_price": 935.35,
+    "current_pnl": 426.0
   },
   {
     "id": "FORCEMOT-2026-04-06",
@@ -900,7 +990,7 @@
         }
       ]
     },
-    "current_price": 22192.0,
+    "current_price": 22432.0,
     "current_pnl": 0.0
   },
   {
@@ -911,8 +1001,8 @@
     "qty": 52,
     "target": 223.33,
     "stop_loss": 194.67,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "WIN",
+    "net_pnl": 1488.83,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 60.0,
@@ -950,8 +1040,10 @@
         }
       ]
     },
-    "current_price": 218.24,
-    "current_pnl": 1225.64
+    "current_price": 225.0,
+    "current_pnl": 1577.16,
+    "exit_price": 223.33,
+    "exit_date": "2026-04-17"
   },
   {
     "id": "NYKAA-2026-04-03",
@@ -1012,8 +1104,8 @@
         }
       ]
     },
-    "current_price": 263.05,
-    "current_pnl": 1007.13
+    "current_price": 268.0,
+    "current_pnl": 1299.18
   },
   {
     "id": "ADANIENSOL-2026-04-02",
@@ -1090,8 +1182,8 @@
         }
       ]
     },
-    "current_price": 435.15,
-    "current_pnl": 774.0
+    "current_price": 435.6,
+    "current_pnl": 784.8
   },
   {
     "id": "GLENMARK-2026-04-02",
@@ -1164,8 +1256,8 @@
         }
       ]
     },
-    "current_price": 2247.4,
-    "current_pnl": 942.0
+    "current_price": 2265.8,
+    "current_pnl": 1034.0
   },
   {
     "id": "IPCALAB-2026-04-02",
@@ -1202,8 +1294,8 @@
         }
       ]
     },
-    "current_price": 1474.7,
-    "current_pnl": 18.9
+    "current_price": 1466.3,
+    "current_pnl": -39.9
   },
   {
     "id": "SONACOMS-2026-04-02",
@@ -1292,8 +1384,8 @@
         }
       ]
     },
-    "current_price": 961.25,
-    "current_pnl": 117.0
+    "current_price": 981.25,
+    "current_pnl": 357.0
   },
   {
     "id": "SUNPHARMA-2026-04-01",
@@ -1492,8 +1584,8 @@
         }
       ]
     },
-    "current_price": 493.75,
-    "current_pnl": 797.5
+    "current_price": 496.1,
+    "current_pnl": 849.2
   },
   {
     "id": "CRAFTSMAN-2026-03-30",
@@ -1530,8 +1622,8 @@
         }
       ]
     },
-    "current_price": 7463.5,
-    "current_pnl": 500.0
+    "current_price": 7605.0,
+    "current_pnl": 641.5
   },
   {
     "id": "BEL-2026-03-27",
@@ -1580,8 +1672,8 @@
         }
       ]
     },
-    "current_price": 454.0,
-    "current_pnl": 1142.4
+    "current_price": 461.45,
+    "current_pnl": 1351.0
   },
   {
     "id": "GMDCLTD-2026-03-20",
@@ -1876,8 +1968,8 @@
         }
       ]
     },
-    "current_price": 991.0,
-    "current_pnl": -289.4
+    "current_price": 1009.95,
+    "current_pnl": -213.6
   },
   {
     "id": "MCX-2026-03-17",
@@ -2026,8 +2118,8 @@
         }
       ]
     },
-    "current_price": 7270.0,
-    "current_pnl": -10.5
+    "current_price": 7231.0,
+    "current_pnl": -49.5
   },
   {
     "id": "NLCINDIA-2026-03-13",
@@ -2088,8 +2180,8 @@
         }
       ]
     },
-    "current_price": 303.3,
-    "current_pnl": 1215.2
+    "current_price": 304.0,
+    "current_pnl": 1236.9
   },
   {
     "id": "GESHIP-2026-03-12",
@@ -3867,8 +3959,8 @@
     "qty": 13,
     "target": 978.26,
     "stop_loss": 866.2,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "WIN",
+    "net_pnl": 1455.32,
     "setup": "BB Reversal",
     "deep_dive": {
       "wr": 83.3,
@@ -3912,8 +4004,10 @@
         }
       ]
     },
-    "current_price": 967.7,
-    "current_pnl": 1319.5
+    "current_price": 996.0,
+    "current_pnl": 1687.4,
+    "exit_price": 978.26,
+    "exit_date": "2026-04-17"
   },
   {
     "id": "JSWSTEEL-2026-03-05",
@@ -4078,8 +4172,8 @@
         }
       ]
     },
-    "current_price": 462.85,
-    "current_pnl": -752.5
+    "current_price": 462.9,
+    "current_pnl": -751.25
   },
   {
     "id": "3MINDIA-2026-02-27",
@@ -6860,8 +6954,8 @@
         }
       ]
     },
-    "current_price": 647.25,
-    "current_pnl": 2263.8
+    "current_price": 656.3,
+    "current_pnl": 2562.45
   },
   {
     "id": "M&M-2026-02-05",
