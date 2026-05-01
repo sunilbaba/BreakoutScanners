@@ -31,7 +31,6 @@ Aegis Vopak Terminals Ltd.,Oil Gas & Consumable Fuels,AEGISVOPAK,EQ,INE0INX01018
 Afcons Infrastructure Ltd.,Construction,AFCONS,EQ,INE101I01011
 Affle 3i Ltd.,Information Technology,AFFLE,EQ,INE00WC01027
 Ajanta Pharmaceuticals Ltd.,Healthcare,AJANTPHARM,EQ,INE031B01049
-Akzo Nobel India Ltd.,Consumer Durables,AKZOINDIA,EQ,INE133A01011
 Alkem Laboratories Ltd.,Healthcare,ALKEM,EQ,INE540L01014
 Allied Blenders and Distillers Ltd.,Fast Moving Consumer Goods,ABDL,EQ,INE552Z01027
 Amara Raja Energy & Mobility Ltd.,Automobile and Auto Components,ARE&M,EQ,INE885A01032
@@ -148,6 +147,10 @@ Divi's Laboratories Ltd.,Healthcare,DIVISLAB,EQ,INE361B01024
 Dixon Technologies (India) Ltd.,Consumer Durables,DIXON,EQ,INE935N01020
 Dr. Lal Path Labs Ltd.,Healthcare,LALPATHLAB,EQ,INE600L01024
 Dr. Reddy's Laboratories Ltd.,Healthcare,DRREDDY,EQ,INE089A01031
+Dummy Vedanta Ltd. 1,Metals & Mining,DUMMYVEDL1,EQ,DU1205A01025
+Dummy Vedanta Ltd. 2,Power,DUMMYVEDL2,EQ,DU2205A01025
+Dummy Vedanta Ltd. 3,Oil Gas & Consumable Fuels,DUMMYVEDL3,EQ,DU3205A01025
+Dummy Vedanta Ltd. 4,Metals & Mining,DUMMYVEDL4,EQ,DU4205A01025
 E.I.D. Parry (India) Ltd.,Fast Moving Consumer Goods,EIDPARRY,EQ,INE126A01031
 EIH Ltd.,Consumer Services,EIHOTEL,EQ,INE230A01023
 Eicher Motors Ltd.,Automobile and Auto Components,EICHERMOT,EQ,INE066A01021
@@ -261,6 +264,7 @@ JBM Auto Ltd.,Automobile and Auto Components,JBMA,EQ,INE927D01051
 JK Tyre & Industries Ltd.,Automobile and Auto Components,JKTYRE,EQ,INE573A01042
 JM Financial Ltd.,Financial Services,JMFINANCIL,EQ,INE780C01023
 JSW Cement Ltd.,Construction Materials,JSWCEMENT,EQ,INE718I01012
+JSW Dulux Ltd.,Consumer Durables,JSWDULUX,EQ,INE133A01011
 JSW Energy Ltd.,Power,JSWENERGY,EQ,INE121E01018
 JSW Infrastructure Ltd.,Services,JSWINFRA,EQ,INE880J01026
 JSW Steel Ltd.,Metals & Mining,JSWSTEEL,EQ,INE019A01038
@@ -294,7 +298,7 @@ L&T Technology Services Ltd.,Information Technology,LTTS,EQ,INE010V01017
 LG Electronics India Ltd.,Consumer Durables,LGEINDIA,EQ,INE324D01010
 LIC Housing Finance Ltd.,Financial Services,LICHSGFIN,EQ,INE115A01026
 LT Foods Ltd.,Fast Moving Consumer Goods,LTFOODS,EQ,INE818H01020
-LTIMindtree Ltd.,Information Technology,LTM,EQ,INE214T01019
+LTM Ltd.,Information Technology,LTM,EQ,INE214T01019
 Larsen & Toubro Ltd.,Construction,LT,EQ,INE018A01030
 Latent View Analytics Ltd.,Information Technology,LATENTVIEW,EQ,INE0I7C01011
 Laurus Labs Ltd.,Healthcare,LAURUSLABS,EQ,INE947Q01028
