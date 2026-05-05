@@ -1,11 +1,11 @@
 {
-  "updated": "2026-05-04",
+  "updated": "2026-05-05",
   "parameters": {
     "strategy_type": "MACD_CROSS",
     "trend_filter": "SMA200",
-    "adx_min": 25,
+    "adx_min": 20,
     "sl_mult": 3.0,
     "tgt_mult": 4.5,
-    "name": "Child-6929"
+    "name": "Child-8368"
   }
 }
