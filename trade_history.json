@@ -1,5 +1,53 @@
 [
   {
+    "id": "ULTRACEMCO-2026-05-06",
+    "date": "2026-05-06",
+    "symbol": "ULTRACEMCO",
+    "entry": 12093.0,
+    "qty": 1,
+    "target": 13289.68,
+    "stop_loss": 11295.21,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 60.0,
+      "trades": 5,
+      "log": [
+        {
+          "date": "2025-06-11",
+          "exit": "2025-07-02",
+          "result": "WIN",
+          "pnl": 8.3
+        },
+        {
+          "date": "2024-08-01",
+          "exit": "2024-08-14",
+          "result": "LOSS",
+          "pnl": -6.7
+        },
+        {
+          "date": "2024-03-01",
+          "exit": "2024-03-06",
+          "result": "LOSS",
+          "pnl": -5.3
+        },
+        {
+          "date": "2023-11-30",
+          "exit": "2023-12-11",
+          "result": "WIN",
+          "pnl": 6.8
+        },
+        {
+          "date": "2023-05-29",
+          "exit": "2023-06-14",
+          "result": "WIN",
+          "pnl": 6.7
+        }
+      ]
+    }
+  },
+  {
     "id": "CGCL-2026-05-04",
     "date": "2026-05-04",
     "symbol": "CGCL",
@@ -34,8 +82,8 @@
         }
       ]
     },
-    "current_price": 201.8,
-    "current_pnl": 483.6
+    "current_price": 200.52,
+    "current_pnl": 417.04
   },
   {
     "id": "NEULANDLAB-2026-05-04",
@@ -114,7 +162,7 @@
         }
       ]
     },
-    "current_price": 16786.0,
+    "current_price": 17032.0,
     "current_pnl": 0.0
   },
   {
@@ -158,8 +206,8 @@
         }
       ]
     },
-    "current_price": 302.75,
-    "current_pnl": -144.0
+    "current_price": 304.6,
+    "current_pnl": -84.8
   },
   {
     "id": "COALINDIA-2026-04-24",
@@ -208,8 +256,8 @@
         }
       ]
     },
-    "current_price": 473.5,
-    "current_pnl": 525.0
+    "current_price": 470.2,
+    "current_pnl": 426.0
   },
   {
     "id": "CCL-2026-04-22",
@@ -264,8 +312,8 @@
         }
       ]
     },
-    "current_price": 1173.8,
-    "current_pnl": 232.2
+    "current_price": 1178.3,
+    "current_pnl": 259.2
   },
   {
     "id": "GESHIP-2026-04-22",
@@ -332,8 +380,8 @@
         }
       ]
     },
-    "current_price": 1522.9,
-    "current_pnl": 303.0
+    "current_price": 1575.1,
+    "current_pnl": 564.0
   },
   {
     "id": "TORNTPHARM-2026-04-17",
@@ -424,8 +472,8 @@
         }
       ]
     },
-    "current_price": 4341.0,
-    "current_pnl": 702.8
+    "current_price": 4358.3,
+    "current_pnl": 772.0
   },
   {
     "id": "ASTRAL-2026-04-15",
@@ -474,8 +522,8 @@
         }
       ]
     },
-    "current_price": 1563.0,
-    "current_pnl": -273.2
+    "current_price": 1576.1,
+    "current_pnl": -220.8
   },
   {
     "id": "FINCABLES-2026-04-10",
@@ -610,8 +658,8 @@
         }
       ]
     },
-    "current_price": 301.0,
-    "current_pnl": 364.55
+    "current_price": 305.2,
+    "current_pnl": 461.15
   },
   {
     "id": "ASHOKLEY-2026-04-08",
@@ -702,8 +750,8 @@
         }
       ]
     },
-    "current_price": 161.37,
-    "current_pnl": -611.83
+    "current_price": 167.8,
+    "current_pnl": -232.46
   },
   {
     "id": "POLYCAB-2026-04-08",
@@ -1652,8 +1700,8 @@
         }
       ]
     },
-    "current_price": 1568.0,
-    "current_pnl": 672.0
+    "current_price": 1564.4,
+    "current_pnl": 646.8
   },
   {
     "id": "SONACOMS-2026-04-02",
@@ -1984,8 +2032,8 @@
         }
       ]
     },
-    "current_price": 7745.5,
-    "current_pnl": 782.0
+    "current_price": 7774.5,
+    "current_pnl": 811.0
   },
   {
     "id": "BEL-2026-03-27",
@@ -2034,8 +2082,8 @@
         }
       ]
     },
-    "current_price": 437.1,
-    "current_pnl": 669.2
+    "current_price": 438.2,
+    "current_pnl": 700.0
   },
   {
     "id": "GMDCLTD-2026-03-20",
@@ -2330,8 +2378,8 @@
         }
       ]
     },
-    "current_price": 1070.0,
-    "current_pnl": 26.6
+    "current_price": 1072.5,
+    "current_pnl": 36.6
   },
   {
     "id": "MCX-2026-03-17",
@@ -2480,8 +2528,8 @@
         }
       ]
     },
-    "current_price": 7597.0,
-    "current_pnl": 316.5
+    "current_price": 7574.5,
+    "current_pnl": 294.0
   },
   {
     "id": "NLCINDIA-2026-03-13",
@@ -4473,8 +4521,8 @@
     "qty": 25,
     "target": 551.82,
     "stop_loss": 453.7,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -980.27,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 66.7,
@@ -4536,8 +4584,10 @@
         }
       ]
     },
-    "current_price": 470.8,
-    "current_pnl": -553.75
+    "current_price": 450.25,
+    "current_pnl": -1067.5,
+    "exit_price": 453.7,
+    "exit_date": "2026-05-06"
   },
   {
     "id": "3MINDIA-2026-02-27",
