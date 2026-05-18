@@ -1,5 +1,263 @@
 [
   {
+    "id": "GESHIP-2026-05-18",
+    "date": "2026-05-18",
+    "symbol": "GESHIP",
+    "entry": 1699.0,
+    "qty": 6,
+    "target": 1928.11,
+    "stop_loss": 1546.26,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 61.5,
+      "trades": 13,
+      "log": [
+        {
+          "date": "2026-01-15",
+          "exit": "2026-01-30",
+          "result": "WIN",
+          "pnl": 7.2
+        },
+        {
+          "date": "2024-10-04",
+          "exit": "2024-10-16",
+          "result": "WIN",
+          "pnl": 8.3
+        },
+        {
+          "date": "2024-08-19",
+          "exit": "2024-08-26",
+          "result": "LOSS",
+          "pnl": -7.7
+        },
+        {
+          "date": "2024-06-28",
+          "exit": "2024-07-08",
+          "result": "WIN",
+          "pnl": 10.7
+        },
+        {
+          "date": "2024-03-18",
+          "exit": "2024-04-15",
+          "result": "LOSS",
+          "pnl": -8.9
+        },
+        {
+          "date": "2023-11-17",
+          "exit": "2023-11-30",
+          "result": "WIN",
+          "pnl": 7.9
+        },
+        {
+          "date": "2023-10-12",
+          "exit": "2023-10-25",
+          "result": "LOSS",
+          "pnl": -6.8
+        },
+        {
+          "date": "2023-09-07",
+          "exit": "2023-09-27",
+          "result": "WIN",
+          "pnl": 7.8
+        },
+        {
+          "date": "2023-02-02",
+          "exit": "2023-02-13",
+          "result": "LOSS",
+          "pnl": -7.6
+        },
+        {
+          "date": "2022-10-27",
+          "exit": "2022-11-07",
+          "result": "WIN",
+          "pnl": 11.2
+        },
+        {
+          "date": "2022-06-30",
+          "exit": "2022-07-19",
+          "result": "WIN",
+          "pnl": 14.7
+        },
+        {
+          "date": "2022-05-18",
+          "exit": "2022-05-25",
+          "result": "LOSS",
+          "pnl": -8.1
+        },
+        {
+          "date": "2022-04-05",
+          "exit": "2022-04-21",
+          "result": "WIN",
+          "pnl": 10.4
+        }
+      ]
+    }
+  },
+  {
+    "id": "SCI-2026-05-18",
+    "date": "2026-05-18",
+    "symbol": "SCI",
+    "entry": 344.1,
+    "qty": 26,
+    "target": 400.31,
+    "stop_loss": 306.62,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 70.0,
+      "trades": 10,
+      "log": [
+        {
+          "date": "2026-04-08",
+          "exit": "2026-04-16",
+          "result": "WIN",
+          "pnl": 13.9
+        },
+        {
+          "date": "2025-10-23",
+          "exit": "2025-10-24",
+          "result": "WIN",
+          "pnl": 9.8
+        },
+        {
+          "date": "2025-10-14",
+          "exit": "2025-10-23",
+          "result": "WIN",
+          "pnl": 9.5
+        },
+        {
+          "date": "2024-07-10",
+          "exit": "2024-07-11",
+          "result": "WIN",
+          "pnl": 12.5
+        },
+        {
+          "date": "2024-05-16",
+          "exit": "2024-05-23",
+          "result": "WIN",
+          "pnl": 12.1
+        },
+        {
+          "date": "2024-01-02",
+          "exit": "2024-01-23",
+          "result": "WIN",
+          "pnl": 13.8
+        },
+        {
+          "date": "2023-10-17",
+          "exit": "2023-10-23",
+          "result": "LOSS",
+          "pnl": -8.7
+        },
+        {
+          "date": "2022-12-20",
+          "exit": "2022-12-23",
+          "result": "LOSS",
+          "pnl": -7.4
+        },
+        {
+          "date": "2022-11-25",
+          "exit": "2022-12-16",
+          "result": "LOSS",
+          "pnl": -5.9
+        },
+        {
+          "date": "2022-10-12",
+          "exit": "2022-10-31",
+          "result": "WIN",
+          "pnl": 8.7
+        }
+      ]
+    }
+  },
+  {
+    "id": "NAM-INDIA-2026-05-18",
+    "date": "2026-05-18",
+    "symbol": "NAM-INDIA",
+    "entry": 1108.3,
+    "qty": 14,
+    "target": 1213.26,
+    "stop_loss": 1038.33,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 72.7,
+      "trades": 11,
+      "log": [
+        {
+          "date": "2026-04-01",
+          "exit": "2026-04-15",
+          "result": "WIN",
+          "pnl": 12.5
+        },
+        {
+          "date": "2026-02-02",
+          "exit": "2026-02-03",
+          "result": "WIN",
+          "pnl": 11.1
+        },
+        {
+          "date": "2025-10-13",
+          "exit": "2025-10-20",
+          "result": "WIN",
+          "pnl": 7.7
+        },
+        {
+          "date": "2025-09-12",
+          "exit": "2025-10-06",
+          "result": "WIN",
+          "pnl": 8.7
+        },
+        {
+          "date": "2025-08-19",
+          "exit": "2025-08-26",
+          "result": "LOSS",
+          "pnl": -5.2
+        },
+        {
+          "date": "2025-06-26",
+          "exit": "2025-07-16",
+          "result": "WIN",
+          "pnl": 10.3
+        },
+        {
+          "date": "2025-05-13",
+          "exit": "2025-06-09",
+          "result": "WIN",
+          "pnl": 13.9
+        },
+        {
+          "date": "2024-12-05",
+          "exit": "2024-12-10",
+          "result": "WIN",
+          "pnl": 8.9
+        },
+        {
+          "date": "2024-04-01",
+          "exit": "2024-04-19",
+          "result": "WIN",
+          "pnl": 16.5
+        },
+        {
+          "date": "2024-02-26",
+          "exit": "2024-03-12",
+          "result": "LOSS",
+          "pnl": -6.7
+        },
+        {
+          "date": "2024-01-29",
+          "exit": "2024-02-09",
+          "result": "LOSS",
+          "pnl": -8.1
+        }
+      ]
+    }
+  },
+  {
     "id": "TATASTEEL-2026-05-14",
     "date": "2026-05-14",
     "symbol": "TATASTEEL",
@@ -7,8 +265,8 @@
     "qty": 113,
     "target": 234.97,
     "stop_loss": 212.86,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -1207.89,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 54.5,
@@ -82,8 +340,10 @@
         }
       ]
     },
-    "current_price": 219.62,
-    "current_pnl": -235.04
+    "current_price": 209.31,
+    "current_pnl": -1400.07,
+    "exit_price": 211.0,
+    "exit_date": "2026-05-18"
   },
   {
     "id": "NLCINDIA-2026-05-14",
@@ -250,8 +510,8 @@
         }
       ]
     },
-    "current_price": 301.15,
-    "current_pnl": 40.95
+    "current_price": 297.5,
+    "current_pnl": -189.0
   },
   {
     "id": "OIL-2026-05-13",
@@ -342,8 +602,8 @@
         }
       ]
     },
-    "current_price": 518.2,
-    "current_pnl": 399.9
+    "current_price": 507.65,
+    "current_pnl": 72.85
   },
   {
     "id": "BANKINDIA-2026-05-11",
@@ -422,8 +682,8 @@
         }
       ]
     },
-    "current_price": 143.25,
-    "current_pnl": -178.12
+    "current_price": 138.12,
+    "current_pnl": -803.98
   },
   {
     "id": "TRITURBINE-2026-05-08",
@@ -484,8 +744,8 @@
         }
       ]
     },
-    "current_price": 599.05,
-    "current_pnl": -19.95
+    "current_price": 602.8,
+    "current_pnl": 51.3
   },
   {
     "id": "MUTHOOTFIN-2026-05-08",
@@ -662,8 +922,8 @@
         }
       ]
     },
-    "current_price": 792.0,
-    "current_pnl": 642.4
+    "current_price": 763.0,
+    "current_pnl": 178.4
   },
   {
     "id": "MMTC-2026-05-08",
@@ -673,8 +933,8 @@
     "qty": 189,
     "target": 75.42,
     "stop_loss": 62.24,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -995.03,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 100.0,
@@ -718,8 +978,10 @@
         }
       ]
     },
-    "current_price": 63.63,
-    "current_pnl": -733.32
+    "current_price": 61.34,
+    "current_pnl": -1166.13,
+    "exit_price": 62.24,
+    "exit_date": "2026-05-18"
   },
   {
     "id": "JSWSTEEL-2026-05-07",
@@ -792,8 +1054,8 @@
         }
       ]
     },
-    "current_price": 1293.1,
-    "current_pnl": 51.0
+    "current_price": 1294.3,
+    "current_pnl": 69.0
   },
   {
     "id": "SHRIRAMFIN-2026-05-07",
@@ -879,8 +1141,8 @@
     "qty": 1,
     "target": 13289.68,
     "stop_loss": 11295.21,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -796.99,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 60.0,
@@ -918,8 +1180,10 @@
         }
       ]
     },
-    "current_price": 11578.0,
-    "current_pnl": -515.0
+    "current_price": 11543.0,
+    "current_pnl": -550.0,
+    "exit_price": 11295.21,
+    "exit_date": "2026-05-18"
   },
   {
     "id": "CGCL-2026-05-04",
@@ -956,8 +1220,8 @@
         }
       ]
     },
-    "current_price": 186.32,
-    "current_pnl": -321.36
+    "current_price": 184.5,
+    "current_pnl": -416.0
   },
   {
     "id": "NEULANDLAB-2026-05-04",
@@ -1049,8 +1313,8 @@
     "qty": 32,
     "target": 353.97,
     "stop_loss": 276.1,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -995.8,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 50.0,
@@ -1082,8 +1346,10 @@
         }
       ]
     },
-    "current_price": 286.7,
-    "current_pnl": -657.6
+    "current_price": 278.6,
+    "current_pnl": -916.8,
+    "exit_price": 276.1,
+    "exit_date": "2026-05-18"
   },
   {
     "id": "COALINDIA-2026-04-24",
@@ -1190,8 +1456,8 @@
         }
       ]
     },
-    "current_price": 1120.4,
-    "current_pnl": -88.2
+    "current_price": 1091.4,
+    "current_pnl": -262.2
   },
   {
     "id": "GESHIP-2026-04-22",
@@ -1404,8 +1670,8 @@
         }
       ]
     },
-    "current_price": 1565.0,
-    "current_pnl": -265.2
+    "current_price": 1558.8,
+    "current_pnl": -290.0
   },
   {
     "id": "FINCABLES-2026-04-10",
@@ -1540,8 +1806,8 @@
         }
       ]
     },
-    "current_price": 297.1,
-    "current_pnl": 274.85
+    "current_price": 295.75,
+    "current_pnl": 243.8
   },
   {
     "id": "ASHOKLEY-2026-04-08",
@@ -2584,8 +2850,8 @@
         }
       ]
     },
-    "current_price": 1618.7,
-    "current_pnl": 1026.9
+    "current_price": 1652.1,
+    "current_pnl": 1260.7
   },
   {
     "id": "SONACOMS-2026-04-02",
@@ -2968,8 +3234,8 @@
         }
       ]
     },
-    "current_price": 425.55,
-    "current_pnl": 345.8
+    "current_price": 425.6,
+    "current_pnl": 347.2
   },
   {
     "id": "GMDCLTD-2026-03-20",
@@ -3264,8 +3530,8 @@
         }
       ]
     },
-    "current_price": 1012.0,
-    "current_pnl": -205.4
+    "current_price": 987.8,
+    "current_pnl": -302.2
   },
   {
     "id": "MCX-2026-03-17",
@@ -3414,8 +3680,8 @@
         }
       ]
     },
-    "current_price": 7394.0,
-    "current_pnl": 113.5
+    "current_price": 7208.0,
+    "current_pnl": -72.5
   },
   {
     "id": "NLCINDIA-2026-03-13",
