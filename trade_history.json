@@ -1,5 +1,77 @@
 [
   {
+    "id": "3MINDIA-2026-05-22",
+    "date": "2026-05-22",
+    "symbol": "3MINDIA",
+    "entry": 33315.0,
+    "qty": 0,
+    "target": 36252.86,
+    "stop_loss": 31356.43,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "MACD Cross",
+    "deep_dive": {
+      "wr": 44.4,
+      "trades": 9,
+      "log": [
+        {
+          "date": "2026-02-27",
+          "exit": "2026-03-04",
+          "result": "LOSS",
+          "pnl": -7.0
+        },
+        {
+          "date": "2026-01-02",
+          "exit": "2026-01-07",
+          "result": "LOSS",
+          "pnl": -4.9
+        },
+        {
+          "date": "2025-10-10",
+          "exit": "2025-11-03",
+          "result": "WIN",
+          "pnl": 5.0
+        },
+        {
+          "date": "2025-08-07",
+          "exit": "2025-09-05",
+          "result": "LOSS",
+          "pnl": -6.0
+        },
+        {
+          "date": "2024-10-16",
+          "exit": "2024-11-05",
+          "result": "WIN",
+          "pnl": 7.7
+        },
+        {
+          "date": "2024-09-03",
+          "exit": "2024-09-30",
+          "result": "LOSS",
+          "pnl": -5.2
+        },
+        {
+          "date": "2024-02-29",
+          "exit": "2024-03-05",
+          "result": "LOSS",
+          "pnl": -5.3
+        },
+        {
+          "date": "2023-12-27",
+          "exit": "2023-12-29",
+          "result": "WIN",
+          "pnl": 8.5
+        },
+        {
+          "date": "2023-12-04",
+          "exit": "2023-12-27",
+          "result": "WIN",
+          "pnl": 6.6
+        }
+      ]
+    }
+  },
+  {
     "id": "KEI-2026-05-22",
     "date": "2026-05-22",
     "symbol": "KEI",
@@ -63,7 +135,9 @@
           "pnl": 8.5
         }
       ]
-    }
+    },
+    "current_price": 5260.5,
+    "current_pnl": -31.2
   },
   {
     "id": "ANGELONE-2026-05-22",
@@ -141,7 +215,9 @@
           "pnl": 14.6
         }
       ]
-    }
+    },
+    "current_price": 339.35,
+    "current_pnl": -81.9
   },
   {
     "id": "AIAENG-2026-05-21",
@@ -274,8 +350,8 @@
         }
       ]
     },
-    "current_price": 3992.8,
-    "current_pnl": -10.4
+    "current_price": 3994.0,
+    "current_pnl": -5.6
   },
   {
     "id": "ELGIEQUIP-2026-05-21",
@@ -378,8 +454,8 @@
         }
       ]
     },
-    "current_price": 563.2,
-    "current_pnl": -137.7
+    "current_price": 560.15,
+    "current_pnl": -220.05
   },
   {
     "id": "BAJAJ-AUTO-2026-05-21",
@@ -488,8 +564,8 @@
         }
       ]
     },
-    "current_price": 10618.5,
-    "current_pnl": -89.5
+    "current_price": 10549.5,
+    "current_pnl": -158.5
   },
   {
     "id": "GVT&D-2026-05-21",
@@ -568,8 +644,8 @@
         }
       ]
     },
-    "current_price": 4875.0,
-    "current_pnl": 32.0
+    "current_price": 4849.5,
+    "current_pnl": -19.0
   },
   {
     "id": "TRITURBINE-2026-05-19",
@@ -736,8 +812,8 @@
         }
       ]
     },
-    "current_price": 1773.8,
-    "current_pnl": -420.8
+    "current_price": 1792.4,
+    "current_pnl": -272.0
   },
   {
     "id": "GESHIP-2026-05-18",
@@ -916,8 +992,8 @@
         }
       ]
     },
-    "current_price": 321.4,
-    "current_pnl": -590.2
+    "current_price": 316.3,
+    "current_pnl": -722.8
   },
   {
     "id": "NAM-INDIA-2026-05-18",
@@ -1002,8 +1078,8 @@
         }
       ]
     },
-    "current_price": 1077.9,
-    "current_pnl": -425.6
+    "current_price": 1080.4,
+    "current_pnl": -390.6
   },
   {
     "id": "TATASTEEL-2026-05-14",
@@ -1258,8 +1334,8 @@
         }
       ]
     },
-    "current_price": 291.8,
-    "current_pnl": -548.1
+    "current_price": 290.0,
+    "current_pnl": -661.5
   },
   {
     "id": "OIL-2026-05-13",
@@ -1350,8 +1426,8 @@
         }
       ]
     },
-    "current_price": 501.6,
-    "current_pnl": -114.7
+    "current_price": 499.75,
+    "current_pnl": -172.05
   },
   {
     "id": "BANKINDIA-2026-05-11",
@@ -1674,8 +1750,8 @@
         }
       ]
     },
-    "current_price": 744.5,
-    "current_pnl": -117.6
+    "current_price": 740.6,
+    "current_pnl": -180.0
   },
   {
     "id": "MMTC-2026-05-08",
@@ -1806,8 +1882,8 @@
         }
       ]
     },
-    "current_price": 1281.9,
-    "current_pnl": -117.0
+    "current_price": 1285.5,
+    "current_pnl": -63.0
   },
   {
     "id": "SHRIRAMFIN-2026-05-07",
@@ -1972,8 +2048,8 @@
         }
       ]
     },
-    "current_price": 191.4,
-    "current_pnl": -57.2
+    "current_price": 190.65,
+    "current_pnl": -96.2
   },
   {
     "id": "NEULANDLAB-2026-05-04",
@@ -2208,8 +2284,8 @@
         }
       ]
     },
-    "current_price": 1069.7,
-    "current_pnl": -392.4
+    "current_price": 1064.9,
+    "current_pnl": -421.2
   },
   {
     "id": "GESHIP-2026-04-22",
@@ -2422,8 +2498,8 @@
         }
       ]
     },
-    "current_price": 1547.0,
-    "current_pnl": -337.2
+    "current_price": 1541.7,
+    "current_pnl": -358.4
   },
   {
     "id": "FINCABLES-2026-04-10",
@@ -2558,8 +2634,8 @@
         }
       ]
     },
-    "current_price": 288.5,
-    "current_pnl": 77.05
+    "current_price": 288.05,
+    "current_pnl": 66.7
   },
   {
     "id": "ASHOKLEY-2026-04-08",
@@ -4286,8 +4362,8 @@
         }
       ]
     },
-    "current_price": 1018.6,
-    "current_pnl": -179.0
+    "current_price": 1016.6,
+    "current_pnl": -187.0
   },
   {
     "id": "MCX-2026-03-17",
@@ -4436,8 +4512,8 @@
         }
       ]
     },
-    "current_price": 7285.0,
-    "current_pnl": 4.5
+    "current_price": 7222.0,
+    "current_pnl": -58.5
   },
   {
     "id": "NLCINDIA-2026-03-13",
