@@ -1,5 +1,299 @@
 [
   {
+    "id": "ATGL-2026-05-28",
+    "date": "2026-05-28",
+    "symbol": "ATGL",
+    "entry": 808.55,
+    "qty": 18,
+    "target": 890.68,
+    "stop_loss": 753.79,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 41.2,
+      "trades": 17,
+      "log": [
+        {
+          "date": "2026-03-12",
+          "exit": "2026-03-13",
+          "result": "LOSS",
+          "pnl": -5.8
+        },
+        {
+          "date": "2025-09-22",
+          "exit": "2025-09-23",
+          "result": "LOSS",
+          "pnl": -4.5
+        },
+        {
+          "date": "2025-09-19",
+          "exit": "2025-09-22",
+          "result": "WIN",
+          "pnl": 5.1
+        },
+        {
+          "date": "2025-06-10",
+          "exit": "2025-06-12",
+          "result": "LOSS",
+          "pnl": -3.6
+        },
+        {
+          "date": "2024-06-03",
+          "exit": "2024-06-04",
+          "result": "LOSS",
+          "pnl": -6.5
+        },
+        {
+          "date": "2024-05-31",
+          "exit": "2024-06-03",
+          "result": "WIN",
+          "pnl": 8.8
+        },
+        {
+          "date": "2024-05-24",
+          "exit": "2024-05-31",
+          "result": "WIN",
+          "pnl": 7.8
+        },
+        {
+          "date": "2024-02-26",
+          "exit": "2024-02-28",
+          "result": "LOSS",
+          "pnl": -5.3
+        },
+        {
+          "date": "2023-12-05",
+          "exit": "2023-12-06",
+          "result": "WIN",
+          "pnl": 12.2
+        },
+        {
+          "date": "2023-11-29",
+          "exit": "2023-11-30",
+          "result": "LOSS",
+          "pnl": -5.1
+        },
+        {
+          "date": "2022-12-29",
+          "exit": "2023-01-03",
+          "result": "LOSS",
+          "pnl": -7.4
+        },
+        {
+          "date": "2022-08-03",
+          "exit": "2022-08-30",
+          "result": "WIN",
+          "pnl": 9.1
+        },
+        {
+          "date": "2022-08-02",
+          "exit": "2022-08-03",
+          "result": "LOSS",
+          "pnl": -5.2
+        },
+        {
+          "date": "2022-07-21",
+          "exit": "2022-08-01",
+          "result": "WIN",
+          "pnl": 10.3
+        },
+        {
+          "date": "2022-07-12",
+          "exit": "2022-07-14",
+          "result": "LOSS",
+          "pnl": -5.9
+        },
+        {
+          "date": "2022-04-11",
+          "exit": "2022-04-18",
+          "result": "LOSS",
+          "pnl": -8.1
+        },
+        {
+          "date": "2022-04-04",
+          "exit": "2022-04-11",
+          "result": "WIN",
+          "pnl": 10.2
+        }
+      ]
+    }
+  },
+  {
+    "id": "SAMMAANCAP-2026-05-28",
+    "date": "2026-05-28",
+    "symbol": "SAMMAANCAP",
+    "entry": 173.32,
+    "qty": 94,
+    "target": 189.13,
+    "stop_loss": 162.78,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 41.7,
+      "trades": 12,
+      "log": [
+        {
+          "date": "2026-02-20",
+          "exit": "2026-03-02",
+          "result": "LOSS",
+          "pnl": -3.6
+        },
+        {
+          "date": "2025-10-01",
+          "exit": "2025-10-03",
+          "result": "LOSS",
+          "pnl": -5.6
+        },
+        {
+          "date": "2025-09-29",
+          "exit": "2025-10-01",
+          "result": "WIN",
+          "pnl": 7.6
+        },
+        {
+          "date": "2025-09-02",
+          "exit": "2025-09-29",
+          "result": "WIN",
+          "pnl": 9.0
+        },
+        {
+          "date": "2025-06-25",
+          "exit": "2025-07-03",
+          "result": "LOSS",
+          "pnl": -6.5
+        },
+        {
+          "date": "2024-02-23",
+          "exit": "2024-02-28",
+          "result": "LOSS",
+          "pnl": -7.1
+        },
+        {
+          "date": "2023-12-15",
+          "exit": "2023-12-20",
+          "result": "LOSS",
+          "pnl": -6.3
+        },
+        {
+          "date": "2023-08-28",
+          "exit": "2023-09-12",
+          "result": "LOSS",
+          "pnl": -8.4
+        },
+        {
+          "date": "2023-08-03",
+          "exit": "2023-08-14",
+          "result": "LOSS",
+          "pnl": -5.5
+        },
+        {
+          "date": "2023-07-31",
+          "exit": "2023-08-03",
+          "result": "WIN",
+          "pnl": 6.7
+        },
+        {
+          "date": "2023-07-28",
+          "exit": "2023-07-31",
+          "result": "WIN",
+          "pnl": 6.5
+        },
+        {
+          "date": "2023-06-30",
+          "exit": "2023-07-06",
+          "result": "WIN",
+          "pnl": 6.7
+        }
+      ]
+    }
+  },
+  {
+    "id": "HFCL-2026-05-28",
+    "date": "2026-05-28",
+    "symbol": "HFCL",
+    "entry": 173.92,
+    "qty": 67,
+    "target": 196.05,
+    "stop_loss": 159.17,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 45.5,
+      "trades": 11,
+      "log": [
+        {
+          "date": "2026-04-17",
+          "exit": "2026-04-27",
+          "result": "WIN",
+          "pnl": 10.5
+        },
+        {
+          "date": "2026-04-13",
+          "exit": "2026-04-17",
+          "result": "WIN",
+          "pnl": 10.8
+        },
+        {
+          "date": "2026-04-09",
+          "exit": "2026-04-13",
+          "result": "WIN",
+          "pnl": 10.3
+        },
+        {
+          "date": "2024-01-24",
+          "exit": "2024-02-02",
+          "result": "LOSS",
+          "pnl": -8.0
+        },
+        {
+          "date": "2023-12-26",
+          "exit": "2024-01-23",
+          "result": "WIN",
+          "pnl": 11.6
+        },
+        {
+          "date": "2023-12-18",
+          "exit": "2023-12-21",
+          "result": "LOSS",
+          "pnl": -5.5
+        },
+        {
+          "date": "2023-12-15",
+          "exit": "2023-12-18",
+          "result": "WIN",
+          "pnl": 7.4
+        },
+        {
+          "date": "2023-08-31",
+          "exit": "2023-09-12",
+          "result": "LOSS",
+          "pnl": -4.7
+        },
+        {
+          "date": "2023-08-07",
+          "exit": "2023-08-08",
+          "result": "LOSS",
+          "pnl": -4.3
+        },
+        {
+          "date": "2022-08-08",
+          "exit": "2022-08-29",
+          "result": "LOSS",
+          "pnl": -7.0
+        },
+        {
+          "date": "2022-04-04",
+          "exit": "2022-04-19",
+          "result": "LOSS",
+          "pnl": -5.0
+        }
+      ]
+    }
+  },
+  {
     "id": "OFSS-2026-05-27",
     "date": "2026-05-27",
     "symbol": "OFSS",
@@ -57,7 +351,9 @@
           "pnl": 6.4
         }
       ]
-    }
+    },
+    "current_price": 10299.5,
+    "current_pnl": 0.0
   },
   {
     "id": "ABB-2026-05-27",
@@ -129,7 +425,9 @@
           "pnl": -7.6
         }
       ]
-    }
+    },
+    "current_price": 7219.0,
+    "current_pnl": 0.0
   },
   {
     "id": "FINCABLES-2026-05-27",
@@ -207,7 +505,9 @@
           "pnl": -5.8
         }
       ]
-    }
+    },
+    "current_price": 1177.25,
+    "current_pnl": 0.0
   },
   {
     "id": "ZENTEC-2026-05-27",
