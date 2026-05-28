@@ -1,5 +1,161 @@
 [
   {
+    "id": "MINDACORP-2026-05-28",
+    "date": "2026-05-28",
+    "symbol": "MINDACORP",
+    "entry": 623.85,
+    "qty": 26,
+    "target": 680.29,
+    "stop_loss": 586.22,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 40.0,
+      "trades": 10,
+      "log": [
+        {
+          "date": "2025-07-17",
+          "exit": "2025-07-22",
+          "result": "LOSS",
+          "pnl": -3.7
+        },
+        {
+          "date": "2025-01-15",
+          "exit": "2025-01-28",
+          "result": "LOSS",
+          "pnl": -5.9
+        },
+        {
+          "date": "2024-08-23",
+          "exit": "2024-08-27",
+          "result": "LOSS",
+          "pnl": -5.5
+        },
+        {
+          "date": "2024-08-22",
+          "exit": "2024-08-23",
+          "result": "WIN",
+          "pnl": 7.1
+        },
+        {
+          "date": "2024-08-01",
+          "exit": "2024-08-22",
+          "result": "WIN",
+          "pnl": 6.2
+        },
+        {
+          "date": "2023-12-19",
+          "exit": "2023-12-20",
+          "result": "LOSS",
+          "pnl": -4.5
+        },
+        {
+          "date": "2023-10-19",
+          "exit": "2023-10-23",
+          "result": "LOSS",
+          "pnl": -4.5
+        },
+        {
+          "date": "2023-04-06",
+          "exit": "2023-04-25",
+          "result": "WIN",
+          "pnl": 10.9
+        },
+        {
+          "date": "2022-04-19",
+          "exit": "2022-05-09",
+          "result": "LOSS",
+          "pnl": -8.5
+        },
+        {
+          "date": "2022-04-18",
+          "exit": "2022-04-19",
+          "result": "WIN",
+          "pnl": 11.3
+        }
+      ]
+    }
+  },
+  {
+    "id": "BHEL-2026-05-28",
+    "date": "2026-05-28",
+    "symbol": "BHEL",
+    "entry": 422.35,
+    "qty": 55,
+    "target": 449.61,
+    "stop_loss": 404.18,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 40.0,
+      "trades": 10,
+      "log": [
+        {
+          "date": "2026-04-27",
+          "exit": "2026-05-04",
+          "result": "WIN",
+          "pnl": 8.3
+        },
+        {
+          "date": "2026-01-07",
+          "exit": "2026-01-08",
+          "result": "LOSS",
+          "pnl": -3.6
+        },
+        {
+          "date": "2025-11-11",
+          "exit": "2025-12-05",
+          "result": "LOSS",
+          "pnl": -4.2
+        },
+        {
+          "date": "2025-10-30",
+          "exit": "2025-11-11",
+          "result": "WIN",
+          "pnl": 5.2
+        },
+        {
+          "date": "2025-10-03",
+          "exit": "2025-10-13",
+          "result": "LOSS",
+          "pnl": -3.0
+        },
+        {
+          "date": "2025-09-11",
+          "exit": "2025-09-22",
+          "result": "WIN",
+          "pnl": 5.5
+        },
+        {
+          "date": "2024-05-21",
+          "exit": "2024-05-22",
+          "result": "LOSS",
+          "pnl": -6.8
+        },
+        {
+          "date": "2023-12-05",
+          "exit": "2023-12-21",
+          "result": "LOSS",
+          "pnl": -5.5
+        },
+        {
+          "date": "2023-09-08",
+          "exit": "2023-09-12",
+          "result": "LOSS",
+          "pnl": -6.8
+        },
+        {
+          "date": "2023-07-05",
+          "exit": "2023-07-25",
+          "result": "WIN",
+          "pnl": 6.2
+        }
+      ]
+    }
+  },
+  {
     "id": "ATGL-2026-05-28",
     "date": "2026-05-28",
     "symbol": "ATGL",
@@ -7,8 +163,8 @@
     "qty": 18,
     "target": 890.68,
     "stop_loss": 753.79,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -1595.9,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 41.2,
@@ -117,7 +273,11 @@
           "pnl": 10.2
         }
       ]
-    }
+    },
+    "current_price": 808.55,
+    "current_pnl": -0.0,
+    "exit_price": 719.8,
+    "exit_date": "2026-05-28"
   },
   {
     "id": "SAMMAANCAP-2026-05-28",
@@ -207,7 +367,9 @@
           "pnl": 6.7
         }
       ]
-    }
+    },
+    "current_price": 173.32,
+    "current_pnl": 0.0
   },
   {
     "id": "HFCL-2026-05-28",
@@ -291,7 +453,9 @@
           "pnl": -5.0
         }
       ]
-    }
+    },
+    "current_price": 173.92,
+    "current_pnl": -0.0
   },
   {
     "id": "OFSS-2026-05-27",
