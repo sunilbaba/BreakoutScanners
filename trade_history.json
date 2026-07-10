@@ -1,5 +1,83 @@
 [
   {
+    "id": "M&MFIN-2026-07-10",
+    "date": "2026-07-10",
+    "symbol": "M&MFIN",
+    "entry": 340.85,
+    "qty": 26,
+    "target": 396.51,
+    "stop_loss": 303.75,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 40.0,
+      "trades": 10,
+      "log": [
+        {
+          "date": "2025-10-29",
+          "exit": "2025-11-24",
+          "result": "WIN",
+          "pnl": 12.5
+        },
+        {
+          "date": "2025-10-15",
+          "exit": "2025-10-29",
+          "result": "WIN",
+          "pnl": 11.5
+        },
+        {
+          "date": "2024-12-03",
+          "exit": "2024-12-26",
+          "result": "LOSS",
+          "pnl": -7.8
+        },
+        {
+          "date": "2024-09-26",
+          "exit": "2024-10-04",
+          "result": "LOSS",
+          "pnl": -8.3
+        },
+        {
+          "date": "2023-12-14",
+          "exit": "2023-12-21",
+          "result": "LOSS",
+          "pnl": -7.8
+        },
+        {
+          "date": "2023-09-20",
+          "exit": "2023-10-09",
+          "result": "LOSS",
+          "pnl": -8.1
+        },
+        {
+          "date": "2023-06-16",
+          "exit": "2023-06-30",
+          "result": "WIN",
+          "pnl": 11.2
+        },
+        {
+          "date": "2023-06-02",
+          "exit": "2023-06-09",
+          "result": "LOSS",
+          "pnl": -6.0
+        },
+        {
+          "date": "2023-04-12",
+          "exit": "2023-05-08",
+          "result": "WIN",
+          "pnl": 14.0
+        },
+        {
+          "date": "2022-06-03",
+          "exit": "2022-06-20",
+          "result": "LOSS",
+          "pnl": -9.9
+        }
+      ]
+    }
+  },
+  {
     "id": "PRESTIGE-2026-07-10",
     "date": "2026-07-10",
     "symbol": "PRESTIGE",
@@ -39,7 +117,9 @@
           "pnl": -9.4
         }
       ]
-    }
+    },
+    "current_price": 1733.2,
+    "current_pnl": -0.0
   },
   {
     "id": "STARHEALTH-2026-07-10",
