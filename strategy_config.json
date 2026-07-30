@@ -1,11 +1,11 @@
 {
-  "updated": "2026-07-29",
+  "updated": "2026-07-30",
   "parameters": {
-    "strategy_type": "MACD_CROSS",
+    "strategy_type": "BREAKOUT",
     "trend_filter": "SMA50",
-    "adx_min": 25,
-    "sl_mult": 2.0,
-    "tgt_mult": 3.0,
-    "name": "Child-1560"
+    "adx_min": 15,
+    "sl_mult": 3.0,
+    "tgt_mult": 4.5,
+    "name": "Child-4616"
   }
 }
