@@ -1,11 +1,11 @@
 {
-  "updated": "2026-08-01",
+  "updated": "2026-08-02",
   "parameters": {
     "strategy_type": "BREAKOUT",
     "trend_filter": "SMA50",
     "adx_min": 15,
     "sl_mult": 2.0,
     "tgt_mult": 3.0,
-    "name": "Gen-5509"
+    "name": "Gen-2796"
   }
 }
