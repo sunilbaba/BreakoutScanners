@@ -1,5 +1,83 @@
 [
   {
+    "id": "HINDALCO-2026-08-12",
+    "date": "2026-08-12",
+    "symbol": "HINDALCO",
+    "entry": 1078.5,
+    "qty": 21,
+    "target": 1149.56,
+    "stop_loss": 1031.13,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 40.0,
+      "trades": 10,
+      "log": [
+        {
+          "date": "2026-01-28",
+          "exit": "2026-02-02",
+          "result": "LOSS",
+          "pnl": -4.8
+        },
+        {
+          "date": "2026-01-06",
+          "exit": "2026-01-08",
+          "result": "LOSS",
+          "pnl": -4.1
+        },
+        {
+          "date": "2026-01-01",
+          "exit": "2026-01-06",
+          "result": "WIN",
+          "pnl": 5.9
+        },
+        {
+          "date": "2025-10-27",
+          "exit": "2025-11-06",
+          "result": "LOSS",
+          "pnl": -3.9
+        },
+        {
+          "date": "2025-05-12",
+          "exit": "2025-06-02",
+          "result": "LOSS",
+          "pnl": -5.1
+        },
+        {
+          "date": "2024-09-24",
+          "exit": "2024-10-03",
+          "result": "WIN",
+          "pnl": 6.6
+        },
+        {
+          "date": "2024-08-26",
+          "exit": "2024-09-04",
+          "result": "LOSS",
+          "pnl": -5.6
+        },
+        {
+          "date": "2024-05-21",
+          "exit": "2024-06-04",
+          "result": "LOSS",
+          "pnl": -5.8
+        },
+        {
+          "date": "2024-03-22",
+          "exit": "2024-04-09",
+          "result": "WIN",
+          "pnl": 8.0
+        },
+        {
+          "date": "2022-07-22",
+          "exit": "2022-08-01",
+          "result": "WIN",
+          "pnl": 10.0
+        }
+      ]
+    }
+  },
+  {
     "id": "APARINDS-2026-08-12",
     "date": "2026-08-12",
     "symbol": "APARINDS",
@@ -117,7 +195,9 @@
           "pnl": 15.8
         }
       ]
-    }
+    },
+    "current_price": 18000.0,
+    "current_pnl": 0.0
   },
   {
     "id": "HAL-2026-08-12",
@@ -219,7 +299,9 @@
           "pnl": 8.5
         }
       ]
-    }
+    },
+    "current_price": 4995.0,
+    "current_pnl": 0.0
   },
   {
     "id": "ARE&M-2026-08-12",
