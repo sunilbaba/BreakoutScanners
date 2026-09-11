@@ -1,11 +1,11 @@
 {
-  "updated": "2026-09-10",
+  "updated": "2026-09-11",
   "parameters": {
     "strategy_type": "BREAKOUT",
     "trend_filter": "SMA50",
-    "adx_min": 15,
+    "adx_min": 25,
     "sl_mult": 2.0,
     "tgt_mult": 3.0,
-    "name": "Child-4021"
+    "name": "Child-9055"
   }
 }
