@@ -1,11 +1,11 @@
 {
-  "updated": "2026-09-24",
+  "updated": "2026-09-25",
   "parameters": {
-    "strategy_type": "MACD_CROSS",
-    "trend_filter": "SMA200",
+    "strategy_type": "BREAKOUT",
+    "trend_filter": "SMA50",
     "adx_min": 15,
-    "sl_mult": 3.0,
-    "tgt_mult": 4.5,
-    "name": "Child-8493"
+    "sl_mult": 2.0,
+    "tgt_mult": 3.0,
+    "name": "Gen-6284"
   }
 }
