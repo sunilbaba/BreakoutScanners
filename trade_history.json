@@ -7,8 +7,8 @@
     "qty": 4,
     "target": 2719.14,
     "stop_loss": 2190.57,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -1042.16,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 57.9,
@@ -129,7 +129,11 @@
           "pnl": 8.6
         }
       ]
-    }
+    },
+    "current_price": 2402.0,
+    "current_pnl": 0.0,
+    "exit_price": 2141.2,
+    "exit_date": "2026-09-29"
   },
   {
     "id": "SAIL-2026-09-28",
