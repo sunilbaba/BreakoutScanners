@@ -1,5 +1,83 @@
 [
   {
+    "id": "FEDERALBNK-2026-10-20",
+    "date": "2026-10-20",
+    "symbol": "FEDERALBNK",
+    "entry": 348.85,
+    "qty": 48,
+    "target": 379.71,
+    "stop_loss": 328.28,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 50.0,
+      "trades": 10,
+      "log": [
+        {
+          "date": "2026-06-03",
+          "exit": "2026-06-17",
+          "result": "WIN",
+          "pnl": 7.1
+        },
+        {
+          "date": "2025-12-15",
+          "exit": "2026-01-06",
+          "result": "LOSS",
+          "pnl": -3.4
+        },
+        {
+          "date": "2025-11-18",
+          "exit": "2025-11-25",
+          "result": "WIN",
+          "pnl": 4.9
+        },
+        {
+          "date": "2025-10-20",
+          "exit": "2025-11-18",
+          "result": "WIN",
+          "pnl": 6.6
+        },
+        {
+          "date": "2025-10-13",
+          "exit": "2025-10-20",
+          "result": "WIN",
+          "pnl": 5.5
+        },
+        {
+          "date": "2025-10-08",
+          "exit": "2025-10-13",
+          "result": "WIN",
+          "pnl": 5.1
+        },
+        {
+          "date": "2024-04-10",
+          "exit": "2024-04-16",
+          "result": "LOSS",
+          "pnl": -4.2
+        },
+        {
+          "date": "2024-02-15",
+          "exit": "2024-02-29",
+          "result": "LOSS",
+          "pnl": -5.0
+        },
+        {
+          "date": "2023-12-05",
+          "exit": "2023-12-21",
+          "result": "LOSS",
+          "pnl": -3.9
+        },
+        {
+          "date": "2023-11-13",
+          "exit": "2023-11-21",
+          "result": "LOSS",
+          "pnl": -4.1
+        }
+      ]
+    }
+  },
+  {
     "id": "FEDERALBNK-2026-10-19",
     "date": "2026-10-19",
     "symbol": "FEDERALBNK",
