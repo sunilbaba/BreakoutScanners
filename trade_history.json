@@ -7,8 +7,8 @@
     "qty": 48,
     "target": 379.71,
     "stop_loss": 328.28,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -986.37,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 50.0,
@@ -75,7 +75,11 @@
           "pnl": -4.1
         }
       ]
-    }
+    },
+    "current_price": 348.85,
+    "current_pnl": 0.0,
+    "exit_price": 328.28,
+    "exit_date": "2026-10-20"
   },
   {
     "id": "FEDERALBNK-2026-10-19",
