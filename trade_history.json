@@ -264,8 +264,8 @@
         }
       ]
     },
-    "current_price": 1184.1,
-    "current_pnl": -187.2
+    "current_price": 1190.0,
+    "current_pnl": -110.5
   },
   {
     "id": "JINDALSAW-2026-10-16",
@@ -462,8 +462,8 @@
         }
       ]
     },
-    "current_price": 746.8,
-    "current_pnl": -738.4
+    "current_price": 786.35,
+    "current_pnl": 289.9
   },
   {
     "id": "HBLENGINE-2026-10-16",
@@ -851,8 +851,8 @@
     "qty": 43,
     "target": 424.95,
     "stop_loss": 367.54,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -986.29,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 50.0,
@@ -932,8 +932,10 @@
         }
       ]
     },
-    "current_price": 375.65,
-    "current_pnl": -638.55
+    "current_price": 372.45,
+    "current_pnl": -776.15,
+    "exit_price": 367.54,
+    "exit_date": "2026-10-22"
   },
   {
     "id": "MRPL-2026-10-14",
@@ -1284,8 +1286,8 @@
         }
       ]
     },
-    "current_price": 1404.4,
-    "current_pnl": 964.6
+    "current_price": 1412.1,
+    "current_pnl": 1064.7
   },
   {
     "id": "BLUESTARCO-2026-10-13",
@@ -1382,8 +1384,8 @@
         }
       ]
     },
-    "current_price": 1547.8,
-    "current_pnl": -462.0
+    "current_price": 1565.6,
+    "current_pnl": -284.0
   },
   {
     "id": "KARURVYSYA-2026-10-13",
@@ -1680,8 +1682,8 @@
         }
       ]
     },
-    "current_price": 24880.0,
-    "current_pnl": 0.0
+    "current_price": 24415.0,
+    "current_pnl": -0.0
   },
   {
     "id": "DEEPAKFERT-2026-10-07",
@@ -1996,8 +1998,8 @@
         }
       ]
     },
-    "current_price": 338.2,
-    "current_pnl": -166.75
+    "current_price": 322.95,
+    "current_pnl": -609.0
   },
   {
     "id": "BBOX-2026-10-07",
@@ -2124,8 +2126,8 @@
         }
       ]
     },
-    "current_price": 898.2,
-    "current_pnl": 160.2
+    "current_price": 894.65,
+    "current_pnl": 117.6
   },
   {
     "id": "TRENT-2026-10-06",
@@ -2135,8 +2137,8 @@
     "qty": 6,
     "target": 3125.13,
     "stop_loss": 2759.91,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -875.66,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 50.0,
@@ -2240,8 +2242,10 @@
         }
       ]
     },
-    "current_price": 2812.1,
-    "current_pnl": -563.4
+    "current_price": 2762.3,
+    "current_pnl": -862.2,
+    "exit_price": 2759.91,
+    "exit_date": "2026-10-22"
   },
   {
     "id": "AETHER-2026-10-06",
@@ -2432,8 +2436,8 @@
         }
       ]
     },
-    "current_price": 294.9,
-    "current_pnl": -205.4
+    "current_price": 290.95,
+    "current_pnl": -517.45
   },
   {
     "id": "CYIENT-2026-10-05",
@@ -2578,8 +2582,8 @@
         }
       ]
     },
-    "current_price": 1165.0,
-    "current_pnl": 248.0
+    "current_price": 1150.8,
+    "current_pnl": 106.0
   },
   {
     "id": "ADANIENSOL-2026-10-01",
@@ -2640,8 +2644,8 @@
         }
       ]
     },
-    "current_price": 1327.9,
-    "current_pnl": 12.0
+    "current_price": 1316.8,
+    "current_pnl": -76.8
   },
   {
     "id": "AIAENG-2026-09-30",
@@ -2726,8 +2730,8 @@
         }
       ]
     },
-    "current_price": 3573.4,
-    "current_pnl": -591.2
+    "current_price": 3613.9,
+    "current_pnl": -510.2
   },
   {
     "id": "KIRLOSENG-2026-09-29",
@@ -3073,8 +3077,8 @@
     "qty": 23,
     "target": 554.34,
     "stop_loss": 449.44,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -964.11,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 66.7,
@@ -3100,8 +3104,10 @@
         }
       ]
     },
-    "current_price": 465.1,
-    "current_pnl": -604.9
+    "current_price": 440.5,
+    "current_pnl": -1170.7,
+    "exit_price": 449.44,
+    "exit_date": "2026-10-22"
   },
   {
     "id": "DIVISLAB-2026-09-23",
@@ -3974,8 +3980,8 @@
         }
       ]
     },
-    "current_price": 2000.6,
-    "current_pnl": -165.6
+    "current_price": 2012.0,
+    "current_pnl": -63.0
   },
   {
     "id": "EIHOTEL-2026-09-18",
@@ -10040,8 +10046,8 @@
         }
       ]
     },
-    "current_price": 4338.6,
-    "current_pnl": -369.1
+    "current_price": 4258.5,
+    "current_pnl": -449.2
   },
   {
     "id": "NAM-INDIA-2026-08-17",
@@ -11139,8 +11145,8 @@
     "qty": 11,
     "target": 1393.7,
     "stop_loss": 1166.87,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -997.03,
     "setup": "MACD Cross",
     "deep_dive": {
       "wr": 50.0,
@@ -11172,8 +11178,10 @@
         }
       ]
     },
-    "current_price": 1183.5,
-    "current_pnl": -815.1
+    "current_price": 1156.8,
+    "current_pnl": -1108.8,
+    "exit_price": 1166.87,
+    "exit_date": "2026-10-22"
   },
   {
     "id": "AAVAS-2026-08-13",
@@ -13972,8 +13980,8 @@
         }
       ]
     },
-    "current_price": 815.0,
-    "current_pnl": -763.2
+    "current_price": 815.5,
+    "current_pnl": -757.2
   },
   {
     "id": "GLENMARK-2026-08-06",
@@ -19488,8 +19496,8 @@
         }
       ]
     },
-    "current_price": 410.75,
-    "current_pnl": -493.0
+    "current_price": 398.35,
+    "current_pnl": -741.0
   },
   {
     "id": "DIXON-2026-07-16",
