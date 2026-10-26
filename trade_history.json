@@ -7,8 +7,8 @@
     "qty": 5,
     "target": 1865.42,
     "stop_loss": 1374.89,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": -1026.47,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 75.0,
@@ -39,7 +39,11 @@
           "pnl": 17.1
         }
       ]
-    }
+    },
+    "current_price": 1575.0,
+    "current_pnl": 19.5,
+    "exit_price": 1365.6,
+    "exit_date": "2026-10-26"
   },
   {
     "id": "FEDERALBNK-2026-10-20",
@@ -506,8 +510,8 @@
         }
       ]
     },
-    "current_price": 790.65,
-    "current_pnl": 401.7
+    "current_price": 795.5,
+    "current_pnl": 527.8
   },
   {
     "id": "HBLENGINE-2026-10-16",
@@ -1730,7 +1734,7 @@
         }
       ]
     },
-    "current_price": 23325.0,
+    "current_price": 23190.0,
     "current_pnl": -0.0
   },
   {
@@ -2636,8 +2640,8 @@
         }
       ]
     },
-    "current_price": 1237.4,
-    "current_pnl": 972.0
+    "current_price": 1242.9,
+    "current_pnl": 1027.0
   },
   {
     "id": "ADANIENSOL-2026-10-01",
@@ -2786,8 +2790,8 @@
         }
       ]
     },
-    "current_price": 3582.9,
-    "current_pnl": -572.2
+    "current_price": 3578.4,
+    "current_pnl": -581.2
   },
   {
     "id": "KIRLOSENG-2026-09-29",
@@ -4036,8 +4040,8 @@
         }
       ]
     },
-    "current_price": 2054.0,
-    "current_pnl": 315.0
+    "current_price": 2058.9,
+    "current_pnl": 359.1
   },
   {
     "id": "EIHOTEL-2026-09-18",
