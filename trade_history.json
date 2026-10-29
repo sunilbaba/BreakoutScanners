@@ -1,5 +1,281 @@
 [
   {
+    "id": "ACUTAAS-2026-10-29",
+    "date": "2026-10-29",
+    "symbol": "ACUTAAS",
+    "entry": 3976.7,
+    "qty": 2,
+    "target": 4686.79,
+    "stop_loss": 3503.31,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 50.0,
+      "trades": 6,
+      "log": [
+        {
+          "date": "2026-03-20",
+          "exit": "2026-04-02",
+          "result": "LOSS",
+          "pnl": -12.6
+        },
+        {
+          "date": "2026-01-28",
+          "exit": "2026-02-10",
+          "result": "WIN",
+          "pnl": 12.7
+        },
+        {
+          "date": "2025-02-01",
+          "exit": "2025-02-14",
+          "result": "LOSS",
+          "pnl": -12.6
+        },
+        {
+          "date": "2023-05-15",
+          "exit": "2023-06-09",
+          "result": "WIN",
+          "pnl": 12.0
+        },
+        {
+          "date": "2023-04-12",
+          "exit": "2023-04-24",
+          "result": "WIN",
+          "pnl": 11.9
+        },
+        {
+          "date": "2022-09-13",
+          "exit": "2022-09-22",
+          "result": "LOSS",
+          "pnl": -9.1
+        }
+      ]
+    }
+  },
+  {
+    "id": "ZENSARTECH-2026-10-29",
+    "date": "2026-10-29",
+    "symbol": "ZENSARTECH",
+    "entry": 537.3,
+    "qty": 17,
+    "target": 621.54,
+    "stop_loss": 481.14,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 53.3,
+      "trades": 15,
+      "log": [
+        {
+          "date": "2026-04-16",
+          "exit": "2026-04-24",
+          "result": "LOSS",
+          "pnl": -8.6
+        },
+        {
+          "date": "2025-09-17",
+          "exit": "2025-09-26",
+          "result": "LOSS",
+          "pnl": -6.2
+        },
+        {
+          "date": "2025-02-01",
+          "exit": "2025-02-14",
+          "result": "LOSS",
+          "pnl": -12.3
+        },
+        {
+          "date": "2025-01-23",
+          "exit": "2025-02-01",
+          "result": "WIN",
+          "pnl": 16.8
+        },
+        {
+          "date": "2024-11-06",
+          "exit": "2024-11-18",
+          "result": "LOSS",
+          "pnl": -8.3
+        },
+        {
+          "date": "2024-06-06",
+          "exit": "2024-06-21",
+          "result": "WIN",
+          "pnl": 17.0
+        },
+        {
+          "date": "2023-12-15",
+          "exit": "2023-12-20",
+          "result": "LOSS",
+          "pnl": -8.0
+        },
+        {
+          "date": "2023-11-20",
+          "exit": "2023-12-15",
+          "result": "WIN",
+          "pnl": 10.9
+        },
+        {
+          "date": "2023-07-14",
+          "exit": "2023-07-21",
+          "result": "WIN",
+          "pnl": 11.9
+        },
+        {
+          "date": "2023-05-15",
+          "exit": "2023-05-17",
+          "result": "LOSS",
+          "pnl": -9.2
+        },
+        {
+          "date": "2023-05-12",
+          "exit": "2023-05-15",
+          "result": "WIN",
+          "pnl": 12.3
+        },
+        {
+          "date": "2023-05-04",
+          "exit": "2023-05-12",
+          "result": "WIN",
+          "pnl": 11.0
+        },
+        {
+          "date": "2023-02-10",
+          "exit": "2023-02-22",
+          "result": "WIN",
+          "pnl": 14.7
+        },
+        {
+          "date": "2023-01-24",
+          "exit": "2023-02-08",
+          "result": "WIN",
+          "pnl": 12.1
+        },
+        {
+          "date": "2022-12-01",
+          "exit": "2022-12-19",
+          "result": "LOSS",
+          "pnl": -5.6
+        }
+      ]
+    }
+  },
+  {
+    "id": "CEMPRO-2026-10-29",
+    "date": "2026-10-29",
+    "symbol": "CEMPRO",
+    "entry": 1287.4,
+    "qty": 5,
+    "target": 1538.25,
+    "stop_loss": 1120.17,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 56.2,
+      "trades": 16,
+      "log": [
+        {
+          "date": "2026-07-03",
+          "exit": "2026-07-29",
+          "result": "LOSS",
+          "pnl": -10.3
+        },
+        {
+          "date": "2026-06-09",
+          "exit": "2026-07-03",
+          "result": "WIN",
+          "pnl": 19.8
+        },
+        {
+          "date": "2026-05-27",
+          "exit": "2026-06-09",
+          "result": "WIN",
+          "pnl": 17.9
+        },
+        {
+          "date": "2026-05-04",
+          "exit": "2026-05-18",
+          "result": "LOSS",
+          "pnl": -11.4
+        },
+        {
+          "date": "2026-04-30",
+          "exit": "2026-05-04",
+          "result": "WIN",
+          "pnl": 15.7
+        },
+        {
+          "date": "2026-04-08",
+          "exit": "2026-04-30",
+          "result": "WIN",
+          "pnl": 19.1
+        },
+        {
+          "date": "2025-09-16",
+          "exit": "2025-09-19",
+          "result": "LOSS",
+          "pnl": -8.6
+        },
+        {
+          "date": "2024-10-03",
+          "exit": "2024-10-22",
+          "result": "LOSS",
+          "pnl": -13.2
+        },
+        {
+          "date": "2024-06-07",
+          "exit": "2024-06-27",
+          "result": "WIN",
+          "pnl": 22.4
+        },
+        {
+          "date": "2024-06-03",
+          "exit": "2024-06-04",
+          "result": "LOSS",
+          "pnl": -10.7
+        },
+        {
+          "date": "2023-11-13",
+          "exit": "2023-12-01",
+          "result": "WIN",
+          "pnl": 16.7
+        },
+        {
+          "date": "2023-08-10",
+          "exit": "2023-09-01",
+          "result": "WIN",
+          "pnl": 15.1
+        },
+        {
+          "date": "2023-07-31",
+          "exit": "2023-08-10",
+          "result": "WIN",
+          "pnl": 11.9
+        },
+        {
+          "date": "2022-12-06",
+          "exit": "2022-12-21",
+          "result": "LOSS",
+          "pnl": -8.8
+        },
+        {
+          "date": "2022-11-07",
+          "exit": "2022-11-10",
+          "result": "LOSS",
+          "pnl": -9.0
+        },
+        {
+          "date": "2022-08-19",
+          "exit": "2022-09-01",
+          "result": "WIN",
+          "pnl": 15.7
+        }
+      ]
+    }
+  },
+  {
     "id": "FSL-2026-10-28",
     "date": "2026-10-28",
     "symbol": "FSL",
@@ -69,7 +345,9 @@
           "pnl": 7.9
         }
       ]
-    }
+    },
+    "current_price": 306.45,
+    "current_pnl": -45.0
   },
   {
     "id": "LAURUSLABS-2026-10-28",
@@ -159,7 +437,9 @@
           "pnl": -7.0
         }
       ]
-    }
+    },
+    "current_price": 2244.0,
+    "current_pnl": 372.6
   },
   {
     "id": "COHANCE-2026-10-27",
@@ -250,8 +530,8 @@
         }
       ]
     },
-    "current_price": 476.05,
-    "current_pnl": -76.8
+    "current_price": 481.35,
+    "current_pnl": 50.4
   },
   {
     "id": "ACUTAAS-2026-10-27",
@@ -352,8 +632,8 @@
         }
       ]
     },
-    "current_price": 1650.0,
-    "current_pnl": -128.0
+    "current_price": 1663.0,
+    "current_pnl": -63.0
   },
   {
     "id": "MRPL-2026-10-27",
@@ -426,8 +706,8 @@
         }
       ]
     },
-    "current_price": 172.9,
-    "current_pnl": -654.77
+    "current_price": 173.24,
+    "current_pnl": -640.83
   },
   {
     "id": "ATHERENERG-2026-10-26",
@@ -940,8 +1220,8 @@
         }
       ]
     },
-    "current_price": 805.2,
-    "current_pnl": 780.0
+    "current_price": 810.0,
+    "current_pnl": 904.8
   },
   {
     "id": "HBLENGINE-2026-10-16",
@@ -2164,8 +2444,8 @@
         }
       ]
     },
-    "current_price": 24005.0,
-    "current_pnl": -0.0
+    "current_price": 24700.0,
+    "current_pnl": 0.0
   },
   {
     "id": "DEEPAKFERT-2026-10-07",
@@ -2935,8 +3215,8 @@
     "qty": 10,
     "target": 1282.66,
     "stop_loss": 1140.2,
-    "status": "OPEN",
-    "net_pnl": 0,
+    "status": "LOSS",
+    "net_pnl": 0.0,
     "setup": "Breakout",
     "deep_dive": {
       "wr": 52.4,
@@ -3070,8 +3350,10 @@
         }
       ]
     },
-    "current_price": 1156.7,
-    "current_pnl": 165.0
+    "current_price": 1144.6,
+    "current_pnl": 44.0,
+    "exit_price": 1140.2,
+    "exit_date": "2026-10-29"
   },
   {
     "id": "ADANIENSOL-2026-10-01",
@@ -3220,8 +3502,8 @@
         }
       ]
     },
-    "current_price": 3608.0,
-    "current_pnl": -522.0
+    "current_price": 3637.5,
+    "current_pnl": -463.0
   },
   {
     "id": "KIRLOSENG-2026-09-29",
