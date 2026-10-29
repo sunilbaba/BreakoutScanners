@@ -1,5 +1,101 @@
 [
   {
+    "id": "DLF-2026-10-29",
+    "date": "2026-10-29",
+    "symbol": "DLF",
+    "entry": 694.35,
+    "qty": 23,
+    "target": 756.98,
+    "stop_loss": 652.6,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 46.2,
+      "trades": 13,
+      "log": [
+        {
+          "date": "2026-08-31",
+          "exit": "2026-09-02",
+          "result": "LOSS",
+          "pnl": -5.4
+        },
+        {
+          "date": "2025-09-16",
+          "exit": "2025-09-24",
+          "result": "LOSS",
+          "pnl": -4.9
+        },
+        {
+          "date": "2025-05-15",
+          "exit": "2025-06-02",
+          "result": "WIN",
+          "pnl": 13.5
+        },
+        {
+          "date": "2024-03-04",
+          "exit": "2024-03-12",
+          "result": "LOSS",
+          "pnl": -6.1
+        },
+        {
+          "date": "2024-02-07",
+          "exit": "2024-03-04",
+          "result": "WIN",
+          "pnl": 11.3
+        },
+        {
+          "date": "2023-12-14",
+          "exit": "2024-01-04",
+          "result": "WIN",
+          "pnl": 8.5
+        },
+        {
+          "date": "2023-12-04",
+          "exit": "2023-12-14",
+          "result": "WIN",
+          "pnl": 7.1
+        },
+        {
+          "date": "2023-10-06",
+          "exit": "2023-10-26",
+          "result": "LOSS",
+          "pnl": -6.0
+        },
+        {
+          "date": "2023-06-13",
+          "exit": "2023-06-23",
+          "result": "LOSS",
+          "pnl": -5.4
+        },
+        {
+          "date": "2023-04-18",
+          "exit": "2023-05-15",
+          "result": "WIN",
+          "pnl": 9.8
+        },
+        {
+          "date": "2023-04-06",
+          "exit": "2023-04-18",
+          "result": "WIN",
+          "pnl": 10.2
+        },
+        {
+          "date": "2022-12-01",
+          "exit": "2022-12-19",
+          "result": "LOSS",
+          "pnl": -5.0
+        },
+        {
+          "date": "2022-09-01",
+          "exit": "2022-09-23",
+          "result": "LOSS",
+          "pnl": -6.9
+        }
+      ]
+    }
+  },
+  {
     "id": "ACUTAAS-2026-10-29",
     "date": "2026-10-29",
     "symbol": "ACUTAAS",
@@ -51,7 +147,9 @@
           "pnl": -9.1
         }
       ]
-    }
+    },
+    "current_price": 3976.7,
+    "current_pnl": -0.0
   },
   {
     "id": "ZENSARTECH-2026-10-29",
@@ -159,7 +257,9 @@
           "pnl": -5.6
         }
       ]
-    }
+    },
+    "current_price": 537.3,
+    "current_pnl": -0.0
   },
   {
     "id": "CEMPRO-2026-10-29",
@@ -273,7 +373,9 @@
           "pnl": 15.7
         }
       ]
-    }
+    },
+    "current_price": 1287.4,
+    "current_pnl": 0.0
   },
   {
     "id": "FSL-2026-10-28",
