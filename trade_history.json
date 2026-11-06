@@ -1,5 +1,305 @@
 [
   {
+    "id": "ANGELONE-2026-11-06",
+    "date": "2026-11-06",
+    "symbol": "ANGELONE",
+    "entry": 331.0,
+    "qty": 67,
+    "target": 375.4,
+    "stop_loss": 301.4,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 43.8,
+      "trades": 16,
+      "log": [
+        {
+          "date": "2026-04-06",
+          "exit": "2026-04-10",
+          "result": "WIN",
+          "pnl": 16.9
+        },
+        {
+          "date": "2026-02-10",
+          "exit": "2026-02-16",
+          "result": "LOSS",
+          "pnl": -10.2
+        },
+        {
+          "date": "2026-01-16",
+          "exit": "2026-01-23",
+          "result": "LOSS",
+          "pnl": -7.8
+        },
+        {
+          "date": "2025-10-13",
+          "exit": "2025-11-07",
+          "result": "WIN",
+          "pnl": 10.9
+        },
+        {
+          "date": "2025-04-03",
+          "exit": "2025-04-07",
+          "result": "LOSS",
+          "pnl": -9.3
+        },
+        {
+          "date": "2024-12-05",
+          "exit": "2024-12-20",
+          "result": "LOSS",
+          "pnl": -9.6
+        },
+        {
+          "date": "2024-10-15",
+          "exit": "2024-10-25",
+          "result": "LOSS",
+          "pnl": -12.8
+        },
+        {
+          "date": "2024-08-20",
+          "exit": "2024-09-09",
+          "result": "LOSS",
+          "pnl": -11.7
+        },
+        {
+          "date": "2024-08-19",
+          "exit": "2024-08-20",
+          "result": "WIN",
+          "pnl": 15.9
+        },
+        {
+          "date": "2024-01-08",
+          "exit": "2024-01-16",
+          "result": "LOSS",
+          "pnl": -9.3
+        },
+        {
+          "date": "2023-12-15",
+          "exit": "2024-01-05",
+          "result": "WIN",
+          "pnl": 15.3
+        },
+        {
+          "date": "2023-10-31",
+          "exit": "2023-11-15",
+          "result": "WIN",
+          "pnl": 17.5
+        },
+        {
+          "date": "2023-09-27",
+          "exit": "2023-10-13",
+          "result": "WIN",
+          "pnl": 13.5
+        },
+        {
+          "date": "2023-08-31",
+          "exit": "2023-09-13",
+          "result": "LOSS",
+          "pnl": -7.5
+        },
+        {
+          "date": "2023-05-31",
+          "exit": "2023-06-13",
+          "result": "WIN",
+          "pnl": 12.0
+        },
+        {
+          "date": "2022-10-14",
+          "exit": "2022-11-11",
+          "result": "LOSS",
+          "pnl": -11.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "MAHABANK-2026-11-06",
+    "date": "2026-11-06",
+    "symbol": "MAHABANK",
+    "entry": 86.91,
+    "qty": 277,
+    "target": 97.71,
+    "stop_loss": 79.71,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 53.8,
+      "trades": 13,
+      "log": [
+        {
+          "date": "2026-08-26",
+          "exit": "2026-09-15",
+          "result": "LOSS",
+          "pnl": -6.1
+        },
+        {
+          "date": "2026-04-17",
+          "exit": "2026-05-06",
+          "result": "WIN",
+          "pnl": 14.3
+        },
+        {
+          "date": "2026-02-24",
+          "exit": "2026-03-09",
+          "result": "LOSS",
+          "pnl": -6.8
+        },
+        {
+          "date": "2026-01-01",
+          "exit": "2026-01-23",
+          "result": "WIN",
+          "pnl": 7.4
+        },
+        {
+          "date": "2025-09-17",
+          "exit": "2025-09-26",
+          "result": "LOSS",
+          "pnl": -5.1
+        },
+        {
+          "date": "2023-08-14",
+          "exit": "2023-09-11",
+          "result": "WIN",
+          "pnl": 14.0
+        },
+        {
+          "date": "2023-07-19",
+          "exit": "2023-08-11",
+          "result": "WIN",
+          "pnl": 16.1
+        },
+        {
+          "date": "2023-07-06",
+          "exit": "2023-07-14",
+          "result": "LOSS",
+          "pnl": -6.9
+        },
+        {
+          "date": "2022-12-14",
+          "exit": "2022-12-21",
+          "result": "LOSS",
+          "pnl": -13.9
+        },
+        {
+          "date": "2022-11-21",
+          "exit": "2022-12-14",
+          "result": "WIN",
+          "pnl": 17.3
+        },
+        {
+          "date": "2022-11-04",
+          "exit": "2022-11-21",
+          "result": "WIN",
+          "pnl": 15.1
+        },
+        {
+          "date": "2022-10-21",
+          "exit": "2022-11-04",
+          "result": "WIN",
+          "pnl": 10.5
+        },
+        {
+          "date": "2022-09-14",
+          "exit": "2022-09-26",
+          "result": "LOSS",
+          "pnl": -7.5
+        }
+      ]
+    }
+  },
+  {
+    "id": "BAJFINANCE-2026-11-06",
+    "date": "2026-11-06",
+    "symbol": "BAJFINANCE",
+    "entry": 1087.75,
+    "qty": 24,
+    "target": 1211.85,
+    "stop_loss": 1005.02,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 58.3,
+      "trades": 12,
+      "log": [
+        {
+          "date": "2026-07-07",
+          "exit": "2026-07-31",
+          "result": "WIN",
+          "pnl": 8.1
+        },
+        {
+          "date": "2026-06-16",
+          "exit": "2026-07-07",
+          "result": "WIN",
+          "pnl": 10.3
+        },
+        {
+          "date": "2025-09-04",
+          "exit": "2025-09-15",
+          "result": "WIN",
+          "pnl": 8.9
+        },
+        {
+          "date": "2025-03-21",
+          "exit": "2025-04-07",
+          "result": "LOSS",
+          "pnl": -6.1
+        },
+        {
+          "date": "2025-01-28",
+          "exit": "2025-02-03",
+          "result": "WIN",
+          "pnl": 9.7
+        },
+        {
+          "date": "2024-08-28",
+          "exit": "2024-09-02",
+          "result": "WIN",
+          "pnl": 5.4
+        },
+        {
+          "date": "2024-01-04",
+          "exit": "2024-01-17",
+          "result": "LOSS",
+          "pnl": -5.1
+        },
+        {
+          "date": "2023-12-18",
+          "exit": "2023-12-22",
+          "result": "LOSS",
+          "pnl": -3.8
+        },
+        {
+          "date": "2023-09-06",
+          "exit": "2023-09-26",
+          "result": "WIN",
+          "pnl": 6.3
+        },
+        {
+          "date": "2023-07-04",
+          "exit": "2023-07-10",
+          "result": "LOSS",
+          "pnl": -5.1
+        },
+        {
+          "date": "2023-06-13",
+          "exit": "2023-07-04",
+          "result": "WIN",
+          "pnl": 4.7
+        },
+        {
+          "date": "2022-09-20",
+          "exit": "2022-09-26",
+          "result": "LOSS",
+          "pnl": -6.0
+        }
+      ]
+    }
+  },
+  {
     "id": "PNB-2026-11-05",
     "date": "2026-11-05",
     "symbol": "PNB",
@@ -69,7 +369,9 @@
           "pnl": 14.9
         }
       ]
-    }
+    },
+    "current_price": 126.55,
+    "current_pnl": 109.8
   },
   {
     "id": "CEATLTD-2026-11-05",
@@ -141,7 +443,9 @@
           "pnl": 7.3
         }
       ]
-    }
+    },
+    "current_price": 3545.8,
+    "current_pnl": 520.8
   },
   {
     "id": "PAYTM-2026-11-05",
@@ -201,7 +505,9 @@
           "pnl": 18.4
         }
       ]
-    }
+    },
+    "current_price": 1794.4,
+    "current_pnl": 166.4
   },
   {
     "id": "HINDPETRO-2026-11-04",
@@ -292,8 +598,8 @@
         }
       ]
     },
-    "current_price": 380.05,
-    "current_pnl": 479.5
+    "current_price": 387.15,
+    "current_pnl": 728.0
   },
   {
     "id": "KIMS-2026-11-04",
@@ -384,8 +690,8 @@
         }
       ]
     },
-    "current_price": 731.05,
-    "current_pnl": -180.5
+    "current_price": 723.0,
+    "current_pnl": -333.45
   },
   {
     "id": "LICI-2026-11-04",
@@ -446,8 +752,8 @@
         }
       ]
     },
-    "current_price": 408.0,
-    "current_pnl": 0.0
+    "current_price": 394.0,
+    "current_pnl": -616.0
   },
   {
     "id": "WELSPUNLIV-2026-11-03",
@@ -550,8 +856,8 @@
         }
       ]
     },
-    "current_price": 253.33,
-    "current_pnl": 7.2
+    "current_price": 241.3,
+    "current_pnl": -353.7
   },
   {
     "id": "KPRMILL-2026-11-03",
@@ -654,8 +960,8 @@
         }
       ]
     },
-    "current_price": 1167.3,
-    "current_pnl": 58.4
+    "current_price": 1164.4,
+    "current_pnl": 35.2
   },
   {
     "id": "INDHOTEL-2026-11-03",
@@ -664,7 +970,7 @@
     "entry": 836.05,
     "qty": 17,
     "target": 922.66,
-    "stop_loss": 778.31,
+    "stop_loss": 836.05,
     "status": "OPEN",
     "net_pnl": 0,
     "setup": "Breakout",
@@ -710,8 +1016,8 @@
         }
       ]
     },
-    "current_price": 875.0,
-    "current_pnl": 662.15
+    "current_price": 888.0,
+    "current_pnl": 883.15
   },
   {
     "id": "PETRONET-2026-11-02",
@@ -888,8 +1194,8 @@
         }
       ]
     },
-    "current_price": 748.85,
-    "current_pnl": -39.1
+    "current_price": 748.2,
+    "current_pnl": -50.15
   },
   {
     "id": "ZYDUSLIFE-2026-10-30",
@@ -968,8 +1274,8 @@
         }
       ]
     },
-    "current_price": 1193.0,
-    "current_pnl": -577.5
+    "current_price": 1197.9,
+    "current_pnl": -523.6
   },
   {
     "id": "DIVISLAB-2026-10-30",
@@ -978,7 +1284,7 @@
     "entry": 9780.0,
     "qty": 1,
     "target": 10758.48,
-    "stop_loss": 9127.68,
+    "stop_loss": 9780.0,
     "status": "OPEN",
     "net_pnl": 0,
     "setup": "Breakout",
@@ -1042,8 +1348,8 @@
         }
       ]
     },
-    "current_price": 10140.5,
-    "current_pnl": 360.5
+    "current_price": 10320.5,
+    "current_pnl": 540.5
   },
   {
     "id": "DLF-2026-10-29",
@@ -1140,8 +1446,8 @@
         }
       ]
     },
-    "current_price": 745.2,
-    "current_pnl": 1169.55
+    "current_price": 752.9,
+    "current_pnl": 1346.65
   },
   {
     "id": "ACUTAAS-2026-10-29",
@@ -1196,8 +1502,8 @@
         }
       ]
     },
-    "current_price": 3770.8,
-    "current_pnl": -411.8
+    "current_price": 3786.6,
+    "current_pnl": -380.2
   },
   {
     "id": "ZENSARTECH-2026-10-29",
@@ -1306,8 +1612,8 @@
         }
       ]
     },
-    "current_price": 565.75,
-    "current_pnl": 483.65
+    "current_price": 568.8,
+    "current_pnl": 535.5
   },
   {
     "id": "CEMPRO-2026-10-29",
@@ -1422,8 +1728,8 @@
         }
       ]
     },
-    "current_price": 1287.4,
-    "current_pnl": 0.0
+    "current_price": 1323.3,
+    "current_pnl": 179.5
   },
   {
     "id": "FSL-2026-10-28",
@@ -1496,8 +1802,8 @@
         }
       ]
     },
-    "current_price": 289.15,
-    "current_pnl": -564.0
+    "current_price": 293.65,
+    "current_pnl": -429.0
   },
   {
     "id": "LAURUSLABS-2026-10-28",
@@ -1786,8 +2092,8 @@
         }
       ]
     },
-    "current_price": 1778.6,
-    "current_pnl": 515.0
+    "current_price": 1821.7,
+    "current_pnl": 730.5
   },
   {
     "id": "MRPL-2026-10-27",
@@ -1860,8 +2166,8 @@
         }
       ]
     },
-    "current_price": 173.73,
-    "current_pnl": -620.74
+    "current_price": 175.67,
+    "current_pnl": -541.2
   },
   {
     "id": "ATHERENERG-2026-10-26",
@@ -3600,7 +3906,7 @@
         }
       ]
     },
-    "current_price": 24325.0,
+    "current_price": 24335.0,
     "current_pnl": -0.0
   },
   {
