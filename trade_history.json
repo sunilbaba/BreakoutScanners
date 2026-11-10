@@ -1,5 +1,269 @@
 [
   {
+    "id": "SHYAMMETL-2026-11-10",
+    "date": "2026-11-10",
+    "symbol": "SHYAMMETL",
+    "entry": 1320.5,
+    "qty": 19,
+    "target": 1472.02,
+    "stop_loss": 1219.49,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 42.9,
+      "trades": 14,
+      "log": [
+        {
+          "date": "2026-02-09",
+          "exit": "2026-02-24",
+          "result": "LOSS",
+          "pnl": -6.8
+        },
+        {
+          "date": "2025-10-03",
+          "exit": "2025-10-07",
+          "result": "LOSS",
+          "pnl": -5.2
+        },
+        {
+          "date": "2025-05-15",
+          "exit": "2025-05-26",
+          "result": "LOSS",
+          "pnl": -6.6
+        },
+        {
+          "date": "2025-04-02",
+          "exit": "2025-04-04",
+          "result": "LOSS",
+          "pnl": -6.5
+        },
+        {
+          "date": "2024-07-01",
+          "exit": "2024-07-10",
+          "result": "LOSS",
+          "pnl": -6.3
+        },
+        {
+          "date": "2024-01-29",
+          "exit": "2024-02-09",
+          "result": "LOSS",
+          "pnl": -7.5
+        },
+        {
+          "date": "2024-01-01",
+          "exit": "2024-01-29",
+          "result": "WIN",
+          "pnl": 10.6
+        },
+        {
+          "date": "2023-12-21",
+          "exit": "2024-01-01",
+          "result": "WIN",
+          "pnl": 12.1
+        },
+        {
+          "date": "2023-12-06",
+          "exit": "2023-12-21",
+          "result": "WIN",
+          "pnl": 9.1
+        },
+        {
+          "date": "2023-10-12",
+          "exit": "2023-10-23",
+          "result": "LOSS",
+          "pnl": -5.3
+        },
+        {
+          "date": "2023-08-08",
+          "exit": "2023-08-09",
+          "result": "WIN",
+          "pnl": 9.8
+        },
+        {
+          "date": "2023-07-17",
+          "exit": "2023-08-08",
+          "result": "WIN",
+          "pnl": 9.6
+        },
+        {
+          "date": "2023-06-14",
+          "exit": "2023-06-28",
+          "result": "WIN",
+          "pnl": 8.7
+        },
+        {
+          "date": "2023-01-02",
+          "exit": "2023-01-06",
+          "result": "LOSS",
+          "pnl": -7.1
+        }
+      ]
+    }
+  },
+  {
+    "id": "ABCAPITAL-2026-11-10",
+    "date": "2026-11-10",
+    "symbol": "ABCAPITAL",
+    "entry": 401.65,
+    "qty": 78,
+    "target": 440.06,
+    "stop_loss": 376.04,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 46.2,
+      "trades": 13,
+      "log": [
+        {
+          "date": "2025-12-09",
+          "exit": "2025-12-16",
+          "result": "LOSS",
+          "pnl": -4.4
+        },
+        {
+          "date": "2025-06-17",
+          "exit": "2025-06-26",
+          "result": "WIN",
+          "pnl": 8.6
+        },
+        {
+          "date": "2025-05-21",
+          "exit": "2025-06-10",
+          "result": "WIN",
+          "pnl": 11.1
+        },
+        {
+          "date": "2024-10-01",
+          "exit": "2024-10-04",
+          "result": "LOSS",
+          "pnl": -5.5
+        },
+        {
+          "date": "2024-04-02",
+          "exit": "2024-04-24",
+          "result": "WIN",
+          "pnl": 10.5
+        },
+        {
+          "date": "2024-01-04",
+          "exit": "2024-01-23",
+          "result": "LOSS",
+          "pnl": -4.7
+        },
+        {
+          "date": "2023-06-12",
+          "exit": "2023-06-23",
+          "result": "LOSS",
+          "pnl": -4.4
+        },
+        {
+          "date": "2023-05-08",
+          "exit": "2023-05-11",
+          "result": "LOSS",
+          "pnl": -4.7
+        },
+        {
+          "date": "2022-12-05",
+          "exit": "2022-12-21",
+          "result": "LOSS",
+          "pnl": -5.9
+        },
+        {
+          "date": "2022-11-29",
+          "exit": "2022-12-05",
+          "result": "WIN",
+          "pnl": 9.0
+        },
+        {
+          "date": "2022-11-25",
+          "exit": "2022-11-29",
+          "result": "WIN",
+          "pnl": 9.0
+        },
+        {
+          "date": "2022-10-27",
+          "exit": "2022-11-07",
+          "result": "WIN",
+          "pnl": 7.0
+        },
+        {
+          "date": "2022-09-12",
+          "exit": "2022-09-23",
+          "result": "LOSS",
+          "pnl": -5.1
+        }
+      ]
+    }
+  },
+  {
+    "id": "SONACOMS-2026-11-10",
+    "date": "2026-11-10",
+    "symbol": "SONACOMS",
+    "entry": 924.0,
+    "qty": 30,
+    "target": 1023.73,
+    "stop_loss": 857.51,
+    "status": "OPEN",
+    "net_pnl": 0,
+    "setup": "Breakout",
+    "deep_dive": {
+      "wr": 50.0,
+      "trades": 8,
+      "log": [
+        {
+          "date": "2026-09-23",
+          "exit": "2026-10-01",
+          "result": "LOSS",
+          "pnl": -5.4
+        },
+        {
+          "date": "2026-07-30",
+          "exit": "2026-08-10",
+          "result": "WIN",
+          "pnl": 8.8
+        },
+        {
+          "date": "2026-01-28",
+          "exit": "2026-02-03",
+          "result": "WIN",
+          "pnl": 8.8
+        },
+        {
+          "date": "2024-05-31",
+          "exit": "2024-06-04",
+          "result": "LOSS",
+          "pnl": -6.7
+        },
+        {
+          "date": "2023-08-22",
+          "exit": "2023-08-23",
+          "result": "LOSS",
+          "pnl": -4.9
+        },
+        {
+          "date": "2023-07-25",
+          "exit": "2023-07-28",
+          "result": "LOSS",
+          "pnl": -4.7
+        },
+        {
+          "date": "2023-07-19",
+          "exit": "2023-07-25",
+          "result": "WIN",
+          "pnl": 6.2
+        },
+        {
+          "date": "2023-05-08",
+          "exit": "2023-05-12",
+          "result": "WIN",
+          "pnl": 9.0
+        }
+      ]
+    }
+  },
+  {
     "id": "UNOMINDA-2026-11-09",
     "date": "2026-11-09",
     "symbol": "UNOMINDA",
@@ -51,7 +315,9 @@
           "pnl": -7.9
         }
       ]
-    }
+    },
+    "current_price": 1353.8,
+    "current_pnl": 0.0
   },
   {
     "id": "LAURUSLABS-2026-11-09",
@@ -141,7 +407,9 @@
           "pnl": -7.0
         }
       ]
-    }
+    },
+    "current_price": 2454.0,
+    "current_pnl": 0.0
   },
   {
     "id": "SBIN-2026-11-09",
@@ -201,7 +469,9 @@
           "pnl": -4.2
         }
       ]
-    }
+    },
+    "current_price": 1042.0,
+    "current_pnl": 0.0
   },
   {
     "id": "ANGELONE-2026-11-06",
